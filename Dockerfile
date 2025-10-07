@@ -1,4 +1,4 @@
-# ROS 2 Humble Dockerfile with MoveIt 2
+# ROS 2 Humble Dockerfile with MoveIt 2 and UR driver
 FROM ros:humble-ros-base
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install MoveIt 2
+# Install MoveIt 2 + UR driver
 RUN apt-get update && apt-get install -y \
     ros-$ROS_DISTRO-moveit \
     ros-$ROS_DISTRO-moveit-ros-planning \
