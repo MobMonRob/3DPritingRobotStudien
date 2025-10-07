@@ -1,0 +1,29 @@
+% frontpage
+\input{document/frontmatter/titlepage.tex}
+% quote
+\input{document/frontmatter/quote.tex}
+\pagenumbering{Roman}
+% declaration of authorship
+\input{document/frontmatter/affidavit.tex}
+% equality clause
+\input{document/frontmatter/equalityClause.tex}
+% abstract (German)
+\input{document/frontmatter/abstract_ger.tex}
+% abstract (English)
+\input{document/frontmatter/abstract_eng.tex}
+% ai declaration
+\input{document/frontmatter/ai_declaration.tex}
+% table of contents
+\setcounter{tocdepth}{2}
+\tableofcontents
+% abbreviations
+\input{document/frontmatter/abbreviations.tex}
+% list of figures
+\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+\listoffigures
+% list of tables
+\addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+\listoftables
+% list of listings
+\addcontentsline{toc}{chapter}{Quellcodeverzeichnis}
+\lstlistoflistings

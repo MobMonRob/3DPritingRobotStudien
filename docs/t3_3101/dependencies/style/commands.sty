@@ -1,0 +1,30 @@
+% general commands
+\newcommand{\Titel}{Prototypische Entwicklung eines 6-Achs-Slicers für nichtplanare, robotergestützte additive Fertigung}
+\newcommand{\Autor}{Adrian Gabriel Axtmann, Ben Stahl und Nik Wachsmann}
+\newcommand{\Kursbezeichnung}{TINF23B3}
+\newcommand{\Betreuer}{Prof. Dr. Marcus Strand}
+\newcommand{\Was}{T3\_3101}
+\newcommand{\Dauer}{30.06.2025 - 15.09.2025}
+\newcommand{\AbgabeDatum}{15. September 2025}
+\newcommand{\Abschluss}{Bachelor of Science}
+\newcommand{\Studiengang}{Informatik/Informationstechnik}
+\newcommand{\FirmenLogo}{\includegraphics[width=2cm]{dependencies/pictures/dmTECH_Logo.png}}
+\newcommand{\DHBWLogo}{\includegraphics[width=4cm]{dependencies/pictures/dhbw_Logo.png}}
+
+% define counter
+\newcounter{savepage}
+
+% define counters
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+\AtBeginDocument{\counterwithout{lstlisting}{chapter}}
+\makeatletter
+\renewcommand{\l@lstlisting}[2]{\@dottedtocline{1}{0em}{1.5em}{#1}{#2}}
+\makeatother
+
+% define name of list of listings
+\renewcommand{\lstlistingname}{Quellcode}
+\renewcommand{\lstlistlistingname}{Quellcodeverzeichnis}
+
+% define toc
+\cftsetpnumwidth{2em}

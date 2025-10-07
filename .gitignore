@@ -1,0 +1,35 @@
+# Build
+*build*/
+
+# MacOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# LaTeX
+*.aux
+*.bbl*
+*.bcf*
+*.blg
+*.fdb_latexmk
+*.fls
+*.gz
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.run.xml
+*.synctex*
+*.toc
+docs/t3_3101/dependencies/style/studentId.sty
+docs/t3_3101/*.pdf

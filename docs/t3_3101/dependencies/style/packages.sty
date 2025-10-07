@@ -1,0 +1,84 @@
+% define packages and their options
+\usepackage[utf8 % set encoding to Unicode UTF-8
+            ]{inputenc} % packet for specifiying the input encoding: https://ctan.org/pkg/inputenc?lang=de
+
+\usepackage[ngerman % set language to n(ew)german
+            ]{babel} % package for language support: https://ctan.org/pkg/babel?lang=de
+
+\usepackage[autostyle=true, % automatically style the quotes
+            german=guillemets % set the quotes to german guillemets
+            ]{csquotes} % package for quoting: https://ctan.org/pkg/csquotes?lang=de
+
+\usepackage{tikz} % package for creating graphics: https://ctan.org/pkg/pgf?lang=de
+
+\usepackage{graphicx} % package for including graphics: https://ctan.org/pkg/graphicx?lang=de
+
+\usepackage[T1 % set font encoding to T1
+            ]{fontenc} % package for font encoding: https://ctan.org/pkg/fontenc?lang=de
+
+% TODO: change color of internallinks, urls, citations and file links
+\usepackage[colorlinks=true, % colors the links instead of using boxe
+            linkcolor=dmTECHcolor, % set the color of internal links
+            urlcolor=dmTECHcolor, % set the color of URLs
+            citecolor=dmTECHcolor, % set the color of citations
+            filecolor=dmTECHcolor, % set the color of file links
+            % linkbordercolor=dmTECHcolor, % set the color of the link border (only active with colorlinks=false)
+            bookmarks=true, % create bookmarks
+            bookmarksopen=true, % open the bookmarks
+            bookmarksnumbered=true, % add section numbers to the bookmarks
+            unicode=true, % allows to use characters of non-latin based languages in  bookmarks
+            pdftoolbar=true, % show toolbar
+            pdfnewwindow=true, % open links in a new window
+            pdfstartview={FitV}, % set the zoom level to fit the width of the page
+            ]{hyperref} % package for hyperlinks: https://ctan.org/pkg/hyperref?lang=de
+
+\usepackage{amsmath} % package for math: https://ctan.org/pkg/amsmath?lang=de
+
+\usepackage[table % can be used to color tables
+            ]{xcolor} % package for color support: https://ctan.org/pkg/xcolor?lang=de
+
+\usepackage{listings} % package for code listings: https://ctan.org/pkg/listings?lang=de
+
+\usepackage{pgf-umlcd} % package for UML diagrams: https://ctan.org/pkg/pgf-umlcd?lang=de
+
+\usepackage{imakeidx} % package for creating indexes: https://ctan.org/pkg/imakeidx?lang=de
+\makeindex % create the index
+
+\usepackage[nonumberlist, % suppress the associated number lists in the glossaries
+            nopostdot % suppress the dot after the glossary entry
+            ]{glossaries} % package for glossaries: https://ctan.org/pkg/glossaries?lang=de
+
+\usepackage[style=numeric, % set the style of the bibliography
+            ]{biblatex}% package for bibliography: https://ctan.org/pkg/biblatex?lang=de
+\bibliography{dependencies/sources/literature.bib} % set the bibliography file for the literature
+\bibliography{dependencies/sources/pictures.bib} % set the bibliography file for the pictures
+\bibliography{dependencies/sources/code.bib} % set the bibliography file for the code
+
+\usepackage[printonlyused, % only print used acronyms
+            withpage % print the page number where the acronym is first used
+            ]{acronym} % package for acronyms: https://ctan.org/pkg/acronym?lang=de
+
+\usepackage{pdfpages} % package for including pdfs: https://ctan.org/pkg/pdfpages?lang=de
+
+\usepackage{lmodern} % package for using the Latin Modern font: https://ctan.org/pkg/lm?lang=de
+
+\usepackage[headings % set the page layout to headings
+            ]{fullpage} % package for setting the page layout: https://ctan.org/pkg/fullpage?lang=de
+
+\usepackage{microtype} % package for micro-typographic extensions: https://ctan.org/pkg/microtype?lang=de
+
+\usepackage{wrapfig} % package for wrapping text around figures: https://ctan.org/pkg/wrapfig?lang=de
+
+\usepackage{cleveref} % package for clever references: https://ctan.org/pkg/cleveref?lang=de
+
+\usepackage{lipsum} % package for generating dummy text: https://ctan.org/pkg/lipsum?lang=de
+
+\usepackage{fancyhdr} % package for customizing headers and footers: https://ctan.org/pkg/fancyhdr?lang=de
+
+\usepackage{chngcntr} % package for changing the counter: https://ctan.org/pkg/chngcntr?lang=de
+
+\usepackage[titles]{tocloft} % package for customizing table of contents: https://ctan.org/pkg/tocloft?lang=de
+
+\usepackage{float} % package for floating objects: https://ctan.org/pkg/float?lang=de
+
+\usepackage{setspace} % package for setting the line spacing: https://ctan.org/pkg/setspace?lang=de

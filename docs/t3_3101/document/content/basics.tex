@@ -1,0 +1,26 @@
+\chapter{Theoretische Grundlagen}\label{ch:theoreticalFoundations}
+    \section{Kundenstammdatenverwaltung}\label{sec:customerDataManagement}
+        \lipsum[1]  \autocite[vgl. S.4-8]{Database.Springer.0}
+        \ac{dm}
+        \glspl{API}
+
+\begin{lstlisting}[style=xmlStyle, caption={Beispiel eines Liquibase Changesets \autocite{liquibaseExample}}, label={lst:liquibaseChangesetExample}, firstnumber=1]
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog  xmlns_ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                    xmlns_pro="https://www.liquibase.org/xml/ns/pro"
+                    xmlns_xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi_schemaLocation="https://www.liquibase.org/xml/ns/dbchangelog-ext">
+   <preConditions> 
+       <dbms  type="oracle"/> 
+       <runningAs  username="SYSTEM"/> 
+   </preConditions> 
+ 
+   <changeSet  id="1"  author="bob"> 
+       <preConditions  onFail="WARN"> 
+           <sqlCheck  expectedResult="0">select count(*) from oldtable</sqlCheck> 
+       </preConditions> 
+       <comment>Comments should go after preCondition. If they are before then liquibase usually gives error.</comment> 
+       <dropTable  tableName="oldtable"/> 
+   </changeSet> 
+</databaseChangeLog>
+\end{lstlisting}

@@ -1,0 +1,2 @@
+add_subdirectory(kronosTests)
+add_subdirectory(medusaTests)

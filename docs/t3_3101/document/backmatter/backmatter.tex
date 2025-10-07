@@ -1,0 +1,20 @@
+\cleardoublepage
+\pagenumbering{Roman}
+\setcounter{page}{\thesavepage}
+% bibliography
+\printbibliography[heading=bibintoc, title={Literaturquellen}, notkeyword={picture}, notkeyword={code}]
+\printbibliography[heading=bibintoc, title={Bilderquellen}, keyword={picture}]
+\printbibliography[heading=bibintoc, title={Codequellen}, keyword={code}]
+\nocite{*}
+% glossary
+\addcontentsline{toc}{chapter}{Glossar}
+\glsaddall
+\printglossary
+% index
+% \addcontentsline{toc}{chapter}{Index}
+% \index{generate}
+% \printindex
+% attachments
+\chapter*{Anhang}\label{chap:attachments}
+  \addcontentsline{toc}{chapter}{Anhang}
+  \input{document/backmatter/attachments.tex}
