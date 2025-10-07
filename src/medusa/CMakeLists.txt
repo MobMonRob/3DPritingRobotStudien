@@ -1,5 +1,5 @@
-add_library(medusa STATIC
-        medusa.cpp
+add_library(Medusa STATIC
+        Medusa.cpp
         Medusa.hpp
 )
 

@@ -1,11 +1,11 @@
 add_executable(
-        kronosTestDummy
-        kronosTestDummy.cpp
+        KronosTestDummy
+        KronosTestDummy.cpp
 )
 
 target_link_libraries(
-        kronosTestDummy
-        kronos
+        KronosTestDummy
+        Kronos
 )
 
-add_test(NAME kronosTestDummy COMMAND kronosTestDummy)
+add_test(NAME KronosTestDummy COMMAND KronosTestDummy)

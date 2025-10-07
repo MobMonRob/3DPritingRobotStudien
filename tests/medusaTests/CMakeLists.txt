@@ -1,11 +1,11 @@
 add_executable(
-        medusaTestDummy
-        medusaTestDummy.cpp
+        MedusaTestDummy
+        MedusaTestDummy.cpp
 )
 
 target_link_libraries(
-        medusaTestDummy
-        medusa
+        MedusaTestDummy
+        Medusa
 )
 
-add_test(NAME medusaTestDummy COMMAND medusaTestDummy)
+add_test(NAME MedusaTestDummy COMMAND MedusaTestDummy)

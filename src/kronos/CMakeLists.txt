@@ -1,5 +1,5 @@
-add_library(kronos STATIC
-        kronos.cpp
+add_library(Kronos STATIC
+        Kronos.cpp
         Kronos.hpp
 )
 
