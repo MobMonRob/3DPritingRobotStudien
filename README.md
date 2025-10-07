@@ -21,9 +21,8 @@ specialized core libraries and their test suites:
 
 ## Prerequisites
 
-- CMake ≥ 4.0.0
+- CMake ≥ 3.22.1
 - A C++17 compatible compiler (e.g., GCC, Clang, MSVC)
-- doxygen (for generating documentation)
 - A recent Clang/LLVM toolchain
 - Ninja (optional but recommended for faster builds)
 
@@ -46,24 +45,6 @@ docker compose build
 docker compose run ros
 ```
 
-3. Your workspace is mounted at `/ros_ws` inside the container, so all changes persist on your host system.
-
-4. ROS 2 environment is automatically sourced, so `ros2` commands and workspace builds work out-of-the-box.
-
-### Create a C++ ROS 2 Package
-
-Inside the container:
-
-```bash
-cd /ros_ws/src
-ros2 pkg create --build-type ament_cmake my_robot_node --dependencies rclcpp
-cd /ros_ws
-colcon build --symlink-install
-ros2 run my_robot_node <your_node>
-```
-
-This allows you to develop and run ROS 2 nodes directly in the container without manual environment setup.
-
 ## Tests
 
 Run tests via CTest:
@@ -82,10 +63,13 @@ ctest --test-dir cmake-build-debug --output-on-failure
 Additionally, we enforce CamelCase for class names and camelBack for method/function names.
 
 ## Formatting
+
 A `.clang-format` configuration is available to ensure consistent code style.
 
 ## Documentation
+
 See `docs/` for detailed information about:
+
 - Thesis materials and research notes
 - Code documentation generated with Doxygen
 
