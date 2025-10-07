@@ -1,4 +1,4 @@
-# T3_3000 Research Project
+# T3_3101 Research Project
 
 This directory contains the complete LaTeX sources and supporting materials for the student thesis on advanced 3D printing robotics.
 

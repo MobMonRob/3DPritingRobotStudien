@@ -1,0 +1,8 @@
+services:
+  ros:
+    build: .
+    container_name: ros2
+    volumes:
+      - ./:/ros_ws
+    tty: true
+    stdin_open: true
