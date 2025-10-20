@@ -2,4 +2,6 @@
 
 class Kronos
 {
+public:
+    explicit Kronos();
 };

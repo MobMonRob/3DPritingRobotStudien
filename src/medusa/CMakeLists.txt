@@ -3,6 +3,11 @@ add_library(Medusa STATIC
         Medusa.hpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_link_libraries(Medusa PUBLIC
+        Kronos
+        spdlog::spdlog
+)
+
+target_include_directories(Medusa PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )

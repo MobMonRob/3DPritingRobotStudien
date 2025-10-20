@@ -1,6 +1,9 @@
-#include <iostream>
+#include "Atlas.hpp"
+#include <spdlog/spdlog.h>
 
-int main() {
-    std::cout << "Hello World" << std::endl;
+int main()
+{
+    Atlas::initLogger(spdlog::level::debug);
+
     return 0;
 }

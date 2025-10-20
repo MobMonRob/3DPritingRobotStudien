@@ -7,6 +7,11 @@ project(Slicer
         DESCRIPTION "6D-Slicer"
 )
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(spdlog REQUIRED)
+
 include(CTest)
 
 add_subdirectory(src)

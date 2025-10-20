@@ -2,4 +2,6 @@
 
 class Medusa
 {
+public:
+    explicit Medusa();
 };

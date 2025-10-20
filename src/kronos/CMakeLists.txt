@@ -3,6 +3,11 @@ add_library(Kronos STATIC
         Kronos.hpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_link_libraries(Kronos PUBLIC
+        Medusa
+        spdlog::spdlog
+)
+
+target_include_directories(Kronos PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
