@@ -36,9 +36,5 @@ RUN rosdep update
 WORKDIR /ros_ws
 RUN mkdir -p src
 
-# Automatically source ROS 2 and workspace on container start
-RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
-RUN echo "source /ros_ws/install/setup.bash" >> ~/.bashrc
-
 # Start interactive bash
 CMD ["bash"]
