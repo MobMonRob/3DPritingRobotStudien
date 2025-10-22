@@ -1,5 +1,5 @@
 # ROS 2 Humble Dockerfile with MoveIt 2 and UR driver
-FROM ros:humble-ros-base-jammy
+FROM docker.io/ros:humble-ros-base-jammy
 #FROM osrf/ros:humble-desktop-jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
