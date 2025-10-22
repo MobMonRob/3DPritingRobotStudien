@@ -4,6 +4,17 @@ services:
     container_name: ros2
     volumes:
       - ./:/ros_ws
+      - /tmp/.X11-unix:/tmp/.X11-unix                # X11 socket for XWayland apps
+      - /run/user/${UID}/wayland-0:/run/user/${UID}/wayland-0 # Wayland socket
+      - /etc/machine-id:/etc/machine-id:ro
+      - /usr/share/glvnd:/usr/share/glvnd:ro         # optional, for OpenGL
+    environment:
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/run/user/${UID}
+      - QT_QPA_PLATFORM=wayland;xcb                  # allows both Wayland and X11 apps
+    devices:
+      - /dev/dri:/dev/dri                           # GPU access for OpenGL
     tty: true
     stdin_open: true
     ports:
