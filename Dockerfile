@@ -1,5 +1,6 @@
 # ROS 2 Humble Dockerfile with MoveIt 2 and UR driver
-FROM ros:humble-ros-base
+FROM ros:humble-ros-base-jammy
+#FROM osrf/ros:humble-desktop-jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_DISTRO=humble
@@ -19,13 +20,8 @@ RUN apt-get update && apt-get install -y \
 
 # Install MoveIt 2 + UR driver
 RUN apt-get update && apt-get install -y \
+    ros-$ROS_DISTRO-desktop \
     ros-$ROS_DISTRO-moveit \
-    ros-$ROS_DISTRO-moveit-ros-planning \
-    ros-$ROS_DISTRO-moveit-ros-planning-interface \
-    ros-$ROS_DISTRO-moveit-ros-visualization \
-    ros-$ROS_DISTRO-moveit-ros-move-group \
-    ros-$ROS_DISTRO-moveit-ros-perception \
-    ros-$ROS_DISTRO-moveit-resources-panda-description \
     ros-$ROS_DISTRO-ur \
     && rm -rf /var/lib/apt/lists/*
 
