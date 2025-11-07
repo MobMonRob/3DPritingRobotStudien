@@ -84,3 +84,8 @@ RUN sudo rosdep update && rosdep install -r --from-paths . --ignore-src --rosdis
 
 WORKDIR /home/developer/ws_moveit
 RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --mixin release"
+
+WORKDIR /home/developer/ws_moveit/src
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && ros2 pkg create kronos --build-type ament_cmake --dependencies rclcpp moveit_ros_planning_interface"
+RUN rm -rf /home/developer/ws_moveit/src/kronos/*
+
