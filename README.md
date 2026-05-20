@@ -15,7 +15,7 @@
 
 ## Structure
 
-\`\`\`
+```
 .
 ├── kronos/
 ├── medusa/
@@ -24,4 +24,4 @@
     ├── progressreport/
     ├── paper/
     └── progressreportpresentation/
-\`\`\`
+```
