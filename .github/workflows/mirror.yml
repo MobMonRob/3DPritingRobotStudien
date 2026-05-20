@@ -1,0 +1,66 @@
+name: Mirror GitLab Repos
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout monorepo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name  "gitlab-mirror-bot"
+          git config user.email "actions@github.com"
+
+      - name: Sync all GitLab repos
+        run: |
+          set -e
+
+          # Format: "ZIELORDNER|GITLAB-URL"
+          REPOS=(
+            "kronos|https://gitlab.com/t3_3101/kronos.git"
+            "medusa|https://gitlab.com/t3_3101/medusa.git"
+            "docs/finalpresentation|https://gitlab.com/t3_3101/docs/finalpresentation.git"
+            "docs/progressreport|https://gitlab.com/t3_3101/docs/progressreport.git"
+            "docs/paper|https://gitlab.com/t3_3101/docs/paper.git"
+            "docs/progressreportpresentation|https://gitlab.com/t3_3101/docs/progressreportpresentation.git"
+          )
+
+          TMP=$(mktemp -d)
+
+          for entry in "${REPOS[@]}"; do
+            DEST="${entry%%|*}"
+            URL="${entry##*|}"
+            NAME=$(basename "$DEST")
+
+            echo "::group::Sync $DEST  <-  $URL"
+
+            git clone --depth=1 "$URL" "$TMP/$NAME"
+            rm -rf "$TMP/$NAME/.git"
+
+            rm -rf "$DEST"
+            mkdir -p "$(dirname "$DEST")"
+            mv "$TMP/$NAME" "$DEST"
+
+            echo "::endgroup::"
+          done
+
+      - name: Commit & push if changed
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen – nichts zu pushen."
+          else
+            git commit -m "chore: sync from GitLab ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git push origin HEAD
+          fi
