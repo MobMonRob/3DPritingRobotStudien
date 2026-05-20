@@ -1,0 +1,6 @@
+Rc files read:
+  .latexmkrc
+Latexmk: This is Latexmk, John Collins, 15 June 2025. Version 4.87.
+Latexmk: Nothing to do for 'T3_3101.tex'.
+Latexmk: All targets (T3_3101.pdf) are up-to-date
+

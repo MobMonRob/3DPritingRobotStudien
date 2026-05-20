@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+
+.claude
+
+/*build*/
+
+imgui.ini
+
+.DS_Store
+
+docs/doxygen/html/
+docs/doxygen/latex/
+public/

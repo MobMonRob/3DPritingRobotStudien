@@ -1,0 +1,23 @@
+{
+    "name": "UR3e ROS2 Development",
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
+    "service": "ur3e-dev",
+    "workspaceFolder": "/ros2_ws",
+    "shutdownAction": "stopCompose",
+    "initializeCommand": "bash ${localWorkspaceFolder}/scripts/prepare-x11.sh",
+    "privileged": true,
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ranch-hand-robotics.rde-pack",
+                "ms-vscode.vscode-json",
+                "ms-python.python",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+    "postCreateCommand": "bash -lc 'if [ -f ./install/setup.bash ]; then source ./install/setup.bash && echo \"DevContainer ready. ROS2 sourced from install/setup.bash\"; else echo \"install/setup.bash not found\"; fi'"
+}

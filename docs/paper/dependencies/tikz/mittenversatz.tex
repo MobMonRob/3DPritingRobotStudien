@@ -1,0 +1,106 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=0.95,
+    every node/.style={font=\small},
+]
+    % ===========================================
+    % PANEL A: Ohne Mittenversatz (links)
+    % ===========================================
+    \begin{scope}[xshift=0cm]
+        % Titel
+        \node[font=\bfseries, anchor=south] at (1, 5)
+            {(a) An Schichtgrenzen};
+
+        % Aufbauachse a
+        \draw[->, thick] (-0.7, -0.3) -- (-0.7, 4.3)
+            node[above, font=\scriptsize] {$\vec{a}$};
+
+        % Bauteil (Querschnitt) - Hoehe 3.7 t
+        \fill[gray!15] (0, 0) rectangle (1.5, 3.7);
+        \draw[thick] (0, 0) rectangle (1.5, 3.7);
+
+        % a_min / a_max Markierungen
+        \draw[dotted, thin] (0, 0) -- (-0.85, 0);
+        \node[anchor=east, font=\scriptsize] at (-0.85, 0) {$a_{\min}$};
+        \draw[dotted, thin] (0, 3.7) -- (-0.85, 3.7);
+        \node[anchor=east, font=\scriptsize] at (-0.85, 3.7) {$a_{\max}$};
+
+        % Schichtgrenzen-Hilfslinien
+        \foreach \i in {1,2,3} {
+            \draw[gray!40, dotted, very thin] (-0.3, \i) -- (2.3, \i);
+        }
+
+        % Schnittebenen (an Schichtgrenzen)
+        \foreach \y/\i in {0/0, 1/1, 2/2, 3/3} {
+            \draw[blue!70!black, very thick] (-0.1, \y) -- (1.6, \y);
+            \node[blue!70!black, anchor=west, font=\scriptsize]
+                at (1.65, \y) {$a_{\i}$};
+        }
+
+        % Nicht erfasster Bereich
+        \fill[red!25] (0, 3) rectangle (1.5, 3.7);
+        \draw[red!70!black, thick] (0, 3) rectangle (1.5, 3.7);
+
+        % Annotation des fehlenden Fragments
+        \node[red!80!black, anchor=south, font=\scriptsize, align=center]
+            at (0.75, 4.0) {fehlende Schicht\\($0{,}7\,t$)};
+
+        % Formel
+        \node[font=\scriptsize, anchor=north] at (0.75, -0.6)
+            {$a_i = a_{\min} + i \cdot t$};
+    \end{scope}
+
+    % ===========================================
+    % PANEL B: Mit Mittenversatz (rechts)
+    % ===========================================
+    \begin{scope}[xshift=6cm]
+        % Titel
+        \node[font=\bfseries, anchor=south] at (1, 5)
+            {(b) Mit Mittenversatz};
+
+        % Aufbauachse a
+        \draw[->, thick] (-0.7, -0.3) -- (-0.7, 4.3)
+            node[above, font=\scriptsize] {$\vec{a}$};
+
+        % Bauteil
+        \fill[gray!15] (0, 0) rectangle (1.5, 3.7);
+        \draw[thick] (0, 0) rectangle (1.5, 3.7);
+
+        % a_min / a_max
+        \draw[dotted, thin] (0, 0) -- (-0.85, 0);
+        \node[anchor=east, font=\scriptsize] at (-0.85, 0) {$a_{\min}$};
+        \draw[dotted, thin] (0, 3.7) -- (-0.85, 3.7);
+        \node[anchor=east, font=\scriptsize] at (-0.85, 3.7) {$a_{\max}$};
+
+        % Schichtgrenzen-Hilfslinien
+        \foreach \i in {0,1,2,3,4} {
+            \draw[gray!40, dotted, very thin] (-0.3, \i) -- (2.3, \i);
+        }
+
+        % Schnittebenen (mittig)
+        \foreach \y/\i in {0.5/0, 1.5/1, 2.5/2, 3.5/3} {
+            \draw[green!50!black, very thick] (-0.1, \y) -- (1.6, \y);
+            \node[green!50!black, anchor=west, font=\scriptsize]
+                at (1.65, \y) {$a_{\i}$};
+        }
+
+        % Bewusst akzeptierter Restbereich (klein)
+        \fill[gray!40] (0, 3.5) rectangle (1.5, 3.7);
+
+        % Annotation
+        \node[gray!60!black, anchor=south, font=\scriptsize, align=center]
+            at (0.75, 4.0) {$<\tfrac{t}{2}$ (akzeptiert)};
+
+        % t/2 und t Bemassung innerhalb des Bauteils
+        \draw[<->, thin, blue!70!black] (0.15, 0) -- (0.15, 0.5);
+        \node[anchor=west, font=\scriptsize, blue!70!black]
+            at (0.18, 0.25) {$\tfrac{t}{2}$};
+        \draw[<->, thin, blue!70!black] (0.15, 0.5) -- (0.15, 1.5);
+        \node[anchor=west, font=\scriptsize, blue!70!black]
+            at (0.18, 1.0) {$t$};
+
+        % Formel
+        \node[font=\scriptsize, anchor=north] at (0.75, -0.6)
+            {$a_i = a_{\min} + (i+\tfrac{1}{2}) \cdot t$};
+    \end{scope}
+\end{tikzpicture}

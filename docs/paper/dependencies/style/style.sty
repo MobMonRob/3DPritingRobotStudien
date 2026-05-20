@@ -1,0 +1,381 @@
+% general colors
+\definecolor{dmTECHcolor}{RGB}{75,55,140}
+\definecolor{dmColor1}{RGB}{31,54,133}
+\definecolor{dmColor2}{RGB}{254,199,0}
+\definecolor{dmColor3}{RGB}{227,6,19}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{chaptercolor}{RGB}{40,40,40}
+\definecolor{rulecolor}{RGB}{100,100,100}
+
+\definecolor{viridisLow}{RGB}{68, 1, 84}
+\definecolor{viridisMid}{RGB}{33, 145, 140}
+\definecolor{viridisHigh}{RGB}{253, 231, 37}
+
+% set hyperref link colors (colors must be defined before this)
+\hypersetup{
+  linkcolor=dmColor1,
+  urlcolor=dmColor1,
+  citecolor=dmColor1,
+  filecolor=dmColor1
+}
+
+% PDF metadata — deferred because \Titel etc. are defined in commands.sty (loaded later)
+\AtBeginDocument{%
+  \hypersetup{
+    pdftitle={\Titel},
+    pdfauthor={\Autor},
+    pdfsubject={\Studiengang{} -- \Abschluss},
+    pdfkeywords={Additive Fertigung, 6-Achs-Slicer, nichtplanare Fertigung, Roboter}
+  }%
+}
+
+% UML colors
+\renewcommand{\umltextcolor}{black}
+\renewcommand{\umlfillcolor}{backcolour}
+\renewcommand{\umldrawcolor}{black}
+
+% reference styles
+\crefformat{part}          {Teil #2#1#3}               % part
+\crefformat{chapter}       {Kapitel #2#1#3}            % chap
+\crefformat{section}       {Abschnitt #2#1#3}          % sec
+\crefformat{subsection}    {Abschnitt #2#1#3}          % subsec
+\crefformat{subsubsection} {Abschnitt #2#1#3}          % subsubsec
+\crefformat{paragraph}     {Absatz #2#1#3}             % para
+\crefformat{subparagraph}  {Unterabsatz #2#1#3}        % subpara
+\crefformat{figure}        {Abbildung #2#1#3}          % fig
+\crefformat{table}         {Tabelle #2#1#3}            % tab
+\crefformat{equation}      {Gleichung #2#1#3}          % eq
+\crefformat{theorem}       {Satz #2#1#3}               % thm
+\crefformat{lemma}         {Lemma #2#1#3}              % lem
+\crefformat{corollary}     {Korollar #2#1#3}           % cor
+\crefformat{proposition}   {Proposition #2#1#3}        % prop
+\crefformat{definition}    {Definition #2#1#3}         % def
+\crefformat{example}       {Beispiel #2#1#3}           % ex
+\crefformat{appendix}      {Anhang #2#1#3}             % app
+\crefformat{footnote}      {Fußnote #2#1#3}            % fn
+\crefformat{page}          {Seite #2#1#3}              % page
+\crefformat{algorithm}     {Algorithmus #2#1#3}        % alg
+\crefformat{remark}        {Bemerkung #2#1#3}          % rem
+\crefformat{conjecture}    {Vermutung #2#1#3}          % conj
+\crefformat{proof}         {Beweis #2#1#3}             % proof
+\crefformat{exercise}      {Übung #2#1#3}              % exer
+\crefformat{property}      {Eigenschaft #2#1#3}        % prop
+\crefformat{note}          {Notiz #2#1#3}              % note
+\crefformat{listing}       {Quellcode #2#1#3}         % listing
+
+% ============================================================
+% LINE SPACING
+% ============================================================
+\setstretch{1.15} % professional line spacing for readability
+
+% ============================================================
+% CHAPTER HEADINGS (titlesec)
+% ============================================================
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\color{chaptercolor}}     % format
+  {\chaptertitlename\ \thechapter}                      % label
+  {8pt}                                                 % sep between label and title
+  {\huge}                                               % before-code
+  [\vspace{4pt}{\titlerule[0.8pt]}]                     % after-code: rule below title
+
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\Large\bfseries\color{chaptercolor}}     % format for unnumbered chapters
+  {}                                                    % no label
+  {0pt}                                                 % sep
+  {\huge}                                               % before-code
+  [\vspace{4pt}{\titlerule[0.8pt]}]                     % after-code
+
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}  % left, before, after
+
+% section styling
+\titleformat{\section}
+  {\normalfont\large\bfseries\color{chaptercolor}}
+  {\thesection}{0.7em}{}
+
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}{0.7em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape}
+  {\thesubsubsection}{0.7em}{}
+
+% ============================================================
+% WIDOW/ORPHAN CONTROL — prevent single lines at page top/bottom
+% ============================================================
+\widowpenalty=10000
+\clubpenalty=10000
+
+% ============================================================
+% PAGE LAYOUT — HEADERS & FOOTERS
+% ============================================================
+\setlength{\headheight}{15pt}
+
+% redefine marks BEFORE pagestyle so they take effect
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+% main page style for content
+\fancypagestyle{main}{%
+  \fancyhf{}%
+  \fancyhead[L]{\small\nouppercase{\leftmark}}%
+  \fancyhead[R]{\small\nouppercase{\rightmark}}%
+  \fancyfoot[C]{\small\thepage}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+% plain pages (chapter openings, TOC, etc.) — page number only
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyfoot[C]{\small\thepage}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+\pagestyle{main}
+
+% =============================================================================
+%  Listings: Sprachdefinitionen und Styles
+% =============================================================================
+
+% --- Custom-Sprachen ----------------------------------------------------------
+% listings kennt CMake, Dockerfile und XML nicht ab Werk.
+% Die folgenden Sprachen sind eigene Definitionen.
+
+\lstdefinelanguage{CMake}{
+  morekeywords={
+    add_executable, add_library, add_subdirectory, add_definitions,
+    add_compile_definitions, add_compile_options, add_custom_command,
+    add_custom_target, add_dependencies, add_test,
+    cmake_minimum_required, cmake_policy, project, include, set, unset,
+    option, message, find_package, find_library, find_path, find_program,
+    if, else, elseif, endif, foreach, endforeach, while, endwhile,
+    function, endfunction, macro, endmacro, return, break, continue,
+    target_link_libraries, target_include_directories,
+    target_compile_features, target_compile_definitions,
+    target_compile_options, target_sources, target_link_options,
+    install, export, configure_file, file, list, string, math,
+    FetchContent_Declare, FetchContent_MakeAvailable,
+    FetchContent_GetProperties, FetchContent_Populate,
+    enable_testing, get_filename_component, get_target_property,
+    set_target_properties, set_property
+  },
+  morekeywords=[2]{
+    PUBLIC, PRIVATE, INTERFACE, STATIC, SHARED, MODULE, ALIAS, IMPORTED,
+    REQUIRED, QUIET, EXACT, COMPONENTS,
+    CMAKE_CURRENT_SOURCE_DIR, CMAKE_SOURCE_DIR, CMAKE_BINARY_DIR,
+    CMAKE_CURRENT_BINARY_DIR, CMAKE_BUILD_TYPE, CMAKE_CXX_STANDARD,
+    PROJECT_NAME, PROJECT_SOURCE_DIR
+  },
+  sensitive=false,
+  morecomment=[l]{\#},
+  morestring=[b]",
+  alsoletter={_:},
+  alsodigit={-}
+}
+
+\lstdefinelanguage{Dockerfile}{
+  morekeywords={
+    FROM, RUN, CMD, LABEL, EXPOSE, ENV, ADD, COPY, ENTRYPOINT,
+    VOLUME, USER, WORKDIR, ARG, ONBUILD, STOPSIGNAL, HEALTHCHECK,
+    SHELL, AS
+  },
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]"
+}
+
+\lstdefinelanguage{XML}{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  morecomment=[s]{<!--}{-->},
+  morekeywords={xmlns, version, type, encoding},
+  alsoletter={:},
+  alsodigit={-}
+}
+
+% --- Globaler Style (einzige Definition) -------------------------------------
+
+\lstdefinestyle{globalStyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegray}\itshape,
+  keywordstyle=\color{codepurple}\bfseries,
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codegreen},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=true,
+  breaklines=true,
+  captionpos=b,
+  frame=single,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  % UTF-8 und Umlaute
+  extendedchars=true,
+  inputencoding=utf8,
+  literate=
+    {ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+    {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+    {ß}{{\ss}}1 {€}{{\euro}}1
+    {–}{{--}}1 {—}{{---}}1,
+  % Umbruchmarker und stabile Zeichenabstaende
+  postbreak=\mbox{\textcolor{codegray}{$\hookrightarrow$}\space},
+  columns=fullflexible,
+  upquote=true
+}
+
+% --- Sprachspezifische Styles ------------------------------------------------
+
+\lstdefinestyle{pythonStyle}{
+  style=globalStyle,
+  language=Python
+}
+
+\lstdefinestyle{sqlStyle}{
+  style=globalStyle,
+  language=SQL
+}
+
+\lstdefinestyle{javaStyle}{
+  style=globalStyle,
+  language=Java
+}
+
+\lstdefinestyle{htmlStyle}{
+  style=globalStyle,
+  language=HTML
+}
+
+\lstdefinestyle{xmlStyle}{
+  style=globalStyle,
+  language=XML
+}
+
+\lstdefinestyle{cppStyle}{
+  style=globalStyle,
+  language=C++,
+  morekeywords={
+    constexpr, consteval, constinit, requires, concept,
+    co_await, co_yield, co_return, char8_t, char16_t, char32_t,
+    nullptr, override, final, noexcept, decltype, alignas, alignof,
+    std, glm, Eigen, igl
+  }
+}
+
+\lstdefinestyle{glslStyle}{
+  style=globalStyle,
+  language=C,
+  morekeywords={
+    vec2, vec3, vec4, mat2, mat3, mat4,
+    sampler2D, sampler3D, samplerCube,
+    in, out, inout, uniform, layout, attribute, varying, discard,
+    gl_Position, gl_FragColor, gl_FragCoord, gl_VertexID, gl_InstanceID,
+    mix, clamp, smoothstep, normalize, dot, cross, length,
+    reflect, refract, texture, texture2D
+  }
+}
+
+\lstdefinestyle{jsonStyle}{
+  style=globalStyle,
+  morestring=[b]",
+  literate=
+    *{0}{{{\color{codepurple}0}}}{1}
+     {1}{{{\color{codepurple}1}}}{1}
+     {2}{{{\color{codepurple}2}}}{1}
+     {3}{{{\color{codepurple}3}}}{1}
+     {4}{{{\color{codepurple}4}}}{1}
+     {5}{{{\color{codepurple}5}}}{1}
+     {6}{{{\color{codepurple}6}}}{1}
+     {7}{{{\color{codepurple}7}}}{1}
+     {8}{{{\color{codepurple}8}}}{1}
+     {9}{{{\color{codepurple}9}}}{1}
+     {:}{{{\color{codegray}{:}}}}{1}
+     {,}{{{\color{codegray}{,}}}}{1}
+     {\{}{{{\color{codegray}{\{}}}}{1}
+     {\}}{{{\color{codegray}{\}}}}}{1}
+     {[}{{{\color{codegray}{[}}}}{1}
+     {]}{{{\color{codegray}{]}}}}{1}
+}
+
+\lstdefinestyle{bashStyle}{
+  style=globalStyle,
+  language=bash,
+  morekeywords={cmake, ctest, ninja, mkdir, cd, git, ros2, colcon}
+}
+
+\lstdefinestyle{cmakeStyle}{
+  style=globalStyle,
+  language=CMake,
+  keywordstyle=[2]\color{codepurple!70!black}\bfseries
+}
+
+\lstdefinestyle{dockerStyle}{
+  style=globalStyle,
+  language=Dockerfile
+}
+
+\lstdefinelanguage{Yaml}{
+  morekeywords={true, false, null, on, off, yes, no},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+  morestring=[b]',
+  alsoletter={_:-}
+}
+
+\lstdefinestyle{yamlStyle}{
+  style=globalStyle,
+  language=Yaml
+}
+
+\lstdefinestyle{otherStyle}{
+  style=globalStyle
+}
+
+% --- Default ---------------------------------------------------------------
+\lstset{style=globalStyle}
+
+% fix for ac-bug: https://tex.stackexchange.com/questions/735500/problem-with-amsmath-cleveref-acronym
+\makeatletter
+\AtBeginDocument
+ {
+   \def\ltx@label#1{\cref@label{#1}}%add braces
+   \def\label@in@display@noarg#1{\cref@old@label@in@display{#1}}%remove braces
+\def\label@in@mmeasure@noarg#1{%
+    \begingroup%
+      \measuring@false%
+      \cref@old@label@in@display{#1}%remove braces for multline, see https://tex.stackexchange.com/q/737204/2388
+    \endgroup}%
+ } %
+\makeatother
+
+% Biblatex Konfiguration
+% URL Formatierung anpassen
+\DeclareFieldFormat{url}{\addspace Verfügbar unter: \url{#1}}
+\DeclareNameAlias{author}{family-given}
+
+% Titel Formatierung für Online-Einträge anpassen
+\DeclareFieldFormat{title}{%
+  \ifboolexpr{ test {\ifentrytype{online}} }
+    {#1\addspace [online]} % Wenn es ein Online-Eintrag ist
+    {#1} % Andernfalls nur den Titel
+}
+
+% Formatierung für urldate anpassen (ohne Klammern)
+\DeclareFieldFormat{urldate}{[abgerufen am #1]}
+
+\setlength{\headheight}{15pt}
+
+% "et al." statt "u. a." für mehrere Autoren in BibLaTeX
+\DefineBibliographyStrings{german}{
+  andothers = {et\addabbrvspace al\adddot}
+}

@@ -1,0 +1,33 @@
+# MacOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# LaTeX
+*.aux
+*.bbl*
+*.bcf*
+*.blg
+*.fdb_latexmk
+*.fls
+*.gz
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.run.xml
+*.synctex*
+*.toc
+*.nav
+*.snm
+*.pdf

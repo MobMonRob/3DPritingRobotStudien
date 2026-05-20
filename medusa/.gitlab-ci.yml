@@ -1,0 +1,147 @@
+# ===============================================================================
+# MEDUSA CI/CD PIPELINE
+# ------------------------------------------------------------------------------
+# Overview:
+# This pipeline orchestrates the build, testing, and deployment lifecycle.
+# It is optimized for C++ performance using Ninja, CCache, and Docker caching.
+#
+# Key Features:
+# 1. Smart Docker Caching: Rebuilds toolchain image only on Dockerfile changes.
+# 2. CCache Persistence: Caches compiler output across pipeline runs.
+# 3. Single-Pass Verification: Combines compilation and testing.
+# 4. GitOps: Automates version tagging based on CMake configuration.
+# ===============================================================================
+
+stages:
+  - prepare           # Infrastructure: Build Docker image
+  - check             # Static Analysis: Formatting, Linting (Fail fast)
+  - build_and_test    # Core: Compile and Run Unit Tests
+  - deploy            # Documentation: Generate Pages
+  - tag               # Release: Git Tagging
+
+# ------------------------------------------------------------------------------
+# GLOBAL CONFIGURATION
+# ------------------------------------------------------------------------------
+
+# Include GitLab's standard security templates.
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+sast:
+  stage: check
+
+secret_detection:
+  stage: check
+
+variables:
+  DOCKER_IMAGE_TAG: $CI_REGISTRY_IMAGE:latest
+  CMAKE_GENERATOR: "Ninja"
+  CMAKE_BUILD_PARALLEL_LEVEL: "4"
+  CMAKE_CXX_COMPILER_LAUNCHER: "ccache"
+  GIT_DEPTH: "1"
+  SECRET_DETECTION_HIST_SCAN: "false"
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .ccache/
+
+# ===============================================================================
+# STAGE: PREPARE
+# ===============================================================================
+prepare_docker:
+  stage: prepare
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $DOCKER_IMAGE_TAG || true
+    - docker build --cache-from $DOCKER_IMAGE_TAG -t $DOCKER_IMAGE_TAG -f ci/docker/Dockerfile .
+    - docker push $DOCKER_IMAGE_TAG
+  rules:
+    - changes:
+        - ci/docker/Dockerfile
+      when: always
+    - when: manual
+      allow_failure: true
+
+# ===============================================================================
+# STAGE: BUILD & TEST
+# Description: Compiles the project and runs tests in a single pass.
+# Optimization: Uses 'RelWithDebInfo' for a good balance of speed and debuggability.
+# ===============================================================================
+build_and_test:
+  stage: build_and_test
+  image: $DOCKER_IMAGE_TAG
+  before_script:
+    - mkdir -p .ccache
+    - export CCACHE_DIR=${PWD}/.ccache
+  script:
+    - uname -m
+    - cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DMEDUSA_BUILD_TESTS=ON
+    - cmake --build build
+    - cd build
+    - xvfb-run ctest --output-on-failure --parallel 4
+
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - .ccache/
+    policy: pull-push
+
+# ===============================================================================
+# STAGE: DEPLOY (Documentation)
+# Description: Generates API docs via Doxygen and publishes to GitLab Pages.
+# ===============================================================================
+pages:
+  stage: deploy
+  image: $DOCKER_IMAGE_TAG
+  script:
+    - cd docs/doxygen
+    - doxygen Doxyfile
+    - cd ../..
+    - mkdir -p public
+    - mv docs/doxygen/html/* public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# ===============================================================================
+# STAGE: TAG
+# Description: Parses CMakeLists.txt and creates a Git Tag if version changed.
+# ===============================================================================
+auto_tag_release:
+  stage: tag
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache git grep
+    - git config --global user.email "ci-bot@medusa.io"
+    - git config --global user.name "Medusa CI Bot"
+  script:
+    - 'VERSION=$(grep -v "cmake_minimum_required" CMakeLists.txt | grep -oE "VERSION [0-9]+\.[0-9]+\.[0-9]+" | head -n 1 | sed "s/VERSION //")'
+    - echo "Detected Version is -> $VERSION"
+    - |
+      if [ -z "$VERSION" ]; then
+        echo "Error: Could not extract version from CMakeLists.txt!"
+        exit 1
+      fi
+    - 'TAG_NAME="v$VERSION"'
+    - git fetch --tags
+    - |
+      if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+        echo "Tag $TAG_NAME already exists. Skipping."
+        exit 0
+      fi
+    - 'echo "Tagging release: $TAG_NAME"'
+    - git remote set-url origin https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git tag -a "$TAG_NAME" -m "Release $VERSION"
+    - git push origin "$TAG_NAME"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'

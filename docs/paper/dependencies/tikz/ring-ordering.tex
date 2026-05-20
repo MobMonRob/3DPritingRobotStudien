@@ -1,0 +1,90 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=0.9,
+    every node/.style={font=\small},
+]
+    % ===========================================
+    % Gemeinsame Geometrie pro Panel:
+    %   - Aussenring eines Bauteils (gross)
+    %   - Drei Bohrungen (kleine Kreise)
+    %   - Ein zweites Bauteil daneben
+    % Eintrittspunkte werden pro Ring markiert.
+    % ===========================================
+
+    % ============== PANEL A ==============
+    \begin{scope}[xshift=0cm]
+        \node[font=\bfseries, anchor=south] at (3.0, 5.0)
+            {(a) Schlechte Reihenfolge};
+
+        % Aussenkontur Bauteil 1 (links)
+        \draw[thick] (0.4, 0.6) rectangle (3.4, 4.2);
+        \fill[gray!10] (0.4, 0.6) rectangle (3.4, 4.2);
+        \draw[thick] (0.4, 0.6) rectangle (3.4, 4.2);
+
+        % Drei Bohrungen
+        \fill[white] (1.2, 1.4) circle (0.35);
+        \draw[thick] (1.2, 1.4) circle (0.35);
+        \fill[white] (2.6, 1.4) circle (0.35);
+        \draw[thick] (2.6, 1.4) circle (0.35);
+        \fill[white] (1.9, 3.2) circle (0.4);
+        \draw[thick] (1.9, 3.2) circle (0.4);
+
+        % Bauteil 2 (rechts)
+        \draw[thick] (4.6, 1.6) rectangle (5.8, 3.4);
+        \fill[gray!10] (4.6, 1.6) rectangle (5.8, 3.4);
+        \draw[thick] (4.6, 1.6) rectangle (5.8, 3.4);
+
+        % Eintrittspunkte (kleine schwarze Punkte) - dieselben Punkte in beiden Panels
+        \fill[black] (0.4, 0.6) circle (1.6pt);                  % E1 Aussen 1
+        \fill[black] (1.55, 1.4) circle (1.6pt);                 % E2 Bohrung 1
+        \fill[black] (2.95, 1.4) circle (1.6pt);                 % E3 Bohrung 2
+        \fill[black] (2.3, 3.2) circle (1.6pt);                  % E4 Bohrung 3
+        \fill[black] (4.6, 1.6) circle (1.6pt);                  % E5 Aussen 2
+
+        % SCHLECHTE Reihenfolge: lange Travel-Wege quer durch das Bild
+        % Reihenfolge: E2 (Bohrung 1) -> E5 (Bauteil 2) -> E4 (Bohrung 3) -> E1 (Aussen 1) -> E3 (Bohrung 2)
+        \draw[red!75!black, thick, dashed, ->] (1.55, 1.4) -- (4.6, 1.6);
+        \draw[red!75!black, thick, dashed, ->] (4.6, 1.6) -- (2.3, 3.2);
+        \draw[red!75!black, thick, dashed, ->] (2.3, 3.2) -- (0.4, 0.6);
+        \draw[red!75!black, thick, dashed, ->] (0.4, 0.6) -- (2.95, 1.4);
+
+        \node[anchor=north, font=\scriptsize, align=center] at (3.0, 0.0)
+            {Lange Travel-Wege\\zwischen den Konturen};
+    \end{scope}
+
+    % ============== PANEL B ==============
+    \begin{scope}[xshift=8.0cm]
+        \node[font=\bfseries, anchor=south] at (3.0, 5.0)
+            {(b) Optimierte Reihenfolge};
+
+        % Identische Geometrie
+        \draw[thick] (0.4, 0.6) rectangle (3.4, 4.2);
+        \fill[gray!10] (0.4, 0.6) rectangle (3.4, 4.2);
+        \draw[thick] (0.4, 0.6) rectangle (3.4, 4.2);
+        \fill[white] (1.2, 1.4) circle (0.35);
+        \draw[thick] (1.2, 1.4) circle (0.35);
+        \fill[white] (2.6, 1.4) circle (0.35);
+        \draw[thick] (2.6, 1.4) circle (0.35);
+        \fill[white] (1.9, 3.2) circle (0.4);
+        \draw[thick] (1.9, 3.2) circle (0.4);
+        \draw[thick] (4.6, 1.6) rectangle (5.8, 3.4);
+        \fill[gray!10] (4.6, 1.6) rectangle (5.8, 3.4);
+        \draw[thick] (4.6, 1.6) rectangle (5.8, 3.4);
+
+        \fill[black] (0.4, 0.6) circle (1.6pt);
+        \fill[black] (1.55, 1.4) circle (1.6pt);
+        \fill[black] (2.95, 1.4) circle (1.6pt);
+        \fill[black] (2.3, 3.2) circle (1.6pt);
+        \fill[black] (4.6, 1.6) circle (1.6pt);
+
+        % OPTIMIERTE Reihenfolge: Greedy NN mit kurzen Wegen
+        % E1 (Aussen 1) -> E2 (Bohrung 1) -> E3 (Bohrung 2) -> E4 (Bohrung 3) -> E5 (Bauteil 2)
+        \draw[green!50!black, thick, dashed, ->] (0.4, 0.6) -- (1.55, 1.4);
+        \draw[green!50!black, thick, dashed, ->] (1.55, 1.4) -- (2.95, 1.4);
+        \draw[green!50!black, thick, dashed, ->] (2.95, 1.4) -- (2.3, 3.2);
+        \draw[green!50!black, thick, dashed, ->] (2.3, 3.2) -- (4.6, 1.6);
+
+        \node[anchor=north, font=\scriptsize, align=center] at (3.0, 0.0)
+            {Greedy Nearest-Neighbor\\reduziert die Travel-Länge};
+    \end{scope}
+\end{tikzpicture}

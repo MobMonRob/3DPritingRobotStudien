@@ -1,0 +1,255 @@
+\chapter{Diskussion}\label{chap:discussion}
+
+  \section{Interpretation der Ergebnisse}\label{sec:interpretation-of-results}
+    Das primäre Ziel dieser Arbeit bestand in der prototypischen Entwicklung eines 6-Achsen-Slicers für die nicht-planare, robotergestützte additive Fertigung.
+    Die vorliegende Arbeit adressiert dabei die signifikante Diskrepanz zwischen der bereits hoch entwickelten 6-Achs-Hardware und der bisher unzureichenden Verfügbarkeit entsprechender Standard-Slicing-Software.
+    Im Rahmen der Implementierung ist es erfolgreich gelungen, eine durchgängige und konsistente Datenkette zu etablieren, die von der Verarbeitung roher \ac{STL}-Daten bis hin zur präzisen Generierung komplexer Roboterbewegungen reicht.
+    Damit konnte die grundlegende Machbarkeit eines solchen Systems sowie dessen technologisches Potenzial zweifelsfrei nachgewiesen werden.
+
+    Die explizite Trennung zwischen \ac{medusa} für das Slicing und \ac{kronos} für die Robotersteuerung verdeutlicht eine modulare Systemarchitektur, die eine hohe Flexibilität für zukünftige Anpassungen bietet.
+    Dass der Datentransfer via \ac{JSON} aktuell noch manuell erfolgt, markiert zwar eine Unterbrechung im automatisierten Workflow, unterstreicht jedoch gleichzeitig die Rolle von \ac{medusa} als eigenständiges, plattformunabhängiges Werkzeug zur Pfadgenerierung.
+    Eine zukünftige Automatisierung dieses Schrittes könnte die Effizienz weiter steigern, ohne die grundsätzliche Funktionalität zu beeinträchtigen.
+    Dies könnte beispielsweise über eine \ac{REST}-\ac{API} oder Pipes realisiert werden.
+    Die erfolgreiche Validierung der Trajektorien innerhalb der \ac{kronos}-Simulation ist als kritischer Sicherheitsfaktor zu interpretieren, da sie das Risiko von Hardware-Kollisionen im realen Betrieb des UR3e signifikant minimiert.
+
+    Obgleich an spezifischen Stellen des Systems noch Optimierungspotenzial sowie ein Bedarf an weiterführender Entwicklung identifiziert wurde, erfüllt dieser Prototyp seine Funktion als Proof-of-Concept vollumfänglich.
+    Die Ergebnisse zeigen auf, dass das gewählte Verfahren operiert und eine belastbare Basis für zukünftige Forschungsvorhaben darstellt.
+    Somit legt diese Arbeit den entscheidenden Grundstein für eine solide Weiterentwicklung hin zu einem produktionsreifen System in der adaptiven Fertigung.
+    \sig{Ben Stahl}
+
+    \section{Entwurfsentscheidungen} \label{sec:discussion-design-decisions}
+      Die softwaretechnische Implementierung des Systems \ac{medusa} basiert auf einer strikt geschichteten Modularchitektur, welche konsequent auf dem Einsatz statischer Bibliotheken und einheitlicher Namespace-Aliase aufbaut.
+      Diese architektonische Struktur hat sich im Projektverlauf als äußerst tragfähig und skalierbar erwiesen.
+      Ein wesentlicher Erfolgsfaktor ist hierbei die konsequente Trennung der fachlichen Domänen zwischen der geometrischen Pfadplanung, die durch das Modul \ac{medusa} repräsentiert wird, und der roboterkinematischen Ausführung, welche durch das Teilsystem \ac{kronos} realisiert wird.
+
+      Während das Teilsystem \ac{medusa} primär High-Level-Aufgaben wie den fehlerfreien Mesh-Import von Geometriedaten sowie die komplexen Slicing-Operationen übernimmt, fokussiert sich \ac{kronos} dediziert auf die Berechnung der Inversen Kinematik, die dynamische Kollisionsprüfung und die hardwarenahe Ansteuerung des Manipulators.
+      Diese klare funktionale Aufteilung erlaubt nicht nur den isolierten und zielgerichteten Einsatz fachspezifischer Programmbibliotheken, sondern trägt auch den grundlegend unterschiedlichen Laufzeitanforderungen der beiden Systeme Rechnung.
+      \ac{medusa} agiert hierbei als reine Offline-Anwendung ohne strikte Echtzeitbedingungen, wohingegen \ac{kronos} inhärent an die Kommunikationszyklen und die hochkritischen Sicherheitsüberwachungen der realen Robotersteuerung gebunden ist.
+
+      Ein wesentliches technisches Detail zur Sicherung der Softwarequalität innerhalb von \ac{medusa} betrifft die Definition einer strikten „Include-only“-Abhängigkeit zwischen den Modulen \texttt{graphics} und \texttt{slicing}.
+      Durch diese gezielte Entkopplung werden zirkuläre Abhängigkeiten im Quellcode effektiv vermieden, was die Wartbarkeit des Systems erheblich steigert.
+      Gleichwohl erfordert diese restriktive Architektur eine hohe disziplinäre Sorgfalt bei zukünftigen Erweiterungen des \texttt{ToolpathRenderer}, um die softwareseitige Integrität der Visualisierungsschicht langfristig zu gewährleisten.
+      \sig{Ben Stahl}
+
+  \section{Validität und Übertragbarkeit} \label{sec:validity-and-transferability}
+    \subsection{Interne und externe Validität} \label{subsec:internal-and-external-validity}
+    Die interne Validität des Systems wird maßgeblich durch die Simulationsumgebung innerhalb des Teilsystems \ac{kronos} gewährleistet, welche eine Überprüfung der von \ac{medusa} generierten Toolpaths ermöglicht.
+    Durch diese virtuelle Validierung können die berechneten Trajektorien auf ihre geometrische Korrektheit und algorithmische Konsistenz hin untersucht werden.
+    Kritisch zu berücksichtigen bleibt jedoch die in Abschnitt \ref{subsec:limitations-and-failure-scenarios} detailliert beschriebene Problematik hinsichtlich des Inverse-Kinematik-Solvers, welche die Zuverlässigkeit der Ergebnisse in spezifischen Randbereichen beeinflussen kann.
+
+    Hinsichtlich der externen Validität muss festgehalten werden, dass eine vollumfängliche Überprüfung unter realen Produktionsbedingungen zum aktuellen Zeitpunkt noch aussteht.
+    Dies liegt primär darin begründet, dass eine Validierung mittels realer Materialextrusion oder weiterführender physikalischer Belastungstests nicht im ursprünglichen Scope der Projektziele definiert wurde.
+    Die externe Validität beschränkt sich somit planmäßig auf die digitale Repräsentation und die Verifikation der theoretischen Bewegungsabläufe, während die physische Umsetzung ein Feld für zukünftige Forschungsarbeiten darstellt.
+    
+    Ein weiterer wesentlicher Aspekt im Hinblick auf die Validität der vorliegenden Ergebnisse ist der Umstand, dass zum aktuellen Zeitpunkt noch kein expliziter Materialfluss innerhalb der Simulation abgebildet wird.
+    Infolgedessen lässt sich das Verhalten des extrudierten Materials während des eigentlichen Schichtaufbaus nicht mit absoluter Gewissheit vollumfänglich prognostizieren.
+    Da die physikalischen Interaktionen, wie Gravitation, beim Austritt aus der Düse eine entscheidende Rolle für die strukturelle Integrität des Bauteils spielen, bleibt die Vorhersage der Materialdynamik ungewiss.
+    Mit dieser Thematik wird sich in Abschnitt \ref{subsec:sideways-material-extrusion} genauer befasst.
+    \sig{Ben Stahl}
+    
+    \subsection{Reproduzierbarkeit der Ergebnisse}\label{subsec:reproducibility-of-results}
+      Die Reproduzierbarkeit der generierten Roboterbewegungen des Universal Robots UR3e wird primär durch den Einsatz von RViz innerhalb der \ac{ROS} 2-Umgebung sichergestellt.
+      Diese Simulationsplattform ermöglicht es, die berechneten Trajektorien unter identischen Randbedingungen wiederholt zu visualisieren und deren Ausführung zu verifizieren.
+      Ein wesentlicher technischer Aspekt, der die absolute Reproduzierbarkeit jedoch einschränkt, ist die Natur des verwendeten Inverse-Kinematik-Solvers.
+
+      Da die Berechnung der Gelenkwinkel für eine vorgegebene Pose im Raum auf numerischen Iterationsverfahren basiert, ist die Lösungsfindung nicht in jedem Fall streng deterministisch.
+      Dies bedeutet, dass für identische Zielkoordinaten potenziell unterschiedliche Konfigurationen der Roboterachsen berechnet werden können, sofern mehrere mathematisch valide Lösungen existieren.
+      Infolgedessen ist eine Reproduzierbarkeit der Bewegungsabläufe zwar grundsätzlich gegeben, ihre absolute Zuverlässigkeit muss jedoch im Kontext der algorithmischen Varianz des Solvers kritisch betrachtet werden.
+      \sig{Ben Stahl}
+
+  \section{Limitationen der Arbeit}\label{sec:thesis-limitations}
+    \subsection{Methodische Limitationen}\label{subsec:methodological-limitations}
+      Zu den wesentlichen methodischen Limitationen dieses Projektes zählt primär der Verzicht auf die Implementierung des sphärenbasierten Algorithmus.
+      Wie bereits in der detaillierten Evaluation in Abschnitt \ref{subsec:evaluation-of-sphere-slicer} dargelegt wurde, erwies sich dieser Ansatz aufgrund struktureller Inkonsistenzen in Überhangbereichen als suboptimal für die angestrebten Fertigungsziele.
+      Jedoch wurde, wie angemerkt, die weiterentwickelte verbesserte Version implementiert.
+
+      Ein weiterer limitierender Faktor im aktuellen Systemaufbau ist das Fehlen einer dynamischen Kollisionsprüfung zwischen dem Manipulator des Universal Robots UR3e und dem bereits extrudierten Material.
+      Es muss jedoch hervorgehoben werden, dass diese spezifische Funktionalität gemäß der Anforderungsdefinition in Abschnitt \ref{subsec:kronos-requirements} explizit nicht Bestandteil des aktuellen Projektumfangs war.
+
+      Für eine zukünftige Weiterführung des Projektes, die insbesondere auf die reale physische Extrusion abzielt, stellt dieser Aspekt jedoch ein kritisches Entwicklungsfeld dar.
+      Um eine prozesssichere Fertigung komplexer Geometrien zu gewährleisten, ist die Integration einer Echtzeit-Kollisionsüberwachung für das gedruckte Objekt zwingend erforderlich.
+      Dies erfordert zusätzliche Entwicklungsarbeit im Bereich der Pfadplanung und der dynamischen Umfeldwahrnehmung innerhalb der Simulationsumgebung.
+      \sig{Ben Stahl}
+
+    \subsection{Technische Limitationen}\label{subsec:technical-limitations}
+      Die technischen Limitationen dieses Projektes manifestieren sich primär in den in Abschnitt \ref{subsec:limitations-and-failure-scenarios} detailliert erörterten Problematiken hinsichtlich der Berechnung nicht-linearer Pfadsegmente.
+      Ein zentraler Schwachpunkt liegt dabei in der mangelnden Linearität der Trajektorien zwischen definierten Wegpunkten, was zu unerwünschten Abweichungen in der angestrebten Bahnbewegung führen kann.
+      Des Weiteren stellt das gelegentliche Ausbleiben einer validen Bewegungslösung durch den Inverse-Kinematik-Solver eine signifikante Hürde für die Prozessstabilität dar.
+
+      Für jede zukünftige Weiterentwicklung oder gar eine Überführung des Systems in den produktiven Einsatz ist die Behebung dieser Defizite von essenzieller Bedeutung.
+      Nur durch eine Optimierung der kinematischen Algorithmen und eine robustere Pfadplanungslogik kann eine zuverlässige und präzise Ansteuerung des Universal Robots UR3e dauerhaft gewährleistet werden.
+      \sig{Ben Stahl}
+
+  \section{Erweiterbarkeit} \label{sec:discussion-extensibility}
+    Die Softwarearchitektur von \ac{medusa} wurde gezielt auf eine hohe strukturelle Flexibilität und langfristige Erweiterbarkeit ausgelegt.
+    Durch die konsequente Implementierung des \texttt{ISlicer}-Interfaces wird eine abstrakte Schnittstelle geschaffen, welche die Integration neuartiger Slicing-Algorithmen maßgeblich vereinfacht.
+    Entwickler können somit maßgeschneiderte Slicing-Strategien implementieren und nahtlos in das bestehende System einbetten, ohne dass Modifikationen an der übergeordneten Pipeline-Logik oder an nachgelagerten Verarbeitungsstufen vorgenommen werden müssen.
+    Diese lose Kopplung minimiert das Risiko von Regressionseffekten bei Systemerweiterungen und sichert die funktionale Integrität des Systems.
+
+    Ein weiterer architektonischer Vorteil manifestiert sich in der Definition der Projektstruktur auf Top-Level-Ebene.
+    Diese saubere Konfiguration erlaubt es, das gesamte \ac{medusa}-Framework ohne tiefgreifenden Anpassungsaufwand als eigenständiges \texttt{CMake}-Unterprojekt in übergeordnete Softwaresysteme oder industrielle Toolchains zu integrieren.
+    Auch die technologische Portabilität im Hinblick auf die verwendete Hardware wurde im Designprozess antizipiert.
+    Für die Anbindung des Slicers an alternative, herstellerfremde Robotersysteme wäre lediglich die Implementierung eines zusätzlichen, isolierten Moduls erforderlich.
+
+    Dieses dedizierte Modul müsste ausschließlich die mathematische Transformation der generierten Segment-Orientierungen in die spezifischen 6-\ac{DOF}-Posen des jeweiligen Manipulators kapseln.
+    Gleichwohl muss kritisch angemerkt werden, dass das Teilsystem \ac{kronos} in seiner aktuellen Implementierungsstufe spezifisch auf die Kinematik und die Parameter des Universal Robots UR3e ausgelegt ist.
+    Für die erfolgreiche Manipulation und Ansteuerung anderer Robotertypen ist daher eine entsprechende softwareseitige Erweiterung der kinematischen Modelle innerhalb von \ac{kronos} zwingend erforderlich.
+    Die konsequente Nutzung des Frameworks \ac{ROS} 2 als zugrundeliegendes Operating System, welches bereits für die Steuerung des UR3e eingesetzt wird, erleichtert diesen Migrationsprozess jedoch erheblich.
+    Durch die inhärente Modularität und die standardisierten Hardware-Interfaces von \ac{ROS} 2 über MoveIt 2 können alternative Manipulatoren mit vergleichsweise geringem Integrationsaufwand eingebunden werden.
+    Diese technologische Flexibilität unterstreicht die universelle Einsetzbarkeit und die zukunftssichere Ausrichtung der entwickelten Systemarchitektur für die robotergestützte Fertigung.
+    \sig{Ben Stahl}
+
+  \section{Diskussion der Forschungsfragen}
+    \subsection{Forschungsfrage 1}
+      \subsubsection{Welche Anforderungen muss ein Slicer erfüllen, um nicht-planare Bahnstrategien für einen 6-Achs-Roboter zu erzeugen?}
+        Um die zusätzlichen Freiheitsgrade eines 6-Achs-Roboters vollständig zu nutzen, muss ein Slicer weitaus komplexere Aufgaben bewältigen als ein herkömmlicher planarer Slicer.
+        Eine zentrale Anforderung ist die simultane Planung von Werkzeugbahn (Toolpath), Werkzeugorientierung und Bewegungsablauf.
+        Dies vergrößert den Lösungsraum und die Komplexität der einzuhaltenden Randbedingungen erheblich.
+        Wie in \ref{subsec:technical-challenges-path-planning} dargelegt, müssen zudem der Materialfluss aus der Düse, die Bahngeschwindigkeit und die Orientierung des Werkzeugs präzise aufeinander abgestimmt werden, um einen gleichmäßigen Materialauftrag sicherzustellen.
+
+        Hierfür muss der Slicer für jeden Wegpunkt eine vollständige 6-\ac{DOF}-Pose bereitstellen.
+        Die Orientierung wird dabei idealerweise in Form von Einheits-Quaternionen an die Robotersteuerung übergeben, um Singularitäten, wie den Gimbal-Lock, zu vermeiden und eine nahtlose Integration in Frameworks wie ROS 2 und MoveIt sicherzustellen.
+        Da das traditionelle G-Code-Format primär auf drei Achsen ausgelegt ist und Orientierungsinformationen nur unzureichend abbilden kann, ist die Erzeugung eines formatunabhängigen Datenmodells, das im Projekt als \gls{json}-Datenartefakt umgesetzt ist, erforderlich.
+        Dieses Format führt Geometrie, Toolpath, Orientierung und maschinenspezifische Parameter durchgängig zusammen.
+
+      \subsubsection{Wie unterscheidet er sich von einem klassischen, planaren Slicer?}
+        Der wesentliche Unterschied liegt in der geometrischen Schichtbildung und der Variabilität der Werkzeugachse.
+        Ein klassischer, planarer Slicer zerlegt das Bauteil ausschließlich in horizontale Schichten entlang einer statischen, globalen Aufbauachse.
+        Im Gegensatz dazu nutzt der 6-Achs-Slicer dynamische Ansätze:
+        \begin{itemize}
+        \item Schichtgeometrie: Während planare Slicer nur ebene Schichten erzeugen, ermöglicht ein 6-Achs-Slicer multidirektionale Strategien.
+        Der Base-Algorithmus teilt das Bauteil in Stamm und Zweige auf, die in unterschiedlichen lokalen Wachstumsrichtungen gesliced werden.
+        Der Kristall-Algorithmus hingegen nutzt vollständig gekrümmte Iso-Flächen basierend auf einem Skalarfeld, sodass sich die Druckrichtung kontinuierlich anpasst
+        \item Werkzeugorientierung: Bei einem planaren Slicer fällt die Werkzeugachse konstant mit der globalen Aufbauachse zusammen.
+        Bei nicht-planaren Strategien variiert die Orientierung stetig; sie wird beispielsweise aus den Oberflächennormalen (beim Base-Algorithmus) oder dem Gradientenfeld des Skalarfeldes berechnet.
+        \item Umgang mit Überhängen: In der planaren Fertigung erfordern Überhänge (typischerweise ab einem Winkel von ca.
+        45°) den Einsatz von Stützstrukturen, was den Materialverbrauch und die Nachbearbeitung erhöht.
+        Ein 6-Achs-Slicer kann durch die freie Orientierung der Düse überhängende Bereiche so beschichten, dass sie sich durch die bereits gedruckte Basis selbst stützen, wodurch eine stützstrukturfreie Fertigung ermöglicht wird.
+        \end{itemize}
+        Diese Unterschiede sind in \ref{sec:concept-of-slicing-strategies} detailliert gegenübergestellt.
+        \sig{Ben Stahl}
+
+
+    \subsection{Forschungsfrage 2}
+      \subsubsection{Wie kann ein solcher Slicer prototypisch umgesetzt werden?}
+        Die Umsetzung des Slicers erfolgt im Projekt durch eine klare Aufteilung in zwei funktionale Softwarekomponenten den Modulen \ac{medusa} und \ac{kronos}.
+        Dies geschah um die geometrische Planung von der maschinennahen Ausführung zu trennen:
+        \begin{itemize}
+        \item \textbf{\acs{medusa} (Slicing):} Dieses Modul ist für das Laden des 3D-Modells, die Visualisierung und den eigentlichen Slicing-Prozess zuständig.
+        Es berechnet die Toolpaths und exportiert diese als plattformunabhängiges Datenartefakt.
+        Hier sind die verschiedenen Slicing-Strategien wie der Base- oder der Kristall-Algorithmus implementiert.
+        \item \textbf{\acs{kronos} (Robotersteuerung):} Diese Komponente fungiert als Middleware.
+        Sie nimmt den Toolpath aus \ac{medusa} entgegen und transformiert die geometrischen Daten in Gelenktrajektorien für den Roboter, hier ein Universal Robots UR3e.
+        Die Ansteuerung erfolgt dabei über die Frameworks ROS 2 und MoveIt 2
+        \end{itemize}
+        Aufgearbeitet wurde diese Trennung im Abschnitt \ref{sec:overall-system-architecture}.
+        
+      \subsubsection{Welche technischen Schwierigkeiten treten dabei auf?}
+        Bei der Entwicklung und Erprobung traten technische Schwierigkeiten auf, die über das klassische 3D-Drucken hinausgehen:
+        \begin{itemize}
+        \item \textbf{Komplexität der Bahnplanung und inversen Kinematik:} Im Gegensatz zu kartesischen Druckern muss für jede Position im Raum die Gelenkstellung des Roboters berechnet werden (Inverse Kinematik).
+        Dabei können Singularitäten auftreten – Bereiche, die der Roboter mathematisch oder physisch nicht erreichen kann oder in denen Gelenke theoretisch unendliche Geschwindigkeiten erreichen müssten.
+        Siehe Abschnitt \ref{subsec:inverse-kinematics-and-singularities}.
+        \item \textbf{Fehlende Standardisierung:} Da etablierte Formate wie herkömmlicher G-Code die benötigten 6-\ac{DOF}-Informationen (Position + Orientierung) nicht standardmäßig unterstützen, musste ein eigenes Austauschformat entwickelt werden, um die Datenkette zwischen Slicer und Roboter zu schließen.
+        \end{itemize}
+        \sig{Ben Stahl}
+
+    \subsection{Forschungsfrage 3}
+      \subsubsection{Welche Probleme entstehen bei der Übertragung der geplanten Bahnen auf einen realen Roboter (im konkreten Fall einen UR3e mit ROS und MoveIt)?}
+        Die Übertragung der geometrischen Bahndaten auf die Hardware ist mit erheblichen steuerungstechnischen und kinematischen Herausforderungen verbunden, die eine strikte architektonische und algorithmische Behandlung erfordern.
+        \begin{itemize}
+        \item \textbf{Hohe Wegpunktdichte und Recheneffizienz:} Aufgrund der dichten Wegpunktfolge beim 3D-Druck würde die Einzelverarbeitung von Punkten zu einem zu hohen Kommunikations-Overhead führen.
+        Das Middleware-System \ac{kronos} verarbeitet Punkte daher in Clustern von 50 Stück (Batch-Processing), was eine vorausschauende Planung (Lookahead) ermöglicht.
+        Siehe \ref{subsubssec:functionality}
+        \item \textbf{Bahninterpolation und konstanter Materialfluss:} Für ein sauberes Druckbild darf der Roboter an Wegpunkten nicht exakt stoppen, da jeder Geschwindigkeitsabfall zu einer Materialanhäufung führen würde (vgl. \ref{subsec:path-interpolation-and-path-control}).
+        Es muss eine lineare Bahninterpolation (z. B. Cartesian Path Planning mit 0,001 m Schrittweite) angewandt werden, um eine konstante Bahngeschwindigkeit zu erzielen.
+        \item \textbf{Kollisionsvermeidung:} Der Roboter bewegt sich in einem engen Arbeitsraum über dem bereits extrudierten Bauteil.
+        Eine kontinuierliche Echtzeit Kollisionsprüfung muss erfolgen, um Kollisionen zwischen dem Endeffektor und dem Druckbett oder dem Bauteil zu verhindern.
+        \end{itemize}
+
+      \subsubsection{Wie lassen sich die beobachteten Effekte wie Konfigurationswechsel und Annäherungen an Singularitäten einordnen?}
+        \textbf{Annäherung an Singularitäten:}
+        \begin{itemize}
+        \item Singularitäten sind Bereiche, die der Roboterarm aufgrund physischer Gelenklimits nicht erreichen kann oder bei denen der idealisierte mathematische Ansatz zu theoretisch unendlichen Gelenkgeschwindigkeiten führen würde (vgl. \ref{subsec:inverse-kinematics-and-singularities}).
+        \item Da der 6-Achs-Druck komplexe Neigungen erfordert, operiert der Roboter oft sehr nah an seinen physikalischen Arbeitsraumgrenzen.
+        Normale Solver scheitern hier oft an lokalen Minima.
+        Daher wird ein spezialisierter Solver (TRAC-IK) eingesetzt, der iterative und genetische Algorithmen kombiniert, um diese Minima zu überwinden (vgl. \ref{subsec:component-kronos}).
+        \item Kann eine Route aufgrund von Singularitäten nicht mit ausreichender Qualität berechnet werden (Coverage unter 95 \%), bricht das System den Prozess ab, um inkonsistente Druckzustände zu vermeiden (vgl. \ref{subsec:component-kronos}).
+        \end{itemize}
+        \textbf{Konfigurationswechsel (Joint Flipping):}
+        \begin{itemize}
+        \item Die Inverse Kinematik liefert oft mehrere mögliche Gelenkstellungen für ein und dieselbe Zielposition (vgl. \ref{subsec:inverse-kinematics-and-singularities}).
+        \item Ein kritisches Problem entsteht bei kontinuierlichen Bahnen, wenn der Solver zwischen zwei Wegpunkten plötzlich in eine völlig andere Gelenkkonfiguration springt.
+        Diese Problematik wird auch „Joint Flipping“ genannt.
+        \item Um dies einzuordnen und zu lösen, nutzt das System einen „Unwrapping-Algorithmus“: Überschreitet die Differenz zwischen aufeinanderfolgenden Gelenkwinkeln den Wert von $\pi$, wird durch Addition oder Subtraktion von $2\pi$ sichergestellt, dass das Gelenk nicht den langen, extremen Weg über den Nullpunkt wählt (vgl. \ref{subsec:component-kronos}).
+        Ohne diese Korrektur würde der Roboter abrupt umschwenken und die kontinuierliche Extrusion zerreißen.
+        \end{itemize}
+        \sig{Ben Stahl}
+
+    \subsection{Forschungsfrage 4}
+    \subsubsection{Welche Schlussfolgerungen lassen sich aus den umgesetzten und den nicht umgesetzten Slicing-Strategien für eine zukünftige Weiterentwicklung ziehen?}
+      Die Arbeit beleuchtet zwei umgesetzte nicht-planare Strategien (den Base- und den Kristall-Algorithmus) sowie eine rein konzeptionell entworfene, nicht umgesetzte Strategie (den Sphären-Algorithmus).
+      Aus deren Analyse ergeben sich folgende Handlungsfelder für zukünftige Iterationen:
+      \subsubsection{Schlussfolgerungen aus den umgesetzten Strategien (Base- und Kristall-Algorithmus)}
+
+      \paragraph{Integration einer ebenenübergreifenden Kollisionsprüfung (Branch-Kollision)}
+        Sowohl beim multidirektionalen Base-Algorithmus als auch beim feldgetriebenen Kristall-Algorithmus wurde festgestellt, dass Zweige (Branches), die aus unterschiedlichen Richtungen aufeinander zu wachsen, derzeit zu überlappenden Schichten führen.
+        Eine automatische Verschmelzung findet nicht statt (\ref{subsec:concept-base-algorithm}, \ref{subsec:concept-crystal-algorithm}).
+        Eine Weiterentwicklung muss zwingend eine vorausschauende topologische Prüfung integrieren, die Kollisionen zwischen wachsenden Bauteilzweigen erkennt und die Pfade entsprechend verschmilzt oder umleitet.
+
+      \paragraph{Erweiterung der Wandkonturen} 
+        Die Erzeugung aufwendiger Füll- und Wandstrukturen auf gekrümmten Flächen ist mathematisch anspruchsvoll.
+        Der Kristall-Algorithmus unterstützt aktuell nur eine einzige Wandkontur pro Schicht.
+        Um mehrwandige Konturen zu erzeugen, die für die mechanische Stabilität unerlässlich sind, muss in Zukunft ein geodätisches Versatzverfahren (Geodesic Offset) für gekrümmte Iso-Flächen entwickelt werden (\ref{subsec:concept-crystal-algorithm}).
+        %ToDo (Optional) Auf Infill-Generiereung noch eingehen 
+
+      \paragraph{Umgang mit komplexen Topologien und Basisregionen} 
+        \begin{itemize}
+        \item Der Base-Algorithmus beschneidet nach Erkennung eines Überhangs den erlaubten Bereich starr.
+        Ein Wechselspiel aus Überhang, vertikalem Stück und erneutem Überhang in derselben Richtung wird dadurch nicht unterstützt (\ref{subsec:concept-base-algorithm}).
+        \item Der Kristall-Algorithmus geht zudem von exakt einer zusammenhängenden Buildplate-Kontaktregion aus (\ref{subsec:concept-crystal-algorithm}).
+        \item \textbf{Schlussfolgerung:} Zukünftige Algorithmen müssen dynamischer auf mehrteilige Bauplätze oder verschachtelte Überhänge reagieren können, beispielsweise durch das Berechnen separater Skalarfelder pro Teilkomponente.
+        \end{itemize}
+
+      \paragraph{Performance-Optimierung der geometrischen Berechnungen} 
+        Die feldgetriebenen Ansätze (Kristall-Slicing) sind stark von der Lösung großer linearer Gleichungssysteme abhängig.
+        Dies macht das Verfahren so rechenintensiv, dass eine kontinuierliche Echtzeitvorschau in der Nutzeroberfläche derzeit ausgeschlossen ist (\ref{subsec:component-medusa}, \ref{subsec:concept-crystal-algorithm}).
+        Für einen produktiven Einsatz muss die Berechnungsgeschwindigkeit massiv erhöht werden.
+
+    \subsubsection{Schlussfolgerungen aus der nicht umgesetzten Strategie (Sphären-Algorithmus)}
+      Obwohl der Sphären-Algorithmus nur als Konzept vorliegt, liefert seine theoretische Analyse wertvolle Erkenntnisse für die Konzeption künftiger Strategien:
+      
+      \paragraph{Kompensation schwacher Schichtübergänge}
+        Während die Stabilität innerhalb einer doppelt gekrümmten Sphärenschale theoretisch sehr hoch ist, bilden die Übergänge zwischen aufeinanderfolgenden Sphärenschalen mechanische Schwachstellen, da die Kontaktfläche orthogonal und somit relativ klein ist (\ref{subsec:concept-sphere-algorithm}).
+        Eine zukünftige Umsetzung müsste dieses Problem durch angepasste Extrusionsparameter oder ineinandergreifende Schichtübergänge lösen.
+
+      \paragraph{Entwicklung angepasster Infill-Muster für 3D-Flächen}
+        Für rein planare Schichten sind Füllmuster leicht generierbar.
+        Da Sphärenschalen jedoch doppelt gekrümmt sind, lassen sich 2D-Muster nicht ohne starke Verzerrungen übertragen.
+        Eine zukünftige Weiterentwicklung muss dedizierte, auf die Sphäre parametrierte Infill-Verfahren (z. B. spiralförmige Bahnen) definieren (\ref{subsec:concept-sphere-algorithm}).
+
+      \paragraph{Spezialisierung statt Generalisierung (Hybride Ansätze)}
+        Der Sphären Algorithmus zeigt, dass Bauteile, deren Hauptmasse nicht radial vom Mittelpunkt erreichbar ist, zu einer ineffizienten Vielzahl an gespawnten Zweigen führen (\ref{subsec:concept-sphere-algorithm}).
+        Umgekehrt entartet der Kristall-Algorithmus bei simplen Quadern zu nutzlos aufwendigen planaren Schichten (\ref{subsec:concept-crystal-algorithm}).
+
+      Schlussfolgerung: Zukünftige Slicer-Software sollte sich nicht auf einen einzigen „perfekten“ Algorithmus verlassen.
+      Vielmehr bedarf es hybrider Ansätze, bei denen das Bauteil vorab segmentiert wird und für jede Teilgeometrie (radial, organisch-gekrümmt, streng prismatisch) die mathematisch und fertigungstechnisch effizienteste Slicing-Strategie automatisch ausgewählt wird.
+      \sig{Ben Stahl}
+
+  \section{Implikationen für Forschung und Praxis}\label{sec:implications-for-research-and-practice}
+    Die konsequente Fortführung dieses Projektes birgt ein erhebliches Potenzial, sowohl für die akademische Forschung, als auch für zukunftsweisende industrielle Anwendungen im Bereich der additiven Fertigung.
+
+    \subsection{Industrielle Praxis und wirtschaftliche Relevanz}\label{subsec:industrial-practice and-economic-relevance}
+      In der industriellen Praxis ermöglicht die Weiterentwicklung nicht-planarer Slicing-Verfahren den technologischen Übergang zu einem weitestgehend stützstrukturfreien, oder zumindest signifikant stützreduzierten 3D-Druck.
+      Durch die Realisierung solcher adaptiven Fertigungsstrategien lassen sich komplexe Bauteile mit einer erheblichen Materialersparnis produzieren, was unmittelbar zur Steigerung der Ressourceneffizienz und zur Senkung der operativen Produktionskosten beiträgt.
+      Über die reine Materialeinsparung hinaus führt die gezielte Reduktion von Stützkonstruktionen zu einer drastischen Verringerung des manuellen Nachbearbeitungsaufwands.
+      Zeitintensive Prozesse, wie das mechanische Entfernen von Support-Strukturen sowie die anschließende Oberflächenveredelung an den Kontaktstellen, entfallen weitestgehend.
+      Dies führt dazu, dass die gesamte Prozesskette ökonomischer, schneller und qualitativ hochwertiger gestaltet werden kann.
+      \sig{Ben Stahl}
+
+    \subsection{Wissenschaftliche Forschung und methodische Flexibilität}\label{subsec:scientific-research-and-methodical-flexibility}
+      Für die wissenschaftliche Forschung bietet der gewählte modulare Systemaufbau eine ideale und hochflexible Plattform für künftige Untersuchungen.
+      Diese Architektur erlaubt es, neuartige Slicing-Algorithmen in einer isolierten Umgebung zu implementieren, experimentell zu testen und systematisch zu validieren, ohne dass eine zeitintensive Neukonfiguration des Gesamtsystems erforderlich ist.
+      Durch diese Effizienzsteigerung innerhalb der Entwicklungsumgebung können innovative Ansätze zur multidimensionalen Trajektorienplanung schneller iteriert und in Richtung einer industriellen Anwendungsreife geführt werden.
+      Somit fungiert das vorliegende Projekt als katalytische Basis für weiterführende Studien im Bereich der robotergestützten, adaptiven Fertigungsverfahren und setzt neue Impulse für die computergestützte Produktionsplanung.
+      \sig{Ben Stahl}

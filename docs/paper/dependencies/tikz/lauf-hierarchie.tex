@@ -1,0 +1,77 @@
+\begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small},
+    run/.style={
+        draw, thick, rounded corners=3pt,
+        minimum width=2.6cm, minimum height=1.0cm,
+        align=center,
+    },
+    trunk/.style={run, fill=gray!20},
+    branch/.style={run, fill=blue!12},
+]
+    % =========================================================
+    % (a) Lauf-Baum
+    % =========================================================
+    \node[font=\bfseries] at (0, 5.2) {(a) Lauf-Hierarchie};
+
+    \node[trunk] (b0) at (0, 4) {$b=0$ (Stamm)\\[-1pt]
+        \scriptsize $\vec{G}_0 = \vec{e}_y$};
+    \node[branch] (b1) at (-2, 2) {$b=1$ (Zweig)\\[-1pt]
+        \scriptsize $\vec{G}_1 = +\vec{U}_0$};
+    \node[branch] (b2) at (2, 2) {$b=2$ (Zweig)\\[-1pt]
+        \scriptsize $\vec{G}_2 = -\vec{U}_0$};
+
+    \draw[->, thick] (b0) -- (b1)
+        node[midway, above left, font=\scriptsize, xshift=2pt] {Spawn};
+    \draw[->, thick] (b0) -- (b2)
+        node[midway, above right, font=\scriptsize, xshift=-2pt] {Spawn};
+
+    % =========================================================
+    % (b) Zeitachse der Schichterzeugung
+    % =========================================================
+    \begin{scope}[xshift=-3.8cm, yshift=-2.5cm]
+        \node[font=\bfseries] at (3.8, 2.7) {(b) Erzeugungsreihenfolge (BFS)};
+
+        % Achse
+        \draw[->, thick] (-0.4, 0) -- (8.0, 0)
+            node[right, font=\scriptsize] {Index};
+
+        % Indizes
+        \foreach \i in {0,1,2,3,4,5,6,7} {
+            \draw (\i, -0.08) -- (\i, 0.08);
+            \node[anchor=north, font=\scriptsize] at (\i, -0.1) {\i};
+        }
+
+        % Stamm (b=0)
+        \foreach \i in {0,1,2} {
+            \fill[gray!40] (\i-0.32, 0.2) rectangle (\i+0.32, 0.95);
+            \node[font=\scriptsize] at (\i, 0.575) {$0$};
+        }
+
+        % Zweig 1 (b=1)
+        \foreach \i in {3,4} {
+            \fill[blue!25] (\i-0.32, 0.2) rectangle (\i+0.32, 0.95);
+            \node[font=\scriptsize] at (\i, 0.575) {$1$};
+        }
+
+        % Zweig 2 (b=2)
+        \foreach \i in {5,6,7} {
+            \fill[blue!25] (\i-0.32, 0.2) rectangle (\i+0.32, 0.95);
+            \node[font=\scriptsize] at (\i, 0.575) {$2$};
+        }
+
+        \node[anchor=east, font=\scriptsize] at (-0.4, 0.575) {$b=$};
+
+        % Klammern
+        \draw [decorate, decoration={brace, amplitude=5pt}]
+            (-0.4, 1.05) -- (2.4, 1.05)
+            node[midway, above=5pt, font=\scriptsize] {Stamm};
+        \draw [decorate, decoration={brace, amplitude=5pt}]
+            (2.6, 1.05) -- (4.4, 1.05)
+            node[midway, above=5pt, font=\scriptsize] {Zweig 1};
+        \draw [decorate, decoration={brace, amplitude=5pt}]
+            (4.6, 1.05) -- (7.4, 1.05)
+            node[midway, above=5pt, font=\scriptsize] {Zweig 2};
+    \end{scope}
+
+\end{tikzpicture}

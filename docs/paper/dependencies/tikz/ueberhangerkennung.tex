@@ -1,0 +1,67 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=1.0,
+    every node/.style={font=\small},
+]
+    % --- Koordinatenachsen (UV-G-System des aktuellen Laufs) ---
+    \draw[->, thick] (-1.0, 0) -- (6.8, 0) node[right] {$+\vec{U}$};
+    \draw[->, thick] (0, -0.3) -- (0, 5.6) node[above] {$\vec{G}$};
+    \node[anchor=north east] at (0,0) {$O$};
+
+    % --- Stamm (Trunk) ---
+    \fill[gray!15] (2, 0) rectangle (3, 3.2);
+    \draw[thick] (2, 0) rectangle (3, 3.2);
+
+    % --- Querbalken (Überhang-Region) ---
+    \fill[gray!30] (0.5, 3.2) rectangle (4.5, 4.0);
+    \draw[thick] (0.5, 3.2) rectangle (4.5, 4.0);
+
+    % --- Schichtdicke t (mit Hilfslinien nach links) ---
+    \draw[gray, thin] (0.5, 2.9) -- (-0.7, 2.9);
+    \draw[gray, thin] (0.5, 3.2) -- (-0.7, 3.2);
+    \draw[<->, thin] (-0.5, 2.9) -- (-0.5, 3.2);
+    \node[anchor=east, font=\scriptsize] at (-0.6, 3.05) {$t$};
+
+    % --- Schicht i-1 (letzte unkritische Schicht des Stamms) ---
+    \draw[blue!70!black, very thick] (2, 2.9) -- (3, 2.9);
+    \draw[blue!70!black, dashed, thin] (3, 2.9) -- (4.8, 2.9);
+    \node[blue!70!black, anchor=west, font=\scriptsize] at (4.8, 2.9)
+        {Schicht $i-1$};
+
+    % --- Schicht i (löst Überhang aus) ---
+    \draw[red!80!black, very thick, dashed] (0.5, 3.2) -- (4.5, 3.2);
+    \draw[red!80!black, dashed, thin] (4.5, 3.2) -- (4.8, 3.2); % Hilfslinie zum Text
+    \node[red!80!black, anchor=west, font=\scriptsize] at (4.8, 3.2)
+        {Schicht $i$};
+
+    % --- Markierungen u^+_{i-1} und u^+_i ---
+    \draw[dotted] (3, 2.9) -- (3, -0.4);
+    \node[anchor=north] at (3, -0.4) {$u^+_{i-1}$};
+
+    \draw[dotted] (4.5, 3.2) -- (4.5, -0.4);
+    \node[anchor=north] at (4.5, -0.4) {$u^+_i$};
+
+    % --- Toleranzschwelle u^+_{i-1} + tau ---
+    \draw[green!55!black, thick] (3, 2.9) -- (3.4, 3.2);
+    \fill[green!55!black, opacity=0.15]
+        (3, 2.9) -- (3.4, 3.2) -- (3, 3.2) -- cycle;
+    \node[green!55!black, anchor=west, font=\scriptsize] at (3.05, 3.05)
+        {$\alpha$};
+
+    \draw[dotted, green!55!black] (3.4, 3.2) -- (3.4, -1.0); % Tiefer gezogen, damit es nicht kollidiert
+    \node[anchor=north, green!55!black, font=\scriptsize] at (3.4, -1.0)
+        {$u^+_{i-1}+\tau$};
+
+    % --- Überschreitung markieren (nach oben verlegt!) ---
+    \draw[red!80!black, thin] (3.4, 4.0) -- (3.4, 4.3);
+    \draw[red!80!black, thin] (4.5, 4.0) -- (4.5, 4.3);
+    \draw[<->, red!80!black, thick] (3.4, 4.2) -- (4.5, 4.2);
+    \node[red!80!black, anchor=south, font=\scriptsize] at (3.95, 4.2)
+        {Überhang};
+
+    % --- Gespawnte Wachstumsrichtung (weiter nach oben verlegt) ---
+    \draw[->, very thick, orange!80!black] (3.0, 4.8) -- (5.7, 4.8);
+    \node[orange!80!black, anchor=south, font=\scriptsize] at (4.35, 4.8)
+        {neuer Lauf $\vec{G}' = +\vec{U}$};
+
+\end{tikzpicture}

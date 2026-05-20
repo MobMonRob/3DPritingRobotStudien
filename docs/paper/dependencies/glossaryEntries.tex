@@ -1,0 +1,673 @@
+\newglossaryentry{slicing}{
+    name={Slicing},
+    description={
+            Slicing bezeichnet die algorithmische Zerlegung eines dreidimensionalen Modells in diskrete Schichten sowie die Ableitung der zugehörigen Werkzeugpfade für den Fertigungsprozess.
+    }
+}
+
+\newglossaryentry{infill}{
+    name={Infill},
+    description={
+            Infill beschreibt die innere Füllstruktur eines additiv gefertigten Bauteils, die mechanische Eigenschaften, Fertigungszeit und Materialverbrauch maßgeblich beeinflusst.
+    }
+}
+
+\newglossaryentry{inverse-kinematics}{
+    name={Inverse Kinematik},
+    description={
+            Die inverse Kinematik umfasst die Berechnung notwendiger Gelenkkoordinaten aus einer vorgegebenen kartesischen Zielpose des Werkzeugs und ist zentral für die Bahnplanung von Robotersystemen.
+    }
+}
+
+\newglossaryentry{non-coplanar}{
+    name={nicht-koplanar},
+    description={
+            Nicht-koplanare Fertigungsstrategien nutzen Schicht- oder Bahnverläufe, die nicht in einer gemeinsamen Ebene liegen, um geometrische Freiheitsgrade des Prozesses besser auszuschöpfen.
+    }
+}
+
+\newglossaryentry{anisotropic-component-properties}{
+    name={anisotrope Bauteileigenschaften},
+    description={
+            Anisotrope Bauteileigenschaften beschreiben richtungsabhängige mechanische, thermische oder strukturelle Kennwerte eines additiv gefertigten Bauteils infolge der schichtweisen Fertigung.
+    }
+}
+
+\newglossaryentry{medusa}{
+    name={MEDUSA},
+    description={
+            MEDUSA ist die im Rahmen dieser Arbeit prototypisch entwickelte Softwarekomponente für nichtplanares \gls{slicing} und Pfadplanung in der robotergestützten additiven Fertigung.
+    }
+}
+
+\newglossaryentry{toolpath}{
+    name={Toolpath},
+    plural={Toolpaths},
+    description={
+            Ein Toolpath bezeichnet die chronologisch geordnete Folge von Bewegungssegmenten, die das Fertigungswerkzeug während des additiven Aufbauprozesses abfährt.
+    }
+}
+
+\newglossaryentry{nonplanar-slicing}{
+    name={nichtplanares Slicing},
+    description={
+            Nichtplanares Slicing bezeichnet Schichtzerlegungsverfahren, bei denen die einzelnen Fertigungsschichten nicht in parallelen Ebenen, sondern entlang gekrümmter oder gekippter Flächen verlaufen.
+    }
+}
+
+\newglossaryentry{singularity}{
+    name={Singularität},
+    plural={Singularitäten},
+    description={
+            Eine Singularität bezeichnet eine Konfiguration eines Robotersystems, in der die kinematische Kette einen oder mehrere Freiheitsgrade verliert und die Jacobi-Matrix singulär wird.
+    }
+}
+
+\newglossaryentry{postprocessor}{
+    name={Postprozessor},
+    plural={Postprozessoren},
+    description={
+            Ein Postprozessor transformiert maschinenunabhängige Werkzeugpfaddaten in steuerungsspezifische Bewegungsbefehle für eine konkrete Fertigungsanlage.
+    }
+}
+
+\newglossaryentry{kronos}{
+    name={KRONOS},
+    description={
+            KRONOS ist die im Rahmen dieser Arbeit konzipierte Softwarekomponente für die roboterkinematische Planung und Echtzeitansteuerung des 6-Achs-Robotersystems in der additiven Fertigung.
+    }
+}
+
+\newglossaryentry{additive-manufacturing}{
+    name={Additive Fertigung},
+    description={
+            Die additive Fertigung umfasst Verfahren, bei denen ein Bauteil durch das gezielte, schichtweise Hinzufügen von Material auf Basis eines digitalen Modells aufgebaut wird.
+            Sie steht im Gegensatz zu subtraktiven Verfahren, bei denen Material entfernt wird.
+    }
+}
+
+\newglossaryentry{material-extrusion}{
+    name={Materialextrusion},
+    description={
+            Materialextrusion bezeichnet ein additives Fertigungsverfahren, bei dem ein thermoplastischer Werkstoff durch eine beheizte Düse gefördert und schichtweise auf einer Bauplattform abgelegt wird.
+    }
+}
+
+\newglossaryentry{cartesian-kinematics}{
+    name={Kartesische Kinematik},
+    description={
+            Eine kartesische Kinematik beschreibt ein Bewegungssystem mit drei zueinander orthogonalen, translatorischen Achsen.
+            Sie ist das vorherrschende Bauprinzip konventioneller 3D-Drucker.
+    }
+}
+
+\newglossaryentry{tool-orientation}{
+    name={Werkzeugorientierung},
+    description={
+            Die Werkzeugorientierung beschreibt die räumliche Ausrichtung des Fertigungswerkzeugs relativ zum Bauteil.
+            In mehrachsigen Systemen ist sie ein zusätzlicher Freiheitsgrad gegenüber rein translatorischen Kinematiken.
+    }
+}
+
+\newglossaryentry{path-planning}{
+    name={Bahnplanung},
+    description={
+            Bahnplanung bezeichnet die Berechnung von Bewegungspfaden des Werkzeugs unter Berücksichtigung von Geometrie, Kollisionsfreiheit, kinematischen Restriktionen und prozesstechnischen Anforderungen.
+    }
+}
+
+\newglossaryentry{degrees-of-freedom}{
+    name={Freiheitsgrade},
+    description={
+            Die Freiheitsgrade eines Bewegungssystems geben die Anzahl der unabhängigen, gleichzeitig steuerbaren Bewegungen an.
+            Ein 6-Achs-Roboter besitzt sechs Freiheitsgrade, drei translatorisch und drei rotatorisch.
+    }
+}
+
+\newglossaryentry{6-axis-slicer}{
+    name={6-Achs-Slicer},
+    description={
+            Ein 6-Achs-Slicer ist ein Slicing-System, das neben der Schichtzerlegung auch die Werkzeugorientierung entlang lokaler Geometrieeigenschaften plant und damit nicht-planare Schicht- und Bahnstrategien für 6-Achs-Robotersysteme ermöglicht.
+    }
+}
+
+\newglossaryentry{mesh}{
+    name={Mesh},
+    plural={Meshes},
+    description={
+            Polygonale Oberflächendarstellung eines dreidimensionalen Körpers, in dieser Arbeit ausschließlich als Dreiecksnetz aus \glspl{vertex}, \glspl{edge} und \glspl{triangle}.
+            Ein Mesh dient als Eingabe der Slicing-Algorithmen.
+    }
+}
+
+\newglossaryentry{vertex}{
+    name={Vertex},
+    plural={Vertizes},
+    description={
+            Eckpunkt eines \gls{mesh}.
+            Jeder Vertex ist durch seine Position im dreidimensionalen Raum sowie optional durch eine Normale gekennzeichnet, die für die Werkzeug-Anstellrichtung in nichtplanaren Slicing-Verfahren interpoliert wird.
+    }
+}
+
+\newglossaryentry{edge}{
+    name={Kante},
+    plural={Kanten},
+    description={
+            Verbindung zwischen zwei \glspl{vertex} eines \gls{mesh}.
+            In einem \gls{watertight}[en] \gls{mesh} gehört jede Kante genau zu zwei \glspl{triangle}.
+            Kanten sind die elementaren Träger der Schnittinformation: ein Schnitt entsteht dort, wo die Endpunkte einer Kante auf verschiedenen Seiten der \gls{slice-plane} liegen.
+    }
+}
+
+\newglossaryentry{triangle}{
+    name={Dreieck},
+    plural={Dreiecke},
+    description={
+            Polygonale Grundfläche eines \gls{mesh}, definiert durch drei \glspl{vertex} und drei \glspl{edge}.
+            Bei der Schnittoperation liefert ein Dreieck unter regulären Voraussetzungen höchstens ein \gls{line-segment} pro \gls{slice-plane}.
+    }
+}
+
+\newglossaryentry{watertight}{
+    name={wasserdicht},
+    description={
+            Eigenschaft eines \gls{mesh}, vollständig geschlossen und mannigfaltig zu sein.
+            Jede \gls{edge} gehört genau zu zwei \glspl{triangle}, sodass sich Schnittsegmente eindeutig zu geschlossenen Konturen verketten lassen.
+            Wasserdichtheit ist Voraussetzung für die Korrektheit aller in dieser Arbeit umgesetzten Slicing-Algorithmen.
+    }
+}
+
+\newglossaryentry{manifold}{
+    name={Mannigfaltigkeit},
+    plural={Mannigfaltigkeiten},
+    description={
+            Topologische Eigenschaft eines \gls{mesh}, in der jeder Punkt eine Umgebung besitzt, die homöomorph zu einer offenen Scheibe der Ebene ist.
+            Jede \gls{edge} gehört zu höchstens zwei \glspl{triangle}.
+            T-Stücke, Selbstdurchdringungen und doppelt belegte Kanten sind ausgeschlossen.
+    }
+}
+
+\newglossaryentry{support-structures}{
+    name={Stützstruktur},
+    plural={Stützstrukturen},
+    description={
+            In der konventionellen \ac{FDM}-Fertigung temporär mitgedrucktes Hilfsmaterial, das überhängende Bauteilbereiche jenseits eines kritischen Überhangwinkels während der Fertigung abstützt und anschließend mechanisch oder chemisch entfernt wird.
+    }
+}
+
+\newglossaryentry{build-axis}{
+    name={Aufbauachse},
+    plural={Aufbauachsen},
+    description={
+            Globale Richtung, entlang der ein Bauteil in der konventionellen additiven Fertigung schichtweise aufgebaut wird.
+            Sie definiert in planaren Slicing-Verfahren die Normale aller \glspl{slice-plane} sowie die konstante \gls{tool-orientation}.
+    }
+}
+
+\newglossaryentry{layer-height}{
+    name={Schichtdicke},
+    plural={Schichtdicken},
+    description={
+            Konstanter Höhenabstand zweier aufeinanderfolgender \glspl{slice-plane} entlang der \gls{build-axis} bzw.\ einer lokalen \gls{growth-direction}.
+            Bestimmt die vertikale Auflösung des gefertigten Bauteils und stellt einen zentralen Parameter aller Slicing-Algorithmen dar.
+    }
+}
+
+\newglossaryentry{growth-direction}{
+    name={Wachstumsrichtung},
+    plural={Wachstumsrichtungen},
+    description={
+            Lokale Richtung, entlang der ein einzelner Slicing-Lauf eines nichtplanaren Verfahrens Schichten aufbaut.
+            Im Gegensatz zur global festgelegten \gls{build-axis} kann jeder \gls{run} eine eigene Wachstumsrichtung besitzen, was die Ausnutzung der zusätzlichen Freiheitsgrade einer 6-\ac{DOF}-Kinematik ermöglicht.
+    }
+}
+
+\newglossaryentry{overhang}{
+    name={Überhang},
+    plural={Überhänge},
+    description={
+            Bauteilregion, deren Oberfläche stärker gegen die aktuelle \gls{growth-direction} geneigt ist als ein parametrierter Grenzwinkel und die deshalb in der konventionellen Fertigung \glspl{support-structures} erfordert.
+            Bei nichtplanaren Slicing-Verfahren kann die Erkennung eines Überhangs einen Wechsel der \gls{growth-direction} auslösen und so eine stützfreie Fertigung ermöglichen.
+    }
+}
+
+\newglossaryentry{run}{
+    name={Lauf},
+    plural={Läufe},
+    description={
+            Verarbeitungseinheit nichtplanarer Slicing-Verfahren mit dynamisch wechselnden Wachstumsrichtungen.
+            Ein Lauf umfasst die Erzeugung aller Schichten eines zusammenhängenden Bauteilabschnitts entlang einer einzelnen \gls{growth-direction} und ist durch Wachstumsrichtung, Startposition sowie Zweigbezeichner eindeutig charakterisiert.
+    }
+}
+
+\newglossaryentry{branch}{
+    name={Zweig},
+    plural={Zweige},
+    description={
+            Bei nichtplanaren Slicing-Verfahren mit dynamischem Richtungswechsel die Gesamtheit aller Schichten, die im selben \gls{run} erzeugt wurden.
+            Zweige bilden eine baumartige Zerlegung des Bauteils, deren Wurzel der von der \gls{buildplate} ausgehende \gls{trunk} ist.
+    }
+}
+
+\newglossaryentry{trunk}{
+    name={Stamm},
+    plural={Stämme},
+    description={
+            Initialer \gls{branch} eines nichtplanaren Slicing-Verfahrens, der von der \gls{buildplate} entlang der globalen \gls{build-axis} aufgebaut wird und aus dem alle weiteren \glspl{branch} hervorgehen.
+    }
+}
+
+\newglossaryentry{contour-ring}{
+    name={Konturring},
+    plural={Konturringe},
+    description={
+            Geschlossener \gls{polygonal-chain}, der die Außenkontur eines Bauteilquerschnitts auf einer Schicht beschreibt.
+            Konturringe entstehen typischerweise durch Verkettung der Schnittsegmente einer \gls{slice-plane} und werden in der Pfadplanung als zusammenhängender Bewegungsbefehl ausgeführt.
+    }
+}
+
+\newglossaryentry{liang-barsky}{
+    name={Liang-Barsky-Verfahren},
+    description={
+            Parametrisches Verfahren zum Clipping von Liniensegmenten an einem achsenparallelen Rechteck.
+            Das Verfahren berechnet die Eintritts- und Austrittsparameter entlang des Segments und liefert das beschnittene Segment ohne iterative Außen-Innen-Tests.
+    }
+}
+
+\newglossaryentry{gram-schmidt}{
+    name={Gram-Schmidt-Verfahren},
+    description={
+            Verfahren zur Konstruktion eines orthonormalen Basistripels aus einer linear unabhängigen Ausgangsmenge.
+            In nichtplanaren Slicing-Verfahren erzeugt eine Gram-Schmidt-artige Konstruktion aus der \gls{growth-direction} und einer Referenzrichtung das lokale Koordinatensystem $(\vec{U}, \vec{V}, \vec{G})$.
+    }
+}
+
+\newglossaryentry{snap-tolerance}{
+    name={Snap-Toleranz},
+    plural={Snap-Toleranzen},
+    description={
+            Numerische Toleranzumgebung im Bereich weniger Mikrometer, mit der bei der Verkettung von Schnittsegmenten geprüft wird, ob zwei berechnete Punkte als identisch zu betrachten sind.
+            Sie überdeckt Rundungsfehler der \gls{ieee-754}-Arithmetik, ohne tatsächlich verschiedene Punkte zu verschmelzen.
+    }
+}
+
+\newglossaryentry{bounding-rectangle}{
+    name={Begrenzungsrechteck},
+    plural={Begrenzungsrechtecke},
+    description={
+            Kleinstes achsenparalleles Rechteck, das eine zweidimensionale Punktmenge vollständig einschließt.
+            Bei der Überhangerkennung in nichtplanaren Slicing-Verfahren wird pro Schicht das Begrenzungsrechteck in der \gls{uv-plane} berechnet und mit dem der Vorgängerschicht verglichen.
+    }
+}
+
+\newglossaryentry{uv-plane}{
+    name={UV-Ebene},
+    plural={UV-Ebenen},
+    description={
+            Zweidimensionale \gls{slice-plane} eines Slicing-Laufs, aufgespannt durch die orthonormalen Achsen $\vec{U}$ und $\vec{V}$ senkrecht zur \gls{growth-direction}.
+            In ihr werden die geometrische Überhangerkennung und das Beschneiden der Segmente durchgeführt.
+    }
+}
+
+\newglossaryentry{buildplate}{
+    name={Buildplate},
+    plural={Buildplates},
+    description={
+            Bauplattform, auf der das Bauteil schichtweise aufgebaut wird.
+            Sie bildet den Ursprung des initialen \gls{run} entlang der globalen \gls{build-axis}.
+    }
+}
+
+\newglossaryentry{polygonal-chain}{
+    name={Polygonzug},
+    plural={Polygonzüge},
+    description={
+            Geordnete Folge von \glspl{line-segment}, deren Endpunkte jeweils mit dem Anfangspunkt des nachfolgenden Segments übereinstimmen.
+            Ein geschlossener Polygonzug, in dem zusätzlich der letzte End- mit dem ersten Anfangspunkt zusammenfällt, bildet einen \gls{contour-ring}.
+    }
+}
+
+\newglossaryentry{coverage}{
+    name={Coverage},
+    description={
+            Vollständigkeitsmaß für nichtplanare Slicing-Verfahren, das den Anteil der durch Schichten abgedeckten Bauteilhöhe beschreibt.
+            Werte nahe eins deuten auf eine vollständige Überdeckung hin, kleinere Werte auf unbearbeitete Regionen, etwa infolge erreichter Iterationslimits.
+    }
+}
+
+\newglossaryentry{slice-plane}{
+    name={Schnitt\-ebene},
+    plural={Schnitt\-ebenen},
+    description={
+            Geometrische Ebene, mit der ein \gls{mesh} bei einer Schicht\-erzeugung verschnitten wird.
+            Ihre Normale entspricht der \gls{build-axis} bei planaren bzw.\ der \gls{growth-direction} bei nichtplanaren Slicing-Verfahren; ihre Lage definiert die Position der erzeugten Schicht.
+    }
+}
+
+\newglossaryentry{line-segment}{
+    name={Liniensegment},
+    plural={Liniensegmente},
+    description={
+            Durch zwei Endpunkte eindeutig festgelegtes, gerades Teilstück einer Geraden.
+            Liniensegmente entstehen als Ergebnis der Schnittoperation eines \gls{triangle} mit einer \gls{slice-plane} und werden anschließend zu einem \gls{polygonal-chain} oder \gls{contour-ring} verkettet.
+    }
+}
+
+\newglossaryentry{traveling-salesman-problem}{
+    name={Traveling Salesman Problem},
+    description={
+            Klassisches Optimierungsproblem der kombinatorischen Optimierung, bei dem die kürzeste geschlossene Rundreise durch eine endliche Menge von Knoten gesucht wird.
+            Im Slicing dient es als Referenzmodell für die Reihenfolgenoptimierung der \glspl{contour-ring} innerhalb einer Schicht.
+            Aufgrund seiner NP-Schwere wird in der Praxis meist auf heuristische Verfahren wie das \gls{nearest-neighbor} zurückgegriffen.
+    }
+}
+
+\newglossaryentry{nearest-neighbor}{
+    name={Nächste-Nachbar-Verfahren},
+    description={
+            Gieriges Heuristikverfahren, das ausgehend von einem Startelement stets das in einem definierten Abstandsmaß nächstgelegene, noch nicht besuchte Element auswählt.
+            Es wird in dieser Arbeit sowohl bei der Verkettung von \glspl{line-segment} zu \glspl{contour-ring} als auch bei der Reihenfolgenoptimierung der Konturringe innerhalb einer Schicht eingesetzt.
+            Das Verfahren liefert keine Optimalitätsgarantie, ist aber für die hier auftretenden Problemgrößen praktisch ausreichend.
+    }
+}
+
+\newglossaryentry{ieee-754}{
+    name={IEEE 754},
+    description={
+            Internationaler Standard zur binären Darstellung von Gleitkommazahlen in Rechnern, der unter anderem die Datentypen \texttt{float} und \texttt{double} der Programmiersprache C++ definiert.
+            Aufgrund der endlichen Mantissenlänge entstehen Rundungsfehler, die bei der Verkettung von Schnittsegmenten durch eine \gls{snap-tolerance} ausgeglichen werden müssen.
+    }
+}
+
+\newglossaryentry{iso-surface}{
+    name={Isofläche},
+    plural={Isoflächen},
+    description={
+            Niveaufläche eines Skalarfeldes \(\Phi: \mathcal{M} \to \mathbb{R}\), entlang derer \(\Phi\) einen konstanten Wert \(\varphi^*\) annimmt, formal \(\{\vec{x} \in \mathcal{M} \mid \Phi(\vec{x}) = \varphi^*\}\).
+            Isoflächen verallgemeinern den Begriff der Höhenlinie auf höhere Dimensionen und stehen lokal senkrecht auf dem Gradienten \(\nabla\Phi\).
+            Ist \(\Phi\) hinreichend glatt und \(\varphi^*\) ein regulärer Wert (d.\,h. \(\nabla\Phi \neq 0\) auf der Niveaumenge), so bildet die Isofläche eine differenzierbare Untermannigfaltigkeit der Kodimension eins.
+    }
+}
+
+\newglossaryentry{slice-surface}{
+    name={Schnittfläche},
+    plural={Schnittflächen},
+    description={
+            Verallgemeinerung der \gls{slice-plane} auf beliebig gekrümmte Flächen.
+            Eine Schnittfläche zerlegt das Eingabe-\gls{mesh} in eine geordnete Folge von Schichten, ohne notwendigerweise eben zu sein.
+            Im planaren und im Base-Algorithmus sind Schnittflächen stets eben, im Kristall-Algorithmus sind es gekrümmte \glspl{iso-surface}.
+    }
+}
+
+\newglossaryentry{iso-step}{
+    name={Iso-Schritt},
+    plural={Iso-Schritte},
+    description={
+            Ein einzelner Schritt der adaptiven Iso-Flächen-Extraktion im Kristall-Algorithmus.
+            Pro Iso-Schritt wird ein Iso-Wert \(\varphi^*_i\) gewählt, das \gls{mesh} mit der zugehörigen \gls{iso-surface} geschnitten und die entstehenden \glspl{line-segment} pro zusammenhängender Komponente zu einer Schicht verkettet.
+            Der Index des Iso-Schritts wird in der Schichtrepräsentation mitgeführt und ist Grundlage des nachgelagerten Branch-Tracking sowie des Branch-Scheduling.
+    }
+}
+
+\newglossaryentry{cotangent-laplacian}{
+    name={Kotangens-Laplace-Operator},
+    plural={Kotangens-Laplace-Operatoren},
+    description={
+            Diskretes Analogon des kontinuierlichen Laplace-Beltrami-Operators auf einem Dreiecksgitter.
+            Die Außerdiagonalelemente sind durch \(L_{ij} = -\tfrac{1}{2}(\cot\alpha_{ij} + \cot\beta_{ij})\) gegeben, wobei \(\alpha_{ij}\) und \(\beta_{ij}\) die der \gls{edge} \((i,j)\) gegenüberliegenden Innenwinkel der beiden angrenzenden \glspl{triangle} sind.
+            Der Operator ist symmetrisch, dünnbesetzt und konvergiert für quasi-uniforme Gitter gegen den kontinuierlichen Laplace-Beltrami-Operator.
+    }
+}
+
+\newglossaryentry{quaternion}{
+    name={Quaternion},
+    plural={Quaternionen},
+    description={
+            Element des vierdimensionalen Schiefkörpers \(\mathbb{H}\), das eine Rotation im dreidimensionalen Raum singularitätsfrei beschreibt.
+            Eine Einheits-Quaternion \((w, x, y, z)\) mit \(w^2 + x^2 + y^2 + z^2 = 1\) repräsentiert eine Drehung um eine Achse \((x, y, z)/\sqrt{1-w^2}\) mit Winkel \(2\arccos(w)\).
+            Quaternionen vermeiden den Gimbal-Lock-Effekt von Eulerwinkeln und sind die Standardrepräsentation der Werkzeugorientierung in ROS und MoveIt.
+    }
+}
+
+\newglossaryentry{idw}{
+    name={Inverse Distance Weighting},
+    description={
+            Verfahren zur räumlichen Interpolation eines Wertes an einer Zielposition aus einer Menge bekannter Stützstellen.
+            Der Wert ergibt sich als gewichtetes Mittel der Stützstellenwerte, wobei das Gewicht jeder Stützstelle invers proportional zu einer Potenz ihres Abstands zur Zielposition ist.
+            Im Kristall-Algorithmus wird Inverse Distance Weighting verwendet, um Infill-Punkte aus der Tangentialebene auf die gekrümmte \gls{iso-surface} anzuheben.
+    }
+}
+
+\newglossaryentry{pca}{
+    name={Hauptkomponentenanalyse},
+    plural={Hauptkomponentenanalysen},
+    description={
+            Statistisches Verfahren zur Bestimmung der Hauptachsen einer Punktwolke durch Eigenwertzerlegung der Kovarianzmatrix.
+            Die Eigenvektoren mit den größten Eigenwerten geben die Richtungen maximaler Varianz an.
+            Im Kristall-Algorithmus dient die Hauptkomponentenanalyse dazu, die Tangentialbasis einer Iso-Schicht so auszurichten, dass die Scanlinien des nicht-planaren Infill entlang der ausgedehnten Komponentenrichtung verlaufen.
+    }
+}
+
+\newglossaryentry{infill-spacing}{
+    name={Bahnabstand},
+    plural={Bahnabstände},
+    description={
+            Senkrechter Abstand zwischen zwei benachbarten Scanlinien des \gls{infill}.
+            Der Bahnabstand bestimmt die Dichte des Infill und damit das Verhältnis aus Materialverbrauch, Druckdauer und mechanischer Steifigkeit des gefertigten Bauteils.
+    }
+}
+
+\newglossaryentry{even-odd-rule}{
+    name={Even-Odd-Regel},
+    plural={Even-Odd-Regeln},
+    description={
+            Punkt-in-Polygon-Test, der die Innen- und Außenbereiche eines Polygons über die Anzahl der Schnittpunkte eines beliebigen Strahls mit dem Polygonrand bestimmt.
+            Eine ungerade Schnittzahl klassifiziert den Ausgangspunkt als innen, eine gerade als außen.
+            Im Kristall-Algorithmus wird die Even-Odd-Regel verwendet, um die Schnittpunkte einer Scanlinie mit dem projizierten Konturpolygon paarweise zu Innen-Linienstücken zu gruppieren.
+    }
+}
+
+\newglossaryentry{snake-pattern}{
+    name={Mäanderbahn},
+    plural={Mäanderbahnen},
+    description={
+            Anordnung paralleler Bahnen, bei der die Bewegungsrichtung jeder zweiten Bahn umgekehrt wird, sodass das Ende einer Bahn unmittelbar in den Anfang der nächsten übergeht.
+            Im \gls{infill} vermeidet die Mäanderbahn Verfahrwege zwischen aufeinanderfolgenden Scanlinien und reduziert dadurch die Druckdauer sowie die Anzahl materialfreier Bewegungen.
+    }
+}
+
+\newglossaryentry{heat-method}{
+    name={Heat Method},
+    description={
+            Numerisches Verfahren zur Approximation geodätischer Distanzen auf einer Mannigfaltigkeit.
+            Eine Wärmediffusionsgleichung wird über einen kurzen Zeitschritt gelöst, der normalisierte Wärmegradient liefert die Näherung der geodätischen Distanzrichtung.
+            Die Heat Method wurde im Kristall-Algorithmus als Alternative zur harmonischen Feldformulierung erwogen, jedoch wegen ihrer Abhängigkeit von einem ad-hoc gewählten Diffusionszeitparameter verworfen.
+    }
+}
+
+\newglossaryentry{drift-threshold}{
+    name={Drift-Schranke},
+    plural={Drift-Schranken},
+    description={
+            Maximaler räumlicher Abstand, den der Schwerpunkt einer Iso-Komponente zwischen zwei aufeinanderfolgenden \glspl{iso-step} aufweisen darf, um noch derselben \gls{branch} zugeordnet zu werden.
+            Größere Sprünge werden im Branch-Tracking als Topologieereignis (Birth, Death, Split oder Merge) interpretiert.
+            Die Drift-Schranke wird typischerweise als Vielfaches der \gls{layer-height} mit einer absoluten Untergrenze parametriert.
+    }
+}
+
+\newglossaryentry{travel-move}{
+    name={Verfahrweg},
+    plural={Verfahrwege},
+    description={
+            Nicht-extrudierende Bewegung des Werkzeugs zwischen zwei Druckbewegungen.
+            Verfahrwege treten innerhalb einer Schicht zwischen disjunkten Konturen, beim Wechsel zwischen \glspl{branch} und beim Übergang zwischen aufeinanderfolgenden Schichten auf.
+            Sie werden in der \gls{toolpath}-Konstruktion explizit markiert, damit der Postprozessor in \ac{kronos} sie mit anderen Geschwindigkeitsprofilen und Extruderparametern versieht als die Druckbewegungen.
+    }
+}
+
+\newglossaryentry{strategy-pattern}{
+    name={Strategie-Entwurfsmuster},
+    plural={Strategie-Entwurfsmuster},
+    description={
+            Verhaltens-Entwurfsmuster der objektorientierten Programmierung, das einen Algorithmus hinter einer abstrakten Schnittstelle kapselt und zur Laufzeit gegen alternative Implementierungen austauschbar macht.
+            Im Kristall-Algorithmus wird das Branch-Scheduling als Strategie-Entwurfsmuster modelliert, sodass alternative Reihenfolgestrategien ohne Änderung der übrigen Pipeline integrierbar sind.
+    }
+}
+
+\newglossaryentry{waypoint}{
+    name={Wegpunkt},
+    plural={Wegpunkte},
+    description={
+            Einzelner Punkt einer Trajektorie, der die vollständige 6-\ac{DOF}-Pose des Werkzeugs (Position und Orientierung) sowie die zugehörigen Prozessparameter (Vorschub, Extrusionsrate, Bewegungsart) zu einem definierten Zeitpunkt der Bewegungsfolge festlegt.
+            Eine geordnete Folge von Wegpunkten definiert implizit die Segmente der Bewegungsfolge.
+    }
+}
+
+\newglossaryentry{semver}{
+    name={Semantic Versioning},
+    description={
+            Versionierungsschema in der Form \emph{MAJOR.MINOR.PATCH}, bei dem die Hauptversion (\emph{MAJOR}) bei nicht-abwärtskompatiblen Änderungen, die Nebenversion (\emph{MINOR}) bei abwärts\-kompatiblen Erweiterungen und die Patchversion (\emph{PATCH}) bei reinen Fehlerkorrekturen erhöht wird.
+            Erlaubt automatisierte Kompatibilitätsprüfungen zwischen unabhängig versionierten Komponenten.
+    }
+}
+
+\newglossaryentry{ipc}{
+    name={Interprozesskommunikation},
+    plural={Interprozesskommunikationen},
+    description={
+            Sammelbegriff für Mechanismen, die den Datenaustausch zwischen mehreren gleichzeitig laufenden Betriebssystemprozessen ermöglichen.
+            Beispiele sind Pipes, Sockets, Shared Memory und nachrichtenbasierte Middleware wie ROS-2-Topics.
+    }
+}
+
+\newglossaryentry{json}{
+    name={JSON},
+    description={
+            \ac{JSON} ist ein textbasiertes, sprachunabhängiges Datenaustauschformat zur strukturierten Repräsentation von Schlüssel-Wert-Paaren, Arrays und verschachtelten Objekten.
+            Aufgrund seiner Lesbarkeit, der einfachen Parsbarkeit und der breiten Unterstützung in nahezu allen Programmiersprachen hat sich \ac{JSON} als De-facto-Standard für den Datenaustausch zwischen heterogenen Softwarekomponenten etabliert.
+            Im Rahmen dieser Arbeit dient \ac{JSON} als Übertragungsformat des geslicten Pfades zwischen \ac{medusa} und \ac{kronos}.
+    }
+}
+\newglossaryentry{json-schema}{
+    name={JSON-Schema},
+    plural={JSON-Schemata},
+    description={
+            Formale Spezifikationssprache zur Beschreibung der Struktur und der zulässigen Werte von \gls{json}-Dokumenten.
+            Erlaubt die maschinelle Validierung eingehender Dokumente gegen einen vorgegebenen Vertrag und damit die explizite Versionierung von Schnittstellen.
+    }
+}
+
+\newglossaryentry{sphere-shell}{
+    name={Sphärenschale},
+    plural={Sphärenschalen},
+    description={
+        Zweidimensionale Mannigfaltigkeit aller Punkte des dreidimensionalen Raums, die von einem festen Mittelpunkt denselben Abstand $r$ besitzen.
+        Geometrisch beschreibt sie die Oberfläche einer Kugel mit Radius $r$.
+    }
+}
+
+\newglossaryentry{sphere-center}{
+    name={Sphärenmittelpunkt},
+    plural={Sphärenmittelpunkte},
+    description={
+        Punkt im dreidimensionalen Raum, von dem aus eine Sphäre oder eine Schar konzentrischer Sphärenschalen durch einen einheitlichen Radius definiert wird.
+    }
+}
+
+\newglossaryentry{sphere-radius}{
+    name={Sphärenradius},
+    plural={Sphärenradien},
+    description={
+        Euklidischer Abstand zwischen dem Sphärenmittelpunkt und einem beliebigen Punkt auf der zugehörigen Sphärenschale.
+        Charakterisiert zusammen mit dem Sphärenmittelpunkt eine Sphäre eindeutig.
+    }
+}
+
+\newglossaryentry{ray-casting}{
+    name={Ray-Casting},
+    plural={Ray-Casting-Verfahren},
+    description={
+        Geometrisches Verfahren, bei dem von einem Testpunkt aus ein Strahl in eine beliebige Richtung ausgesandt und mit den Flächen einer Geometrie verschnitten wird.
+        Die Anzahl bzw. Anordnung der Schnitte erlaubt Aussagen über Sichtbarkeit, Zugehörigkeit zu Volumina oder die Lage des Testpunkts relativ zur Geometrie.
+    }
+}
+
+\newglossaryentry{ci-pipeline}{
+    name={CI-Pipeline},
+    plural={CI-Pipelines},
+    description={
+            Automatisierte Abfolge von Build-, Test- und Auslieferungsschritten, die bei jeder Änderung am Quellcode-Repository ausgeführt wird und die Grundlage der \gls{ci} bildet.
+        }
+}
+
+\newglossaryentry{ci}{
+    name={Continuous Integration},
+    description={
+            Praxis der Softwareentwicklung, bei der Quellcodeänderungen automatisch in einen gemeinsamen Hauptzweig integriert werden und dort durch automatisierte Build- und Testläufe kontinuierlich verifiziert werden.
+            Ziel ist es, Integrationsprobleme frühzeitig zu erkennen und einen jederzeit lauffähigen Stand des Systems sicherzustellen.
+        }
+}
+
+\newglossaryentry{family}{
+    name={Schar},
+    plural={Scharen},
+    description={
+        In der Geometrie eine durch einen oder mehrere Parameter indizierte Menge gleichartig konstruierter geometrischer Objekte wie Geraden, Ebenen, Kurven oder Flächen, deren Elemente sich ausschließlich in den jeweiligen Parameterwerten unterscheiden.
+    }
+}
+
+\newglossaryentry{cmake}{
+    name={CMake},
+    description={
+            CMake ist ein plattformübergreifendes Build-Konfigurationssystem, das aus deklarativen Beschreibungen native Build-Dateien für unterschiedliche Toolchains erzeugt und die Verwaltung von Targets, Sichtbarkeiten und Abhängigkeiten zentralisiert.
+    }
+}
+
+\newglossaryentry{fetchcontent}{
+    name={FetchContent},
+    description={
+            CMake-Modul zum Beziehen externer Quellprojekte zur Konfigurationszeit.
+            Quelle und Versions-Tag werden deklarativ angegeben, anschließend wird das Projekt lokal ausgecheckt und als Teil des aktuellen Builds eingebunden, ohne dass eine systemweite Installation erforderlich ist.
+    }
+}
+
+\newglossaryentry{FNV-1a}{
+    name={FNV-1a-Hash},
+    description={
+            Nicht-kryptografischer Hash-Algorithmus aus der Familie der Fowler-Noll-Vo-Funktionen.
+            Liefert einen 32- oder 64-Bit-Hashwert über einen Bytestrom durch alternierendes XOR und Multiplikation mit einer \ac{FNV}-Primzahl.
+            Geeignet für Integritätsprüfungen und Hashtabellen, nicht jedoch für sicherheitskritische Anwendungen.
+        }
+}
+
+\newglossaryentry{viridis}{
+    name={Viridis},
+    description={
+            Wahrnehmungsuniforme Farbpalette mit monoton wachsender Helligkeit und ohne Bandbildung in den dominanten Farbsehschwächen.
+            Sie wurde für die visuelle Darstellung kontinuierlicher Skalarfelder entwickelt und ist Standardpalette in zahlreichen wissenschaftlichen Visualisierungswerkzeugen.
+    }
+}
+
+\newglossaryentry{face}{
+    name={Face},
+    plural={Faces},
+    description={
+        Elementare polygonale Zelle eines \gls{mesh}, die durch eine geordnete Folge von \glspl{vertex} aufgespannt wird und eine planare Teilfläche der diskreten Geometrie definiert.
+        In Dreiecksgittern, die in der additiven Fertigung und im geometrischen Rechnen üblich sind, ist jeder Face ein Dreieck mit genau drei Eckpunkten.
+        Benachbarte Faces teilen sich mindestens eine gemeinsame \gls{edge}.
+        Jedem Face kann eine Flächennormale zugeordnet werden, die senkrecht auf der aufgespannten Ebene steht und die lokale Orientierung der Oberfläche kodiert.
+    }
+}
+
+\newglossaryentry{segment}{
+    name={Segment},
+    plural={Segmente},
+    description={
+        Geradlinige Verbindung zwischen zwei Punkten im dreidimensionalen Raum, die eine elementare geometrische oder kinematische Einheit darstellt.
+        Im geometrischen Kontext bezeichnet ein Segment das Ergebnis des Schnitts einer Ebene oder Iso-Fläche mit einem \gls{face}: ein gerichtetes Linienstück, dessen Endpunkte auf den \glspl{edge} des \glspl{face} liegen.
+        Im Kontext der Werkzeugpfadplanung ist ein Segment die kleinste ausführbare Bewegungseinheit des Roboters; es trägt neben Anfangs- und Endpunkt eine Werkzeugorientierung sowie Metadaten wie Branch-Bezeichner, Schicht-Index und die Unterscheidung zwischen Druck- und Verbindungsbewegung.
+        Aufeinanderfolgende Segmente bilden zusammen einen \gls{toolpath}.
+    }
+}
+
+\makeglossaries

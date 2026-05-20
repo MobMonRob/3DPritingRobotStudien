@@ -1,0 +1,36 @@
+\chapter*{Zusammenfassung}\label{chap:summary}
+\phantomsection
+\addcontentsline{toc}{chapter}{Zusammenfassung}
+\medskip
+\noindent
+Die vorliegende Projektarbeit befasst sich mit der prototypischen Entwicklung eines Slicers für die nichtplanare, robotergestützte additive Fertigung.
+Konventionelle Slicer zerlegen Bauteile in rein horizontale Schichten.
+Diese Methode bringt inhärente Nachteile mit sich, wie richtungsabhängige Bauteileigenschaften sowie die Notwendigkeit von Stützkonstruktionen für den Druck von Überhängen.
+Um diese Limitationen zu überwinden, nutzt diese Studienarbeit die sechs Freiheitsgrade eines Industrieroboters, um die Werkzeugorientierung und Bahnplanung räumlich flexibel an die Bauteilgeometrie anzupassen.
+
+Zur Lösung der softwareseitigen Herausforderungen wurde eine modulare Architektur entworfen, die aus zwei entkoppelten Hauptkomponenten besteht.
+Das Modul \acs{medusa} übernimmt dabei die geometrische Bahnplanung, während das Modul \acs{kronos} als Middleware die Schnittstelle zum Industrieroboter bildet.
+
+Im Rahmen der Arbeit wurden vier spezifische Slicing-Strategien konzipiert und in unterschiedlicher Tiefe untersucht:
+
+\begin{enumerate}
+    \item \textbf{Planarer Algorithmus} nutzt konventionelle horizontale Schnittebenen und dient im Projekt als funktionale Referenz und Validierungsbaseline.
+    \item \textbf{Base-Algorithmus} ist ein vollständig implementierter Multiachsen-Ansatz.
+    Er erkennt Überhänge geometrisch und spaltet das Bauteil dynamisch in einen \emph{Stamm} und in \emph{Zweige} auf.
+    Diese Zweige werden mit eigenen, lokalen Wachstumsrichtungen gedruckt, was eine stützstrukturfreie Fertigung von Überhängen ermöglicht.
+    \item \textbf{Sphären-Algorithmus} ist ein rein konzeptioneller Entwurf, der das Bauteil in konzentrische Sphärenschalen um einen zentralen Startpunkt zerlegt.
+    Er wurde nicht implementiert, da an den Übergängen zwischen den Sphären mechanische Schwachstellen durch zu kleine Bindungsflächen zu erwarten sind.
+    \item \textbf{Kristall-Algorithmus} ist ein komplexer, feldgetriebener Ansatz.
+    Er basiert auf der Lösung der Laplace-Gleichung, um ein harmonisches Skalarfeld im Bauteilinneren zu erzeugen.
+    Die Druckschichten folgen als gekrümmte Iso-Flächen der natürlichen Geometrie des Bauteils, wodurch die Werkzeugorientierung kontinuierlich variiert.
+\end{enumerate}
+
+Die Evaluation des Gesamtsystems erfolgte simulativ anhand von drei Testgeometrien (Würfel, Doppelpyramide, T-Stück) in der RViz-Umgebung.
+Die Ergebnisse belegen die prinzipielle Machbarkeit der etablierten Datenkette vom \acs{CAD}-Modell bis zur simulierten 6-Achs-Roboterbewegung.
+Mit dem Base-Algorithmus konnten 90\degree-Überhänge erfolgreich und stützfrei geplant werden.
+Auch der Kristall-Algorithmus demonstriert erfolgreich die Generierung stützfreier, vollständig nicht-planarer Werkzeugpfade.
+
+Als kritische Herausforderungen für die zukünftige Weiterentwicklung identifiziert die Arbeit die Grenzen des Inverse-Kinematik-Solvers sowie die Notwendigkeit,
+in Zukunft die reale Extrusionsphysik und eine ebenenübergreifende Branch-Kollisionsprüfung zu integrieren.
+Insgesamt liefert die Arbeit einen wertvollen und flexibel erweiterbaren „Proof of Concept“ zur Schließung der softwareseitigen Lücke in der robotergestützten additiven Fertigung.
+\sig{Ben Stahl}

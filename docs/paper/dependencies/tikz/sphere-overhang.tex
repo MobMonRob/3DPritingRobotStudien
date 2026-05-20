@@ -1,0 +1,91 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=1.4,
+    every node/.style={font=\small},
+]
+    % --- Buildplate ---
+    \fill[gray!15] (-2.5, -0.4) rectangle (3.0, 0);
+    \draw[gray!60] (-2.5, -0.4) rectangle (3.0, 0);
+
+    % --- Bauteil mit unregelmäßiger Form (Pilz-Topf-artig) ---
+    % Linker Teil: glatte Wölbung
+    % Rechter Teil: Schulter mit Lücke darüber
+    \fill[blue!10]
+        (-2.0, 0) -- (-2.0, 0.4)
+        .. controls (-1.8, 1.5) and (-0.8, 2.1) ..
+        (0.5, 2.0) --
+        (1.0, 1.6) --
+        (1.0, 0.5) --
+        (1.5, 0.5) --
+        (1.5, 0) -- cycle;
+    \draw[thick, blue!60!black]
+        (-2.0, 0) -- (-2.0, 0.4)
+        .. controls (-1.8, 1.5) and (-0.8, 2.1) ..
+        (0.5, 2.0) --
+        (1.0, 1.6) --
+        (1.0, 0.5) --
+        (1.5, 0.5) --
+        (1.5, 0);
+    \node[blue!60!black, font=\scriptsize, anchor=west]
+        at (-2.0, -0.6) {Bauteil};
+
+    % --- Mittelpunkt c ---
+    \fill[red!80!black] (-0.3, 0) circle (2pt);
+    \node[red!80!black, anchor=north east, font=\scriptsize]
+        at (-0.3, -0.05) {$\vec{c}$};
+
+    % --- Sphärenschale S_i ---
+    \draw[thick, orange!85!black]
+        ($(-0.3, 0) + (0:1.7)$) arc (0:180:1.7);
+    \node[orange!85!black, font=\scriptsize, anchor=west]
+        at ($(-0.3, 0) + (0:1.75)$) {$S_i$};
+
+    % =========================================================
+    % Punkt A (druckbar, im Bauteil)
+    % auf der Sphäre bei Winkel ~110°
+    % =========================================================
+    \coordinate (A) at ($(-0.3, 0) + (115:1.7)$);
+    \fill[green!50!black] (A) circle (2.5pt);
+    \node[green!50!black, anchor=south east, font=\scriptsize]
+        at ($(A) + (-0.05, 0.05)$) {$\vec{p}_A$};
+
+    % Radiale Normale n_A (nach außen)
+    \draw[->, thick, green!50!black]
+        (A) -- ($(A) + (115:0.45)$);
+    \node[green!50!black, font=\scriptsize, anchor=south east]
+        at ($(A) + (115:0.5)$) {$\hat{n}_A$};
+
+    % Test-Punkt p_A - delta * n_A (nach innen)
+    \fill[green!50!black] ($(A) + (115:-0.3)$) circle (1.5pt);
+    \draw[->, thin, green!50!black, dashed]
+        (A) -- ($(A) + (115:-0.3)$);
+    \node[green!50!black, font=\tiny, anchor=west,
+            align=left, fill=white, inner sep=1pt]
+        at ($(A) + (115:-0.45)$)
+        {im Bauteil\\$\Rightarrow$ druckbar};
+
+    % =========================================================
+    % Punkt B (Überhang, außerhalb Bauteil)
+    % auf der Sphäre über der Lücke (Schulter rechts)
+    % =========================================================
+    \coordinate (B) at ($(-0.3, 0) + (35:1.7)$);
+    \fill[red!80!black] (B) circle (2.5pt);
+    \node[red!80!black, anchor=south west, font=\scriptsize]
+        at ($(B) + (0.05, 0.05)$) {$\vec{p}_B$};
+
+    % Radiale Normale n_B (nach außen)
+    \draw[->, thick, red!80!black]
+        (B) -- ($(B) + (35:0.45)$);
+    \node[red!80!black, font=\scriptsize, anchor=south west]
+        at ($(B) + (35:0.5)$) {$\hat{n}_B$};
+
+    % Test-Punkt p_B - delta * n_B (nach innen, AUSSERHALB Bauteil)
+    \fill[red!80!black] ($(B) + (35:-0.3)$) circle (1.5pt);
+    \draw[->, thin, red!80!black, dashed]
+        (B) -- ($(B) + (35:-0.3)$);
+    \node[red!80!black, font=\tiny, anchor=north west,
+            align=left, fill=white, inner sep=1pt]
+        at ($(B) + (35:-0.4) + (0.05, -0.1)$)
+        {außerhalb\\$\Rightarrow$ \glsentrytext{overhang}};
+
+\end{tikzpicture}

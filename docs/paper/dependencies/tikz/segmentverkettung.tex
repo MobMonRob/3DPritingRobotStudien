@@ -1,0 +1,152 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=0.85,
+    every node/.style={font=\small},
+]
+    % ============================================================
+    % PANEL A: Unsortierte Segmente
+    % ============================================================
+    \begin{scope}[xshift=0cm, yshift=0cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.2)
+            {(a) Unsortierte Segmente};
+
+        % 7 Segmente mit Luecken (shorten)
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (0.6, 1.0) -- (1.8, 0.6);
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (3.6, 2.6) -- (3.0, 3.4);
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (1.8, 0.6) -- (3.2, 0.8);
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (1.4, 3.2) -- (0.6, 2.4);
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (3.6, 2.6) -- (3.2, 0.8);   % wird in (c) umgedreht
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (3.0, 3.4) -- (1.4, 3.2);
+        \draw[gray!70, thick, ->, shorten >=3pt, shorten <=3pt]
+            (0.6, 2.4) -- (0.6, 1.0);
+
+        % Endpunkt-Marker zeigen, dass es 7 isolierte Segmente sind
+        \foreach \p in {(0.6, 1.0), (1.8, 0.6), (3.2, 0.8), (3.6, 2.6),
+                        (3.0, 3.4), (1.4, 3.2), (0.6, 2.4)} {
+            \fill[gray!90!black] \p circle (1.5pt);
+        }
+
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.2)
+            {7 Segmente, beliebige\\
+             Speicherreihenfolge und\\
+             Ausrichtung};
+    \end{scope}
+
+    % ============================================================
+    % PANEL B: Wahl Startsegment + Cursor
+    % ============================================================
+    \begin{scope}[xshift=6cm, yshift=0cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.2)
+            {(b) Startsegment};
+
+        % Inaktive Segmente
+        \draw[gray!40, thick] (3.6, 2.6) -- (3.0, 3.4);
+        \draw[gray!40, thick] (1.8, 0.6) -- (3.2, 0.8);
+        \draw[gray!40, thick] (1.4, 3.2) -- (0.6, 2.4);
+        \draw[gray!40, thick] (3.6, 2.6) -- (3.2, 0.8);
+        \draw[gray!40, thick] (3.0, 3.4) -- (1.4, 3.2);
+        \draw[gray!40, thick] (0.6, 2.4) -- (0.6, 1.0);
+
+        % Startsegment in Magenta
+        \draw[magenta!80!black, very thick, ->] (0.6, 1.0) -- (1.8, 0.6);
+        \fill[magenta!80!black] (0.6, 1.0) circle (3pt);
+        \node[magenta!80!black, anchor=east, font=\scriptsize]
+            at (0.45, 1.0) {Start};
+
+        % Cursor am freien Ende
+        \fill[red!70!black] (1.8, 0.6) circle (3.5pt);
+        \draw[red!70!black, thick] (1.8, 0.6) circle (5.5pt);
+        \node[red!70!black, anchor=north west, font=\scriptsize]
+            at (1.95, 0.40) {Cursor};
+
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.2)
+            {Beliebiges Startsegment\\
+             gewählt; Cursor markiert\\
+             das freie Ende};
+    \end{scope}
+
+    % ============================================================
+    % PANEL C: Iteration mit Umdrehen
+    % ============================================================
+    \begin{scope}[xshift=0cm, yshift=-7cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.2)
+            {(c) Segment umkehren};
+
+        % Bisheriger Ringverlauf in Magenta
+        \draw[magenta!80!black, very thick, ->] (0.6, 1.0) -- (1.8, 0.6);
+        \draw[magenta!80!black, very thick, ->] (1.8, 0.6) -- (3.2, 0.8);
+
+        % Cursor am aktuellen Ende
+        \fill[red!70!black] (3.2, 0.8) circle (3.5pt);
+        \draw[red!70!black, thick] (3.2, 0.8) circle (5.5pt);
+
+        % Originalrichtung (gestrichelt grau, LINKS versetzt)
+        \draw[gray!50, thick, dashed, ->]
+            ($(3.6, 2.6)+(-0.14, 0.03)$) -- ($(3.2, 0.8)+(-0.14, 0.03)$);
+
+        % Umgedrehte Richtung (orange, RECHTS versetzt)
+        \draw[orange!80!black, very thick, ->]
+            ($(3.2, 0.8)+(0.14, -0.03)$) -- ($(3.6, 2.6)+(0.14, -0.03)$);
+
+        % Restliche Segmente grau
+        \draw[gray!40, thick] (3.6, 2.6) -- (3.0, 3.4);
+        \draw[gray!40, thick] (1.4, 3.2) -- (0.6, 2.4);
+        \draw[gray!40, thick] (3.0, 3.4) -- (1.4, 3.2);
+        \draw[gray!40, thick] (0.6, 2.4) -- (0.6, 1.0);
+
+        % Annotation "original" - INNEN im Ring
+        \node[gray!50!black, anchor=east, font=\scriptsize]
+            at (2.8, 2.0) {original};
+        \draw[gray!50!black, thin]
+            (2.85, 2.0) to[bend right=10] (3.25, 1.7);
+
+        \node[orange!80!black, anchor=west, font=\scriptsize]
+            at (3.9, 2.4) {umkehren};
+        \draw[orange!80!black, ->, thick]
+            (4.0, 1.5) -- (4.2, 1.5) arc[start angle=-90, end angle=90, radius=0.25] -- (4.0, 2.0);
+
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.2)
+            {Näherer Endpunkt liegt am\\
+             hinteren Ende $\Rightarrow$ Segment\\
+             vor Anfügen umkehren};
+    \end{scope}
+
+    % ============================================================
+    % PANEL D: Geschlossener Ring + Snap-Tolerance
+    % ============================================================
+    \begin{scope}[xshift=6cm, yshift=-7cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.2)
+            {(d) Geschlossener Ring};
+
+        % Startpunkt-Marker
+        \fill[magenta!80!black] (0.6, 1.0) circle (3pt);
+
+        % Toleranzkreis um Startpunkt
+        \draw[red!70!black, thick, dashed] (0.6, 1.0) circle (11pt);
+
+        \node[red!70!black, anchor=east, font=\scriptsize, align=center]
+            at (0.2, 0.2) {Snap-Tolerance\\$\varepsilon$};
+        \draw[red!70!black, ->, thin]
+            (-0.25, 0.7) to[out=45, in=200] (0.25, 0.9);
+
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.2)
+            {Cursor in $\varepsilon$-Umgebung\\
+             des Startpunkts\\
+             $\Rightarrow$ Ring schließt};
+
+        % Vollstaendiger Ring in Magenta
+        \draw[magenta!80!black, very thick, ->] (0.6, 1.0) -- (1.8, 0.6);
+        \draw[magenta!80!black, very thick, ->] (1.8, 0.6) -- (3.2, 0.8);
+        \draw[magenta!80!black, very thick, ->] (3.2, 0.8) -- (3.6, 2.6);
+        \draw[magenta!80!black, very thick, ->] (3.6, 2.6) -- (3.0, 3.4);
+        \draw[magenta!80!black, very thick, ->] (3.0, 3.4) -- (1.4, 3.2);
+        \draw[magenta!80!black, very thick, ->] (1.4, 3.2) -- (0.6, 2.4);
+        \draw[magenta!80!black, very thick, ->] (0.6, 2.4) -- (0.5, 1.2);
+    \end{scope}
+\end{tikzpicture}

@@ -1,0 +1,194 @@
+solid T
+  // Front (z = +0.1)
+  facet normal 0 0 1
+    outer loop
+      vertex -0.5 0.3 0.1
+      vertex 0.5 0.3 0.1
+      vertex 0.5 0.5 0.1
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -0.5 0.3 0.1
+      vertex 0.5 0.5 0.1
+      vertex -0.5 0.5 0.1
+    endloop
+  endfacet
+
+  facet normal 0 0 1
+    outer loop
+      vertex -0.1 -0.5 0.1
+      vertex 0.1 -0.5 0.1
+      vertex 0.1 0.3 0.1
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex -0.1 -0.5 0.1
+      vertex 0.1 0.3 0.1
+      vertex -0.1 0.3 0.1
+    endloop
+  endfacet
+
+  // Back (z = -0.1)
+  facet normal 0 0 -1
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex 0.5 0.5 -0.1
+      vertex 0.5 0.3 -0.1
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex -0.5 0.5 -0.1
+      vertex 0.5 0.5 -0.1
+    endloop
+  endfacet
+
+  facet normal 0 0 -1
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex 0.1 0.3 -0.1
+      vertex 0.1 -0.5 -0.1
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex -0.1 0.3 -0.1
+      vertex 0.1 0.3 -0.1
+    endloop
+  endfacet
+
+  // Top of cap (y = +0.5)
+  facet normal 0 1 0
+    outer loop
+      vertex -0.5 0.5 -0.1
+      vertex 0.5 0.5 -0.1
+      vertex 0.5 0.5 0.1
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex -0.5 0.5 -0.1
+      vertex 0.5 0.5 0.1
+      vertex -0.5 0.5 0.1
+    endloop
+  endfacet
+
+  // Bottom surfaces
+  // Cap bottom left (y = 0.3, x ∈ [-0.5, -0.1])
+  facet normal 0 -1 0
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex -0.1 0.3 0.1
+      vertex -0.1 0.3 -0.1
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex -0.5 0.3 0.1
+      vertex -0.1 0.3 0.1
+    endloop
+  endfacet
+
+  // Cap bottom right (y = 0.3, x ∈ [0.1, 0.5])
+  facet normal 0 -1 0
+    outer loop
+      vertex 0.1 0.3 -0.1
+      vertex 0.5 0.3 0.1
+      vertex 0.5 0.3 -0.1
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 0.1 0.3 -0.1
+      vertex 0.1 0.3 0.1
+      vertex 0.5 0.3 0.1
+    endloop
+  endfacet
+
+  // Stem bottom (y = -0.5)
+  facet normal 0 -1 0
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex 0.1 -0.5 0.1
+      vertex 0.1 -0.5 -0.1
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex -0.1 -0.5 0.1
+      vertex 0.1 -0.5 0.1
+    endloop
+  endfacet
+
+  // Left faces
+  // Cap left (x = -0.5)
+  facet normal -1 0 0
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex -0.5 0.3 0.1
+      vertex -0.5 0.5 0.1
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -0.5 0.3 -0.1
+      vertex -0.5 0.5 0.1
+      vertex -0.5 0.5 -0.1
+    endloop
+  endfacet
+
+  // Stem left (x = -0.1)
+  facet normal -1 0 0
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex -0.1 -0.5 0.1
+      vertex -0.1 0.3 0.1
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex -0.1 -0.5 -0.1
+      vertex -0.1 0.3 0.1
+      vertex -0.1 0.3 -0.1
+    endloop
+  endfacet
+
+  // Right faces
+  // Cap right (x = 0.5)
+  facet normal 1 0 0
+    outer loop
+      vertex 0.5 0.3 -0.1
+      vertex 0.5 0.5 0.1
+      vertex 0.5 0.3 0.1
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 0.5 0.3 -0.1
+      vertex 0.5 0.5 -0.1
+      vertex 0.5 0.5 0.1
+    endloop
+  endfacet
+
+  // Stem right (x = 0.1)
+  facet normal 1 0 0
+    outer loop
+      vertex 0.1 -0.5 -0.1
+      vertex 0.1 0.3 0.1
+      vertex 0.1 -0.5 0.1
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 0.1 -0.5 -0.1
+      vertex 0.1 0.3 -0.1
+      vertex 0.1 0.3 0.1
+    endloop
+  endfacet
+endsolid T

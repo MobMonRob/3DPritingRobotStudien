@@ -1,0 +1,123 @@
+\begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small},
+]
+    % =========================================================
+    % (a) Persistence-aehnliches Diagramm
+    % =========================================================
+    \node[font=\bfseries, anchor=west] at (0, 3.0)
+        {(a) Topologie-Evolution über die Iso-Stufen};
+
+    % Achsen
+    \draw[->, thick] (-0.3, 0) -- (10, 0)
+        node[anchor=west, font=\scriptsize] {$\varphi^*$};
+
+    % X-Skala
+    \foreach \x/\v in {0/0, 2.5/0{,}25, 5/0{,}5, 7.5/0{,}75, 10/1} {
+        \draw (\x, -0.1) -- (\x, 0.1);
+        \node[anchor=north, font=\scriptsize] at (\x, -0.15) {\v};
+    }
+
+    % Iso-Stufen (gestrichelte Hilfslinien)
+    \foreach \x in {1, 2, 3, 4, 5, 6, 7, 8, 9} {
+        \draw[gray!40, dotted, very thin] (\x, -1.8) -- (\x, 2.5);
+    }
+
+    % --- LINIEN (zuerst zeichnen, damit Symbole obenauf liegen) ---
+    % Stamm-Branch (b=0) von phi*=0 bis exakt phi*=0.5 (x=5)
+    \draw[ultra thick, blue!70!black] (0.3, 0) -- (5.0, 0);
+    
+    % Zweig 1 (b=1, oben) nach Split
+    \draw[ultra thick, orange!85!black] (5.0, 0) -- (5.5, 1.5) -- (10, 1.5);
+    
+    % Zweig 2 (b=2, unten) nach Split
+    \draw[ultra thick, green!50!black] (5.0, 0) -- (5.5, -1.5) -- (10, -1.5);
+
+
+    % --- SYMBOLE & TEXTE (liegen nun sauber über den Linien) ---
+    % Stamm Text
+    \node[font=\scriptsize, blue!70!black, anchor=south, align=center]
+        at (2.5, 0.15) {Stamm $b=0$};
+
+    % Zweig Texte
+    \node[font=\scriptsize, orange!85!black, anchor=south]
+        at (8, 1.65) {Zweig $b=1$};
+    \node[font=\scriptsize, green!50!black, anchor=north]
+        at (8, -1.65) {Zweig $b=2$};
+
+    % Birth-Symbol (offener Kreis) am Stammbeginn
+    \draw[blue!70!black, fill=white, thick] (0.3, 0) circle (0.13);
+    \node[font=\scriptsize, anchor=south] at (0.3, 0.25) {Birth};
+
+    \draw[red!80!black, fill=red!20, thick]
+        (5.0, -0.18) -- (5.0, 0.18) -- (5.45, 0) -- cycle;
+    \node[font=\scriptsize, red!80!black, anchor=south]
+        at (4.5, 0.15) {Split};
+
+    % Death-Symbole (gefuellte Kreise) am Ende
+    \draw[orange!85!black, fill=orange!85!black, thick]
+        (10, 1.5) circle (0.13);
+    \draw[green!50!black, fill=green!50!black, thick]
+        (10, -1.5) circle (0.13);
+    \node[font=\scriptsize, anchor=west] at (10.2, 1.5) {Death};
+    \node[font=\scriptsize, anchor=west] at (10.2, -1.5) {Death};
+
+    % =========================================================
+    % (b) T-Traeger-Referenz (klein, unten links)
+    % =========================================================
+    \begin{scope}[xshift=1.5cm, yshift=-4.2cm, scale=0.6]
+        \node[font=\bfseries, anchor=west] at (-1.5, 2.2)
+            {(b) Zugehöriges Bauteil};
+
+        % Farbige Füllungen
+        \fill[blue!30] (-0.3, -0.5) rectangle (0.3, 1.5);     % Kompletter Stamm
+        \fill[green!40] (-1.5, 1.0) rectangle (-0.3, 1.5);    % Linker Querbalken (b=2)
+        \fill[orange!40] (0.3, 1.0) rectangle (1.5, 1.5);     % Rechter Querbalken (b=1)
+
+        \draw[thick] (-0.3, 1.0) -- (-0.3, 1.5);
+        \draw[thick] (0.3, 1.0) -- (0.3, 1.5);
+
+        % Äußere Umrandung
+        \draw[thick]
+            (-0.3, -0.5) -- (0.3, -0.5) -- (0.3, 1.0) --
+            (1.5, 1.0) -- (1.5, 1.5) --
+            (-1.5, 1.5) -- (-1.5, 1.0) --
+            (-0.3, 1.0) -- cycle;
+
+        % Branch-Beschriftungen
+        \node[font=\tiny, blue!70!black] at (0, -1.0) {$b=0$};
+        \node[font=\tiny, orange!85!black] at (0.9, 0.75) {$b=1$};
+        \node[font=\tiny, green!50!black] at (-0.9, 0.75) {$b=2$};
+    \end{scope}
+
+    % =========================================================
+    % (c) Legende der Topologie-Ereignisse (rechts neben Bauteil)
+    % =========================================================
+    \begin{scope}[xshift=6.5cm, yshift=-4.2cm]
+        \node[font=\bfseries, anchor=west] at (0, 1.5)
+            {(c) Topologie-Ereignisse};
+
+        % Birth
+        \draw[black, fill=white, thick] (0.2, 1.0) circle (0.10);
+        \node[font=\scriptsize, anchor=west] at (0.4, 1.0)
+            {Birth: neue Komponente};
+
+        % Death
+        \draw[black, fill=black, thick] (0.2, 0.6) circle (0.10);
+        \node[font=\scriptsize, anchor=west] at (0.4, 0.6)
+            {Death: Komponente endet};
+
+        % Split
+        \draw[red!80!black, fill=red!20, thick]
+            (0.1, 0.1) -- (0.1, 0.3) -- (0.3, 0.2) -- cycle;
+        \node[font=\scriptsize, anchor=west] at (0.4, 0.2)
+            {Split: Aufspaltung};
+
+        % Merge
+        \draw[red!80!black, fill=red!20, thick]
+            (0.3, -0.4) -- (0.3, -0.2) -- (0.1, -0.3) -- cycle;
+        \node[font=\scriptsize, anchor=west] at (0.4, -0.3)
+            {Merge: Zusammenführung};
+    \end{scope}
+
+\end{tikzpicture}

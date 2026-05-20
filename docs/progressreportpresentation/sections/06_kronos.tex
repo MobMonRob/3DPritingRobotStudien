@@ -1,0 +1,33 @@
+\section{Vorstellung Kronos}
+
+\begin{frame}{Kronos: Kinematic Robotic Operations \& Navigation Orchestration System}
+    \begin{alertblock}{Überblick}
+        Kronos ist die Kinematik- und Pfadplanungs-Engine unseres 6-Achs-Slicers. 
+        Es übersetzt die Druckpfade von Medusa in präzise Bewegungsbefehle für den Roboterarm, 
+        um eine genaue und effiziente Fertigung zu gewährleisten.
+    \end{alertblock}
+
+    \vspace{0.25cm}
+    \textbf{Funktionsweise von Kronos:}
+    \begin{itemize}
+        \item \textbf{Inverse Kinematik (IK):} Berechnet die 6 Gelenkwinkel $(J1...J6)$ für eine gegebene TCP-Position und Orientierung.
+        \item \textbf{Pfad-Interpolation:} Stellt sicher, dass Bewegungen zwischen zwei Punkten linear im kartesischen Raum sind.
+        \item \textbf{Singularitäts-Schutz:} Vermeidet Konfigurationen, bei denen der Roboter unendliche Geschwindigkeiten benötigen würde.
+        \item \textbf{Dynamische Anpassung:} Passt die Druckparameter in Echtzeit an, um Materialfluss und Druckqualität zu optimieren.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Kronos Entwicklungsumgebung} % Docker-Container mit ROS, MoveIt, Gazebo
+    \begin{alertblock}{Entwicklungsumgebung}
+        Kronos wird in einem Docker-Container entwickelt, der ROS (Robot Operating System), MoveIt und Gazebo enthält. 
+        Diese Tools ermöglichen die Simulation und Steuerung von Roboterarmen, die Entwicklung von Pfadplanungsalgorithmen und die Integration von Sensoren für die Echtzeit-Überwachung.
+    \end{alertblock}
+
+    \vspace{0.5cm}
+    \textbf{Vorteile der Docker-basierten Entwicklung:}
+    \begin{itemize}
+        \item Konsistente Entwicklungsumgebung über verschiedene Systeme hinweg.
+        \item Einfache Verwaltung von Abhängigkeiten und Bibliotheken.
+        \item Möglichkeit zur schnellen Iteration und Fehlerbehebung durch isolierte Container.
+    \end{itemize}
+\end{frame}

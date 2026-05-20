@@ -1,0 +1,37 @@
+services:
+  ur3e-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ur3e_dev
+    privileged: true
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - ROS_DOMAIN_ID=0
+    volumes:
+      # X11 forwarding for GUI (Gazebo, RViz)
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Mount source code for live editing
+      - ./src/ur3e_control:/ros2_ws/src/ur3e_control:rw
+      # Persist colcon build artifacts
+      - ur3e_build:/ros2_ws/build
+      - ur3e_install:/ros2_ws/install
+      - ur3e_log:/ros2_ws/log
+    stdin_open: true
+    tty: true
+    # Uncomment below if you have an NVIDIA GPU + nvidia-container-toolkit:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  ur3e_build:
+  ur3e_install:
+  ur3e_log:

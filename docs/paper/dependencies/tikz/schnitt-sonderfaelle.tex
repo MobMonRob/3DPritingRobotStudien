@@ -1,0 +1,163 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=0.85,
+    every node/.style={font=\small},
+]
+    % ============================================================
+    % PANEL A: Eckpunkt auf Ebene
+    % ============================================================
+    \begin{scope}[xshift=0cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.5)
+            {(a) Eckpunkt auf Ebene};
+
+        % Schnittebene
+        \fill[blue!12, opacity=0.5] (-0.3, 1.95) rectangle (4.3, 2.05);
+        \draw[blue!70!black, thick] (-0.3, 2.0) -- (4.3, 2.0);
+        \node[blue!70!black, anchor=west, font=\tiny]
+            at (4.3, 2.0) {Ebene};
+
+        % Triangle: V auf Ebene, A oben, B unten
+        \coordinate (V) at (0.6, 2.0);
+        \coordinate (A) at (3.2, 3.5);
+        \coordinate (B) at (3.2, 0.5);
+        \coordinate (P) at (3.2, 2.0);
+
+        \fill[gray!12] (V) -- (A) -- (B) -- cycle;
+        \draw[thick] (V) -- (A) -- (B) -- cycle;
+
+        % Resultierendes Schnittsegment V-P
+        \draw[magenta!80!black, very thick, line width=2pt] (V) -- (P);
+
+        % Marker
+        \fill[red!70!black] (A) circle (2pt);
+        \fill[blue!70!black] (B) circle (2pt);
+        \fill[red!80!black] (V) circle (3.5pt);
+        \fill[magenta!80!black] (P) circle (2.5pt);
+
+        % Vertex-Labels: alle klar AUSSERHALB des Triangles
+        \node[anchor=west, font=\scriptsize] at ($(A)+(0.15, 0)$)
+            {$\vec{A}\;(d{>}0)$};
+        \node[anchor=west, font=\scriptsize] at ($(B)+(0.15, 0)$)
+            {$\vec{B}\;(d{<}0)$};
+        \node[red!80!black, anchor=east, font=\scriptsize]
+            at ($(V)+(0, 0.5)$) {$\vec{V}\;(d{=}0)$};
+        \node[magenta!80!black, anchor=south west, font=\scriptsize]
+            at ($(P)+(0.05, 0.15)$) {$\vec{P}$};
+
+        % Annotationen "Kante V-A meldet V" und "Kante V-B meldet V"
+        \node[red!50!black, font=\tiny, anchor=south east, align=center]
+            at (1.7, 3.5) {Kante $\vec{V}\!\to\!\vec{A}$\\meldet $\vec{V}$};
+        \draw[->, thin, red!50!black]
+            (1.4, 3.65) to[out=-90, in=60] ($(V)+(0.18, 0.18)$);
+
+        \node[red!50!black, font=\tiny, anchor=north east, align=center]
+            at (1.7, 0.5) {Kante $\vec{V}\!\to\!\vec{B}$\\meldet $\vec{V}$};
+        \draw[->, thin, red!50!black]
+            (1.4, 0.35) to[out=90, in=-60] ($(V)+(0.18, -0.18)$);
+
+        % Erklärung unten (Rechtschreibung korrigiert)
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.45)
+            {\textbf{Problem:} $\vec{V}$ doppelt erfasst.\\
+             \textbf{Regel:} nur die Kante zählen,\\
+             an der $\vec{V}$ \emph{Anfang} ist.};
+    \end{scope}
+
+    % ============================================================
+    % PANEL B: Kante auf Ebene
+    % ============================================================
+    \begin{scope}[xshift=6.0cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.5)
+            {(b) Kante auf Ebene};
+
+        \fill[blue!12, opacity=0.5] (-0.3, 1.95) rectangle (4.3, 2.05);
+        \draw[blue!70!black, thick] (-0.3, 2.0) -- (4.3, 2.0);
+        \node[blue!70!black, anchor=west, font=\tiny]
+            at (4.3, 2.0) {Ebene};
+
+        \coordinate (TA) at (0.7, 2.0);
+        \coordinate (TB) at (3.3, 2.0);
+        \coordinate (TC) at (2.0, 3.5);
+
+        \fill[gray!12] (TA) -- (TB) -- (TC) -- cycle;
+        \draw[thick] (TA) -- (TC) -- (TB) -- cycle;
+
+        % Koplanare Kante orange
+        \draw[orange!85!black, very thick, dash pattern=on 5pt off 2pt,
+              line width=1.5pt] (TA) -- (TB);
+
+        \fill[red!80!black] (TA) circle (3pt);
+        \fill[red!80!black] (TB) circle (3pt);
+        \fill[red!70!black] (TC) circle (2pt);
+
+        \node[anchor=south, font=\scriptsize] at ($(TC)+(0, 0.1)$)
+            {$\vec{C}\;(d{>}0)$};
+        \node[red!80!black, anchor=north east, font=\scriptsize]
+            at ($(TA)+(-0.05, -0.1)$) {$\vec{A}\;(d{=}0)$};
+        \node[red!80!black, anchor=north west, font=\scriptsize]
+            at ($(TB)+(0.05, -0.1)$) {$\vec{B}\;(d{=}0)$};
+
+        % Annotation OBERHALB des Triangles, Pfeil zur orangen Kante
+        \node[orange!85!black, font=\tiny, anchor=south, align=center]
+            at (3.6, 2.95) {Kante $\vec{A}\vec{B}$\\koplanar};
+        \draw[->, thin, orange!85!black]
+            (3.4, 2.85) to[out=-135, in=20] ($(TA)!0.65!(TB)+(0, 0.08)$);
+
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.45)
+            {\textbf{Problem:} keine eindeutige\\
+             Punktinformation, $\vec{A}\vec{B}$ ist tangential.\\
+             \textbf{Regel:} Kante stillschweigend ignorieren.};
+    \end{scope}
+
+    % ============================================================
+    % PANEL C: Dreieck auf Ebene
+    % ============================================================
+    \begin{scope}[xshift=12.0cm]
+        \node[font=\bfseries, anchor=south] at (2.0, 4.5)
+            {(c) Dreieck auf Ebene};
+
+        % 3D-Parallelogramm
+        \fill[blue!12, opacity=0.6]
+            (0.0, 1.4) -- (4.0, 1.4) -- (3.4, 2.8) -- (-0.6, 2.8) -- cycle;
+        \draw[blue!70!black, thick]
+            (0.0, 1.4) -- (4.0, 1.4) -- (3.4, 2.8) -- (-0.6, 2.8) -- cycle;
+        
+        \node[blue!70!black, anchor=west, font=\tiny]
+            at (4.0, 1.4) {Ebene};
+
+        % Triangle ON the plane
+        \coordinate (CA) at (0.5, 1.7);
+        \coordinate (CB) at (3.0, 1.7);
+        \coordinate (CC) at (1.5, 2.5);
+
+        \fill[gray!40, opacity=0.7] (CA) -- (CB) -- (CC) -- cycle;
+        \draw[gray!60!black, thick] (CA) -- (CB) -- (CC) -- cycle;
+
+        \fill[red!70!black] (CA) circle (2.5pt);
+        \fill[red!70!black] (CB) circle (2.5pt);
+        \fill[red!70!black] (CC) circle (2.5pt);
+
+        \node[gray!40!black, font=\scriptsize\itshape] at (1.66, 1.96)
+            {koplanar};
+
+        % Linkes Label ist jetzt bei x=-0.8 (deutlich außerhalb des blauen Rahmens)
+        \node[red!70!black, anchor=east, font=\scriptsize] (lblCA)
+            at (0.5, 1.0) {$d{=}0$};
+        \draw[thin, red!70!black] (lblCA.east) -- (CA);
+
+        % Rechtes Label ist jetzt bei x=4.2 (deutlich außerhalb des blauen Rahmens)
+        \node[red!70!black, anchor=west, font=\scriptsize] (lblCB)
+            at (4.2, 1.7) {$d{=}0$};
+        \draw[thin, red!70!black] (lblCB.west) -- (CB);
+
+        \node[red!70!black, anchor=south, font=\scriptsize] (lblCC)
+            at (1.5, 3.0) {$d{=}0$};
+        \draw[thin, red!70!black] (lblCC.south) -- (CC);
+
+        % Erklärung unten (Rechtschreibung korrigiert)
+        \node[anchor=north, font=\scriptsize, align=center] at (2.0, -0.45)
+            {\textbf{Problem:} keine 1D-Kontur,\\
+             nur eine 2D-Fläche.\\
+             \textbf{Regel:} verwerfen, Nachbardreiecke\\
+             liefern bereits die Kontur.};
+    \end{scope}
+\end{tikzpicture}

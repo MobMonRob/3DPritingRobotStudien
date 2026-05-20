@@ -1,0 +1,42 @@
+# MacOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# LaTeX
+*.aux
+*.bbl*
+*.bcf*
+*.blg
+*.fdb_latexmk
+*.fls
+*.gz
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.run.xml
+*.synctex*
+*.toc
+*.nav
+*.snm
+T3_3101.pdf
+
+studentId.sty
+
+# Helper Scripts
+*.sh
+
+.claude/
+
+!dependencies/style/index.ist

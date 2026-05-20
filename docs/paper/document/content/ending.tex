@@ -1,0 +1,41 @@
+\chapter{Fazit und Ausblick}\label{chap:conclusion-and-outlook}
+    \section{Fazit}\label{sec:conclusion}
+        Zusammenfassend lässt sich sagen, dass im Rahmen der vorliegenden Arbeit ein innovativer Algorithmus für das nicht-planare Slicing erfolgreich konzipiert, entwickelt und vollständig implementiert wurde.
+        Durch diesen innovativen Ansatz wurde die technologische Grundlage geschaffen, um komplexe Geometrien jenseits konventioneller, planarer Schichtstrukturen präzise zu realisieren.
+        Parallel zur algorithmischen Entwicklung wurde eine umfassende Simulationsumgebung projektiert, welche eine präzise Vorausberechnung der kinematischen Bewegungsabläufe des Universal Robots UR3e ermöglicht.
+        Die Validierung des Gesamtsystems beschränkte sich dabei nicht nur auf den digitalen Zwilling innerhalb der Simulationssoftware, sondern wurde durch die erfolgreiche Ansteuerung des physischen UR3e-Roboterarms in einer realen Testumgebung eindrucksvoll bestätigt.
+        Dieser erreichte Meilenstein ist als signifikanter Erfolg und entscheidender Fortschritt im Bereich der adaptiven Fertigung sowie der robotergestützten additiven Herstellung zu bewerten.
+        Somit leistet diese Arbeit einen wesentlichen Beitrag zur Schließung der Lücke zwischen hochflexibler Hardware und der dafür benötigten, spezialisierten Softwareplanung.
+        \sig{Ben Stahl}
+
+    \section{Ausblick} \label{sec:outlook}
+        Trotz der erzielten Erfolge besteht im Bereich des Kinematik-Solvers innerhalb des \ac{kronos}-Moduls noch Optimierungsbedarf.
+        Ein primärer Fokus liegt hierbei auf der Robustheit des Kinematik-Solvers innerhalb des \ac{kronos}-Moduls, da dieser gegenwärtig bei bestimmten Pfadkonfigurationen noch keine validen Bewegungspläne generieren kann, was die Anwendbarkeit des Systems in der Praxis beeinträchtigt.
+        Dies muss bei einer Weitentwicklung des Projekts als vorrangiges Ziel adressiert werden, um die Robustheit und Zuverlässigkeit des Gesamtsystems zu gewährleisten.
+        Ebenso muss die Problematik der nicht-linearen Trajektorien, welche zu unvorhersehbaren Bewegungen des UR3e führen können, dringend angegangen werden.
+        Die Lösung dieser kinematischen Herausforderungen wäre somit der zentrale Anknüpfungspunkt für jede weiterführende Entwicklung dieses Projektes.
+            
+        Additive Fertigung mit 6-Achs-Robotern, wie dem Universal Robots UR3e ist ein hochkomplexes und interdisziplinäres Feld, das sowohl Herausforderungen als auch Chancen bietet.
+        Die erfolgreiche Implementierung eines nicht-planaren Slicing-Algorithmus und die Ansteuerung eines physischen Roboters sind bedeutende Schritte in Richtung einer flexibleren und leistungsfähigeren Fertigungstechnologie.
+        Es ist zu erwarten, dass die kontinuierliche Weiterentwicklung und Optimierung eines solchen Systems in Zukunft zu einer breiteren Akzeptanz und Anwendung in der Industrie führen kann, insbesondere in Bereichen, die von der Fähigkeit profitieren, komplexe Geometrien ohne Stützstrukturen zu drucken.
+        Somit stellt diese Arbeit nicht nur einen wichtigen Beitrag zum Stand der Technik dar, sondern auch eine vielversprechende Grundlage für zukünftige Innovationen im Bereich der robotergestützten additiven Fertigung.
+        \sig{Ben Stahl}
+
+    \section{Ausblick der Hardwareentwicklung}\label{sec:future-of-hardware-development}
+        \subsection{Anforderungen an die hardwareseitige Systemerweiterung}
+            Für die Überführung des Systems von einer rein virtuellen Simulationsumgebung in eine physisch funktionierende Extrusionsplattform müssen hardwareseitig noch wesentliche Komponenten integriert werden.
+            Die primäre Herausforderung besteht darin, das Steuerungssystem \ac{kronos} um eine echtzeitfähige Schnittstelle zu erweitern, die eine zuverlässige Signal- und Befehlsübertragung an externe Peripheriegeräte ermöglicht.
+            Ohne diese informationstechnische Brücke zwischen der übergeordneten Pfadplanung und den physischen Aktoren ist eine reale Materialextrusion nicht realisierbar.
+            Zudem erfordert die Synchronisation zwischen der präzisen Bewegung des Universal Robots UR3e und dem kontinuierlichen Materialfluss eine durchgängige, latenzarme Kommunikationsarchitektur.
+            \sig{Ben Stahl}
+
+        \subsection{Mögliche technische Realisierung der Extrusionseinheit}
+            Im Zuge einer zukünftigen Hardwareentwicklung sollte an diese neue Schnittstelle ein dedizierter Mikrocontroller angebunden werden, welcher die zentrale Steuerung der Extrusionshardware sowie des Druckbetts übernimmt.
+            Zur präzisen thermischen Regulierung des Hotends sowie des beheizten Druckbetts ist die Implementierung einer Leistungselektronik, beispielsweise basierend auf einer \ac{MOSFET}-Schaltung, zwingend erforderlich.
+            Diese Schaltung ermöglicht es, die Heizelemente mittels \ac{PWM} anzusteuern, während die integrierten Temperatursensoren ein kontinuierliches Feedback zur geschlossenen Regelschleife an den Mikrocontroller liefern.
+            Für die präzise Dosierung des Materialflusses muss zudem der Schrittmotor des Extruders über einen zwischengeschalteten Stepper-Treiber angesteuert werden.
+
+            Ein kritischer Erfolgsfaktor für die Qualität des Druckergebnisses bleibt hierbei die Minimierung der Latenzzeiten innerhalb der gesamten Wirkungskette.
+            Sowohl die Kommunikationsverzögerung zwischen \ac{kronos} und dem Mikrocontroller als auch die Signallaufzeiten zu den Heizelementen und dem Extrudermotor müssen softwareseitig antizipiert und kompensiert werden.
+            Nur durch eine deterministische und hochfrequente Datenübertragung kann gewährleistet werden, dass die Bahngeschwindigkeit des UR3e-Roboterarms und die Extrusionsrate perfekt synchron zueinander verlaufen.
+            \sig{Ben Stahl}

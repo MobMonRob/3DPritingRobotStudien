@@ -1,0 +1,53 @@
+\section{Motivation}
+
+\begin{frame}{Warum 6-Achs-Druck?}
+    \begin{columns}[T]
+        \column{0.6\textwidth}
+            \textbf{Limitierungen klassischer 3-Achs-Verfahren:}
+            \begin{itemize}
+                \item Schichten müssen parallel zur Bauplattform sein.
+                \item Treppenstufeneffekte auf gekrümmten Oberflächen.
+                \item Hoher Bedarf an Stützstrukturen bei Überhängen.
+                \item Mechanische Schwäche entlang der Schichtgrenzen.
+            \end{itemize}
+            
+            \vspace{0.25cm}
+            \textbf{Potential von 6 Achsen:}
+            \begin{itemize}
+                \item \textcolor{SecondaryColor}{\textbf{Nichtplanares Slicen:}} 
+                    Erhöhte Stabilität durch nicht-parallele und nicht-planare Schichten.
+                \item \textcolor{SecondaryColor}{\textbf{Support-Reduktion:}} 
+                    Überhänge ohne Stütze durch Änderung der Druckrichtung.
+                \item \textcolor{SecondaryColor}{\textbf{Oberflächenqualität:}}
+                    Glattere Oberflächen durch Anpassung der Schichtgeometrie an die Modellkonturen.
+            \end{itemize}
+
+        \column{0.4\textwidth}
+            % Vergleichsgrafik: Treppe vs Smooth
+            \centering
+            \begin{tcolorbox}[
+                enhanced, colback=white, colframe=PrimaryColor!30, arc=2mm, boxrule=0.5pt,
+                title={Planar (3-Achs)}, fonttitle=\bfseries\tiny, coltitle=PrimaryColor, colbacktitle=PrimaryColor!10
+            ]
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    \draw[gray!50] (0,0) -- (3,1.5); % Slope
+                    \foreach \x in {0,0.5,...,2.5} {
+                        \draw[fill=PrimaryColor!40] (\x, {0.5*\x}) rectangle (\x+0.6, {0.5*\x+0.25});
+                    }
+                \end{tikzpicture}
+            \end{tcolorbox}
+            
+            \vspace{0.2cm}
+
+            \begin{tcolorbox}[
+                enhanced, colback=white, colframe=SecondaryColor!30, arc=2mm, boxrule=0.5pt,
+                title={Nichtplanar (6-Achs)}, fonttitle=\bfseries\tiny, coltitle=SecondaryColor, colbacktitle=SecondaryColor!10
+            ]
+                \centering
+                \begin{tikzpicture}[scale=0.5]
+                    \draw[fill=SecondaryColor!40, draw=SecondaryColor] (0,0) -- (3,1.5) -- (3,2.0) -- (0,0.5) -- cycle;
+                \end{tikzpicture}
+            \end{tcolorbox}
+    \end{columns}
+\end{frame}

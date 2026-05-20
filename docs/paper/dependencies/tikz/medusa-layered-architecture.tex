@@ -1,0 +1,94 @@
+\begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small},
+    layer/.style={
+        rectangle, rounded corners=4pt, draw, very thick,
+        minimum width=11.0cm, minimum height=1.4cm,
+        align=center, inner sep=6pt,
+    },
+    composition/.style={layer, fill=purple!10, draw=purple!55!black},
+    presentation/.style={layer, fill=blue!8,    draw=blue!55!black},
+    interface/.style={layer, fill=red!8,        draw=red!55!black},
+    domainlayer/.style={layer, fill=green!10,   draw=green!45!black},
+    infrastructure/.style={layer, fill=gray!15, draw=gray!60!black},
+    module/.style={
+        rectangle, rounded corners=2pt, draw, thin,
+        fill=white, minimum width=2.4cm, minimum height=0.65cm,
+        align=center, font=\scriptsize\ttfamily, inner sep=2pt,
+    },
+    layerlabel/.style={
+        font=\bfseries\small, anchor=west, inner sep=2pt,
+    },
+    dep/.style={->, very thick, blue!50!black},
+    sidenote/.style={
+        font=\scriptsize\itshape, gray!65!black,
+        align=left, anchor=west,
+    },
+]
+    % =========================================================
+    % Schichten (von oben nach unten)
+    % =========================================================
+    \node[composition]                                  (L1) {};
+    \node[presentation,    below=0.35cm of L1]          (L2) {};
+    \node[interface,       below=0.35cm of L2]          (L3) {};
+    \node[domainlayer,     below=0.35cm of L3]          (L4) {};
+    \node[infrastructure,  below=0.35cm of L4]          (L5) {};
+
+    % =========================================================
+    % Schicht-Beschriftungen (links)
+    % =========================================================
+    \node[layerlabel, anchor=east]
+        at ([xshift=-4pt]L1.west) {Komposition};
+    \node[layerlabel, anchor=east]
+        at ([xshift=-4pt]L2.west) {Präsentation};
+    \node[layerlabel, anchor=east]
+        at ([xshift=-4pt]L3.west) {Schnittstelle};
+    \node[layerlabel, anchor=east]
+        at ([xshift=-4pt]L4.west) {Domäne};
+    \node[layerlabel, anchor=east]
+        at ([xshift=-4pt]L5.west) {Infrastruktur};
+
+    % =========================================================
+    % Module pro Schicht
+    % =========================================================
+    % Komposition
+    \node[module] at (L1) {app};
+
+    % Präsentation: graphics, ui, controls
+    \node[module] (m_graphics) at ([xshift=-3.0cm]L2.center) {graphics};
+    \node[module] (m_ui)       at (L2.center)                {ui};
+    \node[module] (m_controls) at ([xshift=3.0cm]L2.center)  {controls};
+
+    % Schnittstelle: exporter
+    \node[module] at (L3) {exporter};
+
+    % Domäne: geometry, slicing
+    \node[module] (m_geometry) at ([xshift=-1.6cm]L4.center) {geometry};
+    \node[module] (m_slicing)  at ([xshift=1.6cm]L4.center)  {slicing};
+
+    % Infrastruktur: core
+    \node[module] at (L5) {core};
+
+    % =========================================================
+    % Abhängigkeitsrichtung (Pfeil rechts neben den Schichten)
+    % =========================================================
+    \draw[dep, very thick]
+        ([xshift=0.6cm]L1.east) -- ([xshift=0.6cm]L5.east)
+        node[midway, sloped, above, font=\scriptsize, gray!70!black]
+        {Abhängigkeitsrichtung};
+
+    % =========================================================
+    % Erläuterungen rechts
+    % =========================================================
+    \node[sidenote] at ([xshift=1.3cm]L1.east)
+        {kennt alle\\anderen Schichten};
+    \node[sidenote] at ([xshift=1.3cm]L2.east)
+        {Fenster, GUI,\\Eingabe};
+    \node[sidenote] at ([xshift=1.3cm]L3.east)
+        {JSON-Serialisierung};
+    \node[sidenote] at ([xshift=1.3cm]L4.east)
+        {Mesh, Slicing-\\Algorithmen};
+    \node[sidenote] at ([xshift=1.3cm]L5.east)
+        {Logging,\\Basisfunktionen};
+
+\end{tikzpicture}

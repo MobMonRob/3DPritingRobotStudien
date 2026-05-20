@@ -1,0 +1,32 @@
+# Doxyfile - Configuration for Medusa Documentation
+
+PROJECT_NAME           = "Medusa"
+PROJECT_NUMBER         = 0.0.1
+PROJECT_BRIEF          = "A Modern C++23 Graphics Engine"
+
+# Inputs
+INPUT                  = src
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+
+# Input directories
+INPUT                  = ../../src
+
+# Output directory (GitLab Pages requires "public")
+OUTPUT_DIRECTORY       = .
+HTML_OUTPUT            = html
+
+# Visual Style
+GENERATE_HTML          = YES
+GENERATE_LATEX         = YES
+HAVE_DOT               = YES
+UML_LOOK               = YES
+TEMPLATE_RELATIONS     = YES
+CALL_GRAPH             = YES
+COLLABORATION_GRAPH    = YES
+GENERATE_TREEVIEW      = YES
+
+# Code Parsing
+OPTIMIZE_OUTPUT_FOR_C  = NO
+BUILTIN_STL_SUPPORT    = YES

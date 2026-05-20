@@ -1,0 +1,94 @@
+\begin{tikzpicture}[
+    >=Latex,
+    scale=1.0,
+    every node/.style={font=\small},
+]
+    % ===========================================
+    % Aufbauachse a (links)
+    % ===========================================
+    \draw[->, thick] (-1.0, -0.4) -- (-1.0, 4.6)
+        node[above, font=\scriptsize] {$\vec{a}$};
+
+    % ===========================================
+    % Schnittebene a_i (duenner halbtransparenter Band)
+    % ===========================================
+    \fill[blue!12, opacity=0.5] (-0.6, 1.95) rectangle (6.2, 2.05);
+    \draw[blue!70!black, thick] (-0.6, 2.0) -- (6.2, 2.0);
+    \node[blue!70!black, anchor=west, font=\scriptsize]
+        at (6.25, 2.0) {Schnittebene $a_i$};
+
+    % ===========================================
+    % Dreieck mit drei Vertices
+    % ===========================================
+    \coordinate (v1) at (1.0, 3.8);
+    \coordinate (v2) at (3.0, 0.3);
+    \coordinate (v3) at (5.4, 3.4);
+
+    \fill[gray!12] (v1) -- (v2) -- (v3) -- cycle;
+    \draw[thick] (v1) -- (v2) -- (v3) -- cycle;
+
+    % Schnittpunkte (linear berechnet)
+    \coordinate (Pa) at (2.029, 2.0);
+    \coordinate (Pb) at (4.316, 2.0);
+
+    % Resultierendes Liniensegment (Magenta hervorgehoben)
+    \draw[magenta!80!black, very thick, line width=2pt] (Pa) -- (Pb);
+
+    % Vertices als Kreise
+    \fill[red!70!black] (v1) circle (2.5pt);
+    \fill[blue!70!black] (v2) circle (2.5pt);
+    \fill[red!70!black] (v3) circle (2.5pt);
+
+    % Vertex-Labels: alle ausserhalb des Dreiecks platziert
+    \node[anchor=south west, font=\scriptsize] at ($(v1)+(0.10, 0.05)$)
+        {$\vec{v}_1\;(d_1>0)$};
+    \node[anchor=north, font=\scriptsize] at ($(v2)+(0, -0.18)$)
+        {$\vec{v}_2\;(d_2<0)$};
+    \node[anchor=south west, font=\scriptsize] at ($(v3)+(0.10, 0.05)$)
+        {$\vec{v}_3\;(d_3>0)$};
+
+    % ===========================================
+    % Dimensionspfeil d_1 (weit LINKS vom Dreieck)
+    % ===========================================
+    \coordinate (D1top) at (0.3, 3.8);
+    \coordinate (D1bot) at (0.3, 2.0);
+    \draw[red!50!black, thin, dotted] (D1top) -- (v1);
+    \draw[<->, thin, red!70!black] (D1top) -- (D1bot);
+    \node[red!70!black, anchor=east, font=\scriptsize]
+        at ($(D1top)!0.5!(D1bot)+(-0.05, 0)$) {$|d_1|$};
+
+    % ===========================================
+    % Dimensionspfeil |d_2| (RECHTS unten, ausserhalb des Dreiecks)
+    % ===========================================
+    \coordinate (D2bot) at (4.6, 0.3);
+    \coordinate (D2top) at (4.6, 2.0);
+    \draw[blue!50!black, thin, dotted] (v2) -- (D2bot);
+    \draw[<->, thin, blue!70!black] (D2bot) -- (D2top);
+    \node[blue!70!black, anchor=west, font=\scriptsize]
+        at ($(D2bot)!0.5!(D2top)+(0.05, 0)$) {$|d_2|$};
+
+    % ===========================================
+    % Schnittpunkt-Marker und Labels (klar OBERHALB des Bands)
+    % ===========================================
+    \fill[magenta!80!black] (Pa) circle (2.5pt);
+    \fill[magenta!80!black] (Pb) circle (2.5pt);
+    \node[magenta!80!black, anchor=south west, font=\scriptsize]
+        at ($(Pa)+(0.05, 0.18)$) {$\vec{P}_A$};
+    \node[magenta!80!black, anchor=south east, font=\scriptsize]
+        at ($(Pb)+(-0.05, 0.18)$) {$\vec{P}_B$};
+
+    % ===========================================
+    % Dashed Linie v1 -> Pa mit tau-Label
+    % tau im Dreieck-Inneren, abseits von d_1
+    % ===========================================
+    \draw[->, thin, gray!70!black, dashed] (v1) -- (Pa);
+    \node[gray!50!black, font=\scriptsize, anchor=south west]
+        at ($(v1)!0.5!(Pa)+(0.18, 0.10)$) {$\tau$};
+
+    % ===========================================
+    % Formel am unteren Rand
+    % ===========================================
+    \node[font=\scriptsize, anchor=north] at (3.0, -0.95)
+        {$\vec{P} = \vec{v}_A + \tau\,(\vec{v}_B - \vec{v}_A),
+          \quad \tau = d_A/(d_A - d_B)$};
+\end{tikzpicture}

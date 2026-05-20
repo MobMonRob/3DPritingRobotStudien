@@ -1,0 +1,191 @@
+\chapter{Einleitung}\label{chap:introduction}
+    \section{Stand der Technik}\label{sec:state-of-the-art}
+        \subsection{Additive Fertigungsverfahren im Überblick}\label{subsec:additive-manufacturing-overview}
+            \Gls{additive-manufacturing}\index{Additive Fertigung} hat sich in den letzten Jahrzehnten vom reinen Rapid-Prototyping\index{Rapid Prototyping} zu Verfahren entwickelt, die auch in der Serienfertigung\index{Serienfertigung} eingesetzt werden \autocite[vgl.][S.~335--336]{urhalRobotAssistedAdditive2019}.
+            Alle Verfahren zeichnen sich durch den schichtweisen Aufbau\index{Schichtaufbau} eines Bauteils auf Basis eines digitalen 3D-Modells\index{3D-Modell} aus.
+            Dadurch lassen sich auch komplexe Geometrien fertigen, die mit klassischen, subtraktiven Verfahren\index{Subtraktive Fertigung} nur schwer oder nicht herstellbar wären \autocite[vgl.][S.~2785--2786]{nayyeriPlanarNonplanarSlicing2022}.
+
+            Für die vorliegende Arbeit ist insbesondere die \gls{material-extrusion}\index{Materialextrusion} relevant, bei der ein thermoplastischer Kunststoff\index{Werkstoff!Thermoplast} aufgeschmolzen und über eine Düse\index{Düse} Schicht für Schicht abgelegt wird.
+            Die Datenkette\index{Datenkette} aus \ac{CAD}-Modell\index{CAD-Modell}, \gls{slicing}\index{Slicing} und Maschinensteuerung\index{Maschinensteuerung} ist dabei in der Praxis weitgehend etabliert \autocite[vgl.][S.~3768--3770]{lettoriReviewGeometryRepresentation2022}.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Konventionelle 3D-Drucksysteme}\label{subsec:conventional-3d-printing-systems}
+            % TODO bei cartesian-kinematics n hinter Kartesische
+            Die meisten heute verfügbaren 3D-Drucker\index{3D-Drucker!kartesisch} arbeiten mit einer \gls{cartesian-kinematics}\index{Kinematik!kartesisch}, d.\,h. mit drei zueinander senkrechten, translatorischen Achsen\index{Achse!translatorisch} \autocite[vgl.][S.~2787--2789]{nayyeriPlanarNonplanarSlicing2022}.
+            Diese Bauform ist mechanisch vergleichsweise einfach, gut beherrschbar und wird durch eine breite Auswahl an Software unterstützt.
+            Als Austauschformat\index{Datenformat!Austauschformat} für die Maschinensteuerung hat sich \ac{GCODE}\index{G-Code} durchgesetzt \autocite[vgl.][S.~2549--2551]{latifReviewCodeSTEP2021}.
+
+            Die typische Prozesskette\index{Prozesskette} eines kartesischen Druckers ist linear aufgebaut: Anfangs wird das 3D-Modell aufbereitet und in horizontale Schichten\index{Schicht!horizontal} zerlegt.
+            Daraus werden \glspl{toolpath} erzeugt und diese schließlich vom Drucker abgefahren \autocite[vgl.][S.~252--253]{gregoriSlicingTriangleMeshes2014}.
+            Diese Vorgehensweise ist robust und einfach zu implementieren, weshalb sie sich als Quasi-Standard etabliert hat.
+            Die meisten Slicer\index{Slicer} und Steuerungswerkzeuge sind jedoch stark auf diese drei Achsen ausgelegt, sodass eine Erweiterung auf \gls{nonplanar-slicing} oder auf mehrachsige Strategien\index{Schichtstrategie!mehrachsig} nur mit erheblichem Aufwand möglich ist \autocite[vgl.][S.~2--3]{pelzerAdditiveManufacturingNonplanar2021}.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Limitationen von kartesischen 3D-Druckern}\label{subsec:limitations-cartesian-3d-printers}
+            Aus der schichtweisen, planaren Bauweise\index{Bauweise!planar} ergeben sich mehrere bekannte Nachteile.
+            Da das Material immer in horizontalen Ebenen\index{Schicht!horizontal} abgelegt wird, entstehen \gls{anisotropic-component-properties}\index{Anisotropie}: Bauteile sind in Z-Richtung deutlich weniger belastbar als in der XY-Ebene \autocite[vgl.][S.~1--2]{pelzerAdditiveManufacturingNonplanar2021}.
+            Darüber hinaus müssen für \glspl{overhang}\index{Überhänge} oder freistehende Geometrien\index{Geometrie!freistehend} häufig \glspl{support-structures}\index{Stützstrukturen} mitgedruckt werden, welche nach dem Druck wieder entfernt werden müssen und zusätzlichen Material- und Zeitaufwand verursachen \autocite[vgl.][S.~537--538]{brandstoetterRoboterbasierter3DDruckMit2023}.
+
+            Hinzu kommt, dass gekrümmte Oberflächen durch die treppenartige Schichtung sichtbare Stufen aufweisen (Treppeneffekt\index{Treppeneffekt}), was die Oberflächenqualität\index{Oberflächenqualität} beeinträchtigt \autocite[vgl.][S.~1--3]{ottonelloQuickCurveRevisitingSlightly2024}.
+            Da Werkstück und Düse\index{Düse!Orientierung} nur in begrenzter Weise zueinander orientiert werden können, sind die Möglichkeiten der \gls{path-planning}\index{Bahnplanung} grundsätzlich auf zweidimensionale Konturen und \gls{infill}\index{Infill}-Muster beschränkt.
+            Das räumliche Potenzial, das sich durch zusätzliche \gls{degrees-of-freedom}\index{Freiheitsgrad} ergeben würde, bleibt damit ungenutzt.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Mehrachsige Fertigungssysteme}\label{subsec:multi-axis-systems-research-industry}
+            Eine Möglichkeit, diese Einschränkungen zu umgehen, sind mehrachsige Fertigungssysteme\index{Mehrachsige Fertigung}.
+            Insbesondere 6-Achs-Industrieroboter\index{6-Achs-Roboter} bieten zusätzlich zu den drei translatorischen\index{Freiheitsgrad!translatorisch} auch drei rotatorische \gls{degrees-of-freedom}\index{Freiheitsgrad!rotatorisch} und können so die Druckdüse\index{Druckdüse} nahezu beliebig im Raum orientieren \autocite[vgl.][S.~536--538]{brandstoetterRoboterbasierter3DDruckMit2023}.
+            Damit lassen sich \gls{nonplanar-slicing}-Strategien\index{Schichtstrategie!nicht-planar} umsetzen, somit Schichten, die nicht zwingend horizontal verlaufen.
+            In der Forschung gibt es hierzu bereits diverse Ansätze, von axialsymmetrischen Bahnstrategien\index{Bahnstrategie!axialsymmetrisch} \autocite[vgl.][S.~1--4]{lopez-arrabalAxisymmetricNonplanarSlicing2024} über zylindrische Vier-Achs-Verfahren\index{Bahnstrategie!zylindrisch}\index{4-Achs-Verfahren} \autocite[vgl.][S.~494--498]{guerraCylindricalSlicingAlgorithm2025} bis zur Kombination mit Lichtbogen- und Drahtprozessen \autocite[vgl.][S.~66--69]{dingAutomatedRoboticArcweldingbased2016}.
+
+            In der industriellen Praxis\index{Industrielle Anwendung} sind solche Systeme aber bisher die Ausnahme.
+            Das liegt weniger an der Hardware -- 6-Achs-Roboter sind ausgereift und etabliert -- sondern vielmehr an der Software.
+            Die Kopplung von \gls{slicing} und \gls{inverse-kinematics}\index{Inverse Kinematik} ist nicht trivial \autocite[vgl.][S.~36--40]{aristidouInverseKinematicsTechniques2018}.
+            Kollisionsfreie Bahnen\index{Bahnplanung!kollisionsfrei} müssen in oft engen Arbeitsräumen\index{Arbeitsraum} geplant werden \autocite[vgl.][S.~1--3]{bhattOptimizingPartPlacement2021}.
+            Hinzu kommt, dass einheitliche Datenformate\index{Datenformat} fehlen, die alle benötigten Informationen (Geometrie, \gls{toolpath}, \gls{tool-orientation}\index{Werkzeugorientierung}) durchgängig abbilden \autocite[vgl.][S.~2549--2554]{latifReviewCodeSTEP2021}.
+
+            An dieser Stelle, der softwareseitigen Verknüpfung von Slicer und Roboter, setzt die vorliegende Arbeit an.
+            \sig{Adrian Gabriel Axtmann}
+
+    \section{Grundidee der Arbeit}\label{sec:core-idea}
+        \subsection{Übertragung auf den 6-Achs-3D-Druck}\label{subsec:transfer-to-6-axis-3d-printing}
+            Die Grundidee dieser Arbeit ist es, das Prinzip des klassischen Slicens auf einen 6-Achs-Roboter zu übertragen.
+            Statt das Bauteil ausschließlich in horizontale Schichten\index{Schicht!horizontal} zu zerlegen, sollen auch Schichten\index{Schicht!beliebig orientiert} mit beliebiger Orientierung im Raum betrachtet werden.
+            Die etablierte planare Vorgehensweise wird dabei nicht verworfen, sondern als Spezialfall in ein erweitertes Modell eingebettet, das zusätzlich \gls{nonplanar-slicing} erlaubt.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Konzeption eines 6-Achs-Slicer-Ansatzes}\label{subsec:concept-6-axis-slicer-approach}
+            Auf dieser Idee aufbauend wird ein prototypischer \gls{6-axis-slicer}\index{6-Achs-Slicer} entworfen, der die Schichtzerlegung\index{Schichtzerlegung}, die \gls{path-planning} und die \gls{tool-orientation} gemeinsam betrachtet.
+            Der Slicer bildet damit das Bindeglied\index{Toolchain} zwischen dem digitalen 3D-Modell und dem ausführbaren Programm für den Roboter.
+
+            Die Software wird in zwei Module aufgeteilt:
+            \textbf{\ac{medusa}}\index{Modul!Medusa} ist für das Laden und Anzeigen des 3D-Modells, das eigentliche Slicen sowie den Export der berechneten Pfade zuständig.
+            \textbf{\ac{kronos}}\index{Modul!Kronos} nimmt diese Pfade entgegen und steuert über \ac{ros}\index{ROS} und \ac{moveit}\index{MoveIt} den Roboter an.
+            Diese klare Trennung\index{Trennung!Planung/Ausführung} zwischen Planungs- und Ausführungsseite soll die Entwicklung und das Testen der einzelnen Komponenten erleichtern und die spätere Erweiterbarkeit\index{Erweiterbarkeit} verbessern.
+
+            Im Rahmen der Arbeit werden insgesamt vier Slicing-Strategien betrachtet, die in unterschiedlichem Maße umgesetzt werden\index{Slicing-Strategien!Übersicht}:
+            \begin{itemize}
+                \item Der \textbf{planare Algorithmus}\index{Slicing-Strategien!planar}\index{Algorithmus!planar} dient als Referenz und Funktionsnachweis. Er stellt sicher, dass die gesamte Toolchain von der Modellaufbereitung bis zur Roboterbewegung grundsätzlich funktioniert.
+                \item Der \textbf{Base-Algorithmus}\index{Slicing-Strategien!Base}\index{Algorithmus!Base} ist ein erster Multiachsen-Ansatz und ist im Rahmen dieser Arbeit ebenfalls vollständig implementiert.
+                \item Der \textbf{Sphären-Algorithmus}\index{Slicing-Strategien!Sphären}\index{Algorithmus!Sphären} wird ausschließlich konzeptionell ausgearbeitet. Eine Implementierung ist nicht Bestandteil der Arbeit.
+                \item Der \textbf{Kristall-Algorithmus}\index{Slicing-Strategien!Kristall}\index{Algorithmus!Kristall} wurde vollständig implementiert und bildet damit den nichtplanaren Slicing-Ansatz der Arbeit.
+            \end{itemize}
+            Diese gestaffelten Reifegrade\index{Reifegrad} der vier Strategien sind bewusst gewählt: Sie ermöglichen es, sowohl funktionierende Lösungen zu zeigen als auch die Grenzen einer prototypischen Umsetzung\index{Prototyp} ehrlich zu dokumentieren.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Erwartete Vorteile gegenüber planaren Verfahren}\label{subsec:expected-benefits-over-established-approaches}
+            Aus den in \cref{subsec:limitations-cartesian-3d-printers} beschriebenen Limitationen lassen sich umgekehrt die Potenziale eines 6-Achs-Drucks ableiten.
+            Sie werden hier ausdrücklich als \emph{Erwartung} formuliert, deren Eintritt im Rahmen der prototypischen Umsetzung zu prüfen ist.
+
+            Durch die freie \gls{tool-orientation}\index{Werkzeugorientierung!frei} könnten \glspl{overhang} teilweise ohne \glspl{support-structures} gefertigt werden.
+            Da die Schichten der Bauteilgeometrie folgen können, ließe sich der Treppeneffekt an gekrümmten Oberflächen reduzieren.
+            Zudem könnten die mechanischen \gls{anisotropic-component-properties} gezielter beeinflusst werden, indem die Schichten entlang der zu erwartenden Lastpfade\index{Lastpfad} ausgerichtet werden.
+            Die zugehörigen Quellen sind bereits in \cref{subsec:limitations-cartesian-3d-printers} aufgeführt.
+
+            Wie weit diese Potenziale in einem prototypischen Aufbau tatsächlich erreicht werden können, ist offen.
+            Der Schwerpunkt der Arbeit liegt daher nicht darauf, diese Vorteile messtechnisch nachzuweisen, sondern die Voraussetzungen und Hürden zu identifizieren, die einer praktischen Realisierung im Weg stehen.
+            \sig{Adrian Gabriel Axtmann}
+
+    \section{Problemstellung}\label{sec:problem-statement-and-research-gap}
+        \subsection{Herausforderungen bei der Bahnplanung}\label{subsec:technical-challenges-path-planning}
+            Bei einem 6-Achs-Roboter müssen \gls{toolpath}, \gls{tool-orientation} und Bewegungsablauf gleichzeitig geplant werden.
+            Die zusätzlichen \gls{degrees-of-freedom} vereinfachen die Aufgabe nicht, sondern vergrößern den Lösungsraum\index{Lösungsraum} und erhöhen die Komplexität der Randbedingungen\index{Randbedingung} \autocite[vgl.][S.~3776--3787]{lettoriReviewGeometryRepresentation2022}.
+
+            Hinzu kommen prozessspezifische Anforderungen: Der Materialfluss\index{Materialfluss} aus der Düse, die Bahngeschwindigkeit\index{Bahnplanung!Geschwindigkeit} und die Orientierung müssen aufeinander abgestimmt sein, damit das Material gleichmäßig abgelegt wird \autocite[vgl.][S.~3--7]{pelzerAdditiveManufacturingNonplanar2021}.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Offene Fragen bei Datenmodell und Prozesskette}\label{subsec:open-questions-data-model-and-process-chain}
+            Die etablierten Datenformate und Werkzeugketten sind auf den planaren Druck zugeschnitten.
+            Insbesondere \ac{GCODE}\index{G-Code!Beschränkung} ist auf drei Achsen ausgelegt und bildet zusätzliche Orientierungsinformationen nur über Erweiterungen oder Workarounds ab \autocite[vgl.][S.~2554--2560]{latifReviewCodeSTEP2021}.
+            Für mehrachsige Anwendungen gibt es bislang kein einheitliches Format\index{Datenformat!fehlend}, das Geometrie, \gls{toolpath}, \gls{tool-orientation} und maschinenspezifische Parameter durchgängig zusammenführt \autocite[vgl.][S.~3--6]{witteRealisierungFunktionalDeterminierten2024}.
+
+            Auch die Schnittstelle\index{Schnittstelle!Slicer-Controller} zwischen dem Slicer und dem Robotercontroller\index{Robotercontroller} ist nicht standardisiert.
+            Verschiedene Controller verwenden unterschiedliche Bewegungsbefehle\index{Bewegungsbefehl} und Interpolationsverfahren\index{Interpolation}, sodass die Übertragung der geplanten Bahnen in eine reproduzierbare Roboterbewegung jeweils individuell gelöst werden muss \autocite[vgl.][S.~336--342]{urhalRobotAssistedAdditive2019}.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Relevanz des Themas}\label{subsec:scientific-relevance-of-research-project}
+            Wie in \cref{subsec:multi-axis-systems-research-industry} dargestellt, ist die softwareseitige Lücke\index{Software!Engpass} bei mehrachsiger additiver Fertigung der eigentliche Engpass.
+            Sie wird umso spürbarer, je weiter der Standardanwendungsfall des planaren Drucks verlassen wird.
+            Anwendungsfelder reichen vom großformatigen Druck\index{Großformatdruck} mit mehreren Robotern\index{Multi-Roboter-Fertigung} \autocite[vgl.][S.~1--4]{shenResearchLargescaleAdditive2019} bis hin zur medizinischen Implantatfertigung\index{Anwendung!Medizintechnik} \autocite[vgl.][S.~951--960]{martin-rodriguezRoboticPlatformNavigated2025}.
+
+            Diese Arbeit greift einen kleinen Ausschnitt aus diesem Spektrum auf und untersucht prototypisch, wie sich ein Slicer für einen 6-Achs-Roboter umsetzen lässt und welche Konsequenzen sich daraus für eine spätere, ausgereiftere Umsetzung ergeben.
+            \sig{Adrian Gabriel Axtmann}
+
+    \section{Zielsetzung und Forschungsfragen}\label{sec:objectives-and-research-questions}
+        \subsection{Gesamtziel der Arbeit}\label{subsec:overall-objective}
+            % TODO hier auch wieder ändern: additiveN
+            Ziel dieser Arbeit ist die prototypische Entwicklung\index{Prototyp} eines Slicers für \gls{nonplanar-slicing} in der robotergestützten \gls{additive-manufacturing} mit einem 6-Achs-Roboter.
+            Der Slicer soll vom 3D-Modell ausgehend \glspl{toolpath} berechnen, die anschließend von einem Roboter ausgeführt werden können.
+
+            Es geht dabei ausdrücklich nicht darum, ein produktionsreifes System zu entwickeln.
+            Vielmehr soll gezeigt werden, dass eine durchgängige Kette\index{Prozesskette!durchgängig} von der Modell\-aufbereitung über das \gls{slicing} bis zur Roboteransteuerung grundsätzlich umsetzbar ist.
+            Dabei sollen die Stellen identifiziert werden, an denen diese Kette in der Praxis an Grenzen stößt.
+            Die Module \ac{medusa} und \ac{kronos} dienen dabei als prototypische Implementierung, welche die theoretischen Überlegungen greifbar machen und es erlauben, das Verhalten des Gesamtsystems zu beobachten.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Forschungsfragen}\label{subsec:specific-research-questions}
+            Auf Grundlage des Standes der Technik sowie der Problemstellung leiten sich die folgenden Forschungsfragen\index{Forschungsfragen} ab, welche die Arbeit strukturieren:
+
+            \begin{enumerate}
+                \item Welche Anforderungen muss ein Slicer erfüllen, um nicht-planare Bahnstrategien\index{Bahnstrategie!nicht-planar} für einen 6-Achs-Roboter zu erzeugen und wie unterscheidet er sich von einem klassischen planaren Slicer\index{Slicer!planar}?
+                \item Wie kann ein solcher Slicer prototypisch umgesetzt werden und welche technischen Schwierigkeiten treten dabei auf?
+                \item Welche Probleme entstehen bei der Übertragung der geplanten Bahnen auf einen realen Roboter (im konkreten Fall einen \ac{ur3e}\index{Roboter!UR3e} mit \ac{ros} und \ac{moveit})? Insbesondere: Wie lassen sich die beobachteten Effekte wie Konfigurationswechsel\index{Konfigurationswechsel} und Annäherungen an \glspl{singularity}\index{Singularität} einordnen?
+                \item Welche Schlussfolgerungen lassen sich aus den umgesetzten und den nicht umgesetzten Slicing-Strategien für eine zukünftige Weiterentwicklung ziehen?
+            \end{enumerate}
+
+            Diese Forschungsfragen werden in den folgenden Kapiteln aufgegriffen und in der Diskussion zusammengeführt.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Abgrenzung}\label{subsec:scope-delimitation}
+            Die Arbeit beschränkt sich auf materialextrusionsbasierte Verfahren\index{Materialextrusion!Verfahren} und einen \ac{ur3e}-Roboter, der über \ac{ros} und \ac{moveit} angesteuert wird.
+            Die beobachteten Effekte sind damit zunächst an diese konkrete Konfiguration gebunden, lassen sich aber teilweise auch auf andere 6-Achs-Knickarmroboter\index{Roboter!Knickarm} und vergleichbare Bewegungsplanungs-Frameworks\index{Bewegungsplanung!Framework} übertragen.
+
+            \textbf{Nicht Bestandteil} der Arbeit sind
+            \begin{itemize}
+                \item hardwareseitige Entwicklungen am Roboter, am Extruder\index{Extruder} oder an der Sensorik\index{Sensorik},
+                \item eine wirtschaftliche Bewertung\index{Wirtschaftlichkeit} des Verfahrens,
+                \item ein mit realen Druckergebnissen validierter Slicer,
+                \item ein quantitativer Vergleich der Druckqualität\index{Druckqualität} zwischen den vier Strategien.
+            \end{itemize}
+
+            Wie in \cref{subsec:concept-6-axis-slicer-approach} erläutert, sind der planare, der Base- und der Kristall-Algorithmus vollständig implementiert.
+            Der Sphären-Algorithmus liegt ausschließlich als Konzept vor und wird im Rahmen dieser Arbeit nicht implementiert.
+            \sig{Adrian Gabriel Axtmann}
+
+    \section{Methodisches Vorgehen}\label{sec:methodological-approach}
+        \subsection{Vorgehensweise}\label{subsec:research-design-and-development-strategy}
+            Das Vorgehen ist folgt dem typischen Ablauf einer prototypischen Softwareentwicklung\index{Softwareentwicklung!prototypisch}: Anforderungsanalyse, Konzeption, Implementierung und Evaluation in mehreren Iterationen\index{Vorgehensmodell!iterativ}.
+
+            Ausgangspunkt sind die Anforderungen, die sich aus dem Stand der Technik sowie der Problemstellung ergeben.
+            Auf dieser Grundlage wird ein Konzept für die Software-Architektur\index{Softwarearchitektur} entwickelt, welches die in \cref{subsec:concept-6-axis-slicer-approach} eingeführten Komponenten \ac{medusa} und \ac{kronos} sowie deren Schnittstellen umfasst.
+            Anschließend wird das Konzept implementiert und schrittweise erprobt.
+            Erkenntnisse aus der Erprobung fließen in spätere Iterationen zurück, sodass Konzept und Implementierung sich gegenseitig schärfen.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Evaluation}\label{subsec:evaluation-concept-and-comparison-criteria}
+            Die Evaluation erfolgt in mehreren Schritten.
+            Zunächst wird die Funktionsfähigkeit des Slicers anhand einfacher Testgeometrien\index{Testgeometrie} geprüft, um sicherzustellen, dass die berechneten \glspl{toolpath} plausibel sind.
+            Daraufhin wird untersucht, inwieweit sich diese \glspl{toolpath} vom realen Roboter ausführen lassen, und welche Probleme dabei auftreten.
+            Nachfolgend werden die umgesetzten Strategien konzeptionell mit dem klassischen, planaren Ansatz verglichen.
+
+            Als Bewertungskriterien\index{Bewertungskriterium} dienen unter anderem die geometrische Korrektheit\index{Korrektheit!geometrisch} der \glspl{toolpath}, die Stabilität der Roboterbewegung\index{Roboterbewegung!Stabilität}, die Ausführbarkeit ohne Konfigurationswechsel oder Annäherung an \glspl{singularity} sowie qualitative Aspekte\index{Evaluation!qualitativ} wie \gls{support-structures}-Bedarf und \gls{toolpath}-Verlauf.
+            Eine quantitative Vermessung\index{Evaluation!quantitativ} gefertigter Bauteile findet dagegen nicht statt.
+            Eine derartige Untersuchung überschreitet den Rahmen der vorliegenden Arbeit und bleibt daher zukünftigen Forschungsprojekten vorbehalten
+            \sig{Adrian Gabriel Axtmann}
+
+    \section{Aufbau der Arbeit}\label{sec:thesis-structure}
+        Die Arbeit ist in mehrere inhaltlich aufeinander aufbauende Kapitel gegliedert.
+
+        Auf diese \textbf{Einleitung} folgen die \textbf{theoretischen Grundlagen}, in welchen für die Arbeit relevante Begriffe und Konzepte aus den Bereichen additive Fertigung, Robotik und Kinematik erläutert werden.
+        Die \textbf{Anforderungsanalyse} leitet aus der Problemstellung konkrete funktionale und nicht-funktionale Anforderungen an das Gesamtsystem ab.
+        Die \textbf{Konzeption} beschreibt die Architektur des Systems, die beiden Module \ac{medusa} und \ac{kronos}, die zwischen ihnen verwendete Schnittstelle sowie die vier betrachteten Slicing-Strategien.
+        Die \textbf{Implementierung} dokumentiert die konkrete Umsetzung der Module und der Algorithmen.
+        Die \textbf{Evaluation} zeigt die Ergebnisse der Erprobung anhand definierter Testfälle und beschreibt die dabei aufgetretenen Probleme bei der Roboteransteuerung.
+        Die \textbf{Diskussion} ordnet die Ergebnisse ein, reflektiert die Grenzen der Arbeit (insbesondere die nicht erfolgreich umgesetzten Strategien und die Schwierigkeiten bei der Roboteransteuerung) und diskutiert mögliche Ursachen.
+        Den Abschluss bildet das Kapitel \textbf{Fazit und Ausblick}, in dem die Ergebnisse zusammengefasst und konkrete Ansatzpunkte für eine Weiterentwicklung benannt werden.
+        \sig{Adrian Gabriel Axtmann}
+
+    \section{Begleitender Quellcode}\label{sec:accompanying-source-code}
+        Ergänzend zu dieser schriftlichen Ausarbeitung ist der vollständige Quellcode\index{Quellcode} der Module \ac{medusa} und \ac{kronos} in einem GitLab-Repository\index{Repository!GitLab} verfügbar.
+        Auf diese Weise lassen sich die in der \textbf{Implementierung} beschriebenen Konzepte direkt im Code nachvollziehen und die in der \textbf{Evaluation} dokumentierten Ergebnisse reproduzieren\index{Reproduzierbarkeit}.
+        Die genaue Adresse des Repositorys sind im Anhang in \cref{sec:gitlab-repository-link} dokumentiert.
+        \sig{Adrian Gabriel Axtmann}

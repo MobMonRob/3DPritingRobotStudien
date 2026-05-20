@@ -1,0 +1,20 @@
+\cleardoublepage
+\pagestyle{plain} % clean style for backmatter
+\pagenumbering{Roman}
+\setcounter{page}{\thesavepage}
+% bibliography
+\printbibliography[heading=bibintoc, title={Literaturquellen}, notkeyword={picture}, notkeyword={code}]
+\printbibliography[heading=bibintoc, title={Bilderquellen}, keyword={picture}]
+\printbibliography[heading=bibintoc, title={Codequellen}, keyword={code}]
+\nocite{*}
+% glossary
+\addcontentsline{toc}{chapter}{Glossar}
+\glsaddall
+\printglossary
+% index
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Stichwortverzeichnis}
+\printindex
+% attachments
+\chapter{Anhang}\label{chap:attachments}
+\input{document/backmatter/attachments.tex}

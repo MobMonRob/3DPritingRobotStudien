@@ -1,0 +1,120 @@
+\documentclass[aspectratio=169, 10pt]{beamer} % 16:9 aspect ratio (modern standard)
+
+% --- PACKAGES ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern} % Improved font quality
+\usepackage{helvet}  % Helvetica as sans-serif font (looks more modern)
+\usepackage{graphicx}
+% Search paths for images (cover both in-place and outdir builds)
+\graphicspath{{images/}{./images/}{../images/}}
+\renewcommand{\familydefault}{\sfdefault} % Set sans-serif as default
+
+\usepackage{booktabs} % Nice table rules
+\usepackage{siunitx}  % For units
+\usepackage{graphicx}
+\usepackage{tikz}     % For drawings and diagrams
+\usepackage[most]{tcolorbox}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{shapes, arrows, arrows.meta, positioning, shadows, calc, fit, backgrounds}
+\usepackage{fontawesome5} % For modern icons
+\usepackage{xcolor}
+\usepackage{colortbl} % For colored table cells
+
+% --- THEME & COLORS (MODERN FLAT DESIGN) ---
+\usetheme{Madrid} % Madrid is clean, but we customize it heavily
+\usecolortheme{default}
+
+% Define custom color palette (DHBW Red or a Tech Blue)
+\definecolor{PrimaryColor}{RGB}{44, 62, 80}    % Dark Blue (Midnight Blue)
+\definecolor{SecondaryColor}{RGB}{44, 62, 80} % Accent Color
+\definecolor{LightGray}{RGB}{236, 240, 241}    % Light Background
+\definecolor{TechGreen}{RGB}{39, 174, 96}      % For Success/Progress
+
+% Set Beamer colors
+\setbeamercolor{palette primary}{bg=PrimaryColor,fg=white}
+\setbeamercolor{palette secondary}{bg=PrimaryColor!80,fg=white}
+\setbeamercolor{palette tertiary}{bg=PrimaryColor!90,fg=white}
+\setbeamercolor{structure}{fg=PrimaryColor} % Heading color
+\setbeamercolor{frametitle}{bg=PrimaryColor,fg=white}
+\setbeamercolor{title}{bg=PrimaryColor,fg=white}
+
+% Modernize blocks (Flat, no shadows)
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercolor{block title}{bg=PrimaryColor!15,fg=PrimaryColor}
+\setbeamercolor{block body}{bg=PrimaryColor!5,fg=black}
+\setbeamercolor{block title alerted}{bg=SecondaryColor!15,fg=SecondaryColor}
+\setbeamercolor{block body alerted}{bg=SecondaryColor!5,fg=black}
+
+% Hide navigation symbols (looks cleaner)
+\setbeamertemplate{navigation symbols}{}
+
+% Customize itemize bullets
+\setbeamertemplate{itemize item}{\color{SecondaryColor}$\blacksquare$}
+\setbeamertemplate{itemize subitem}{\color{SecondaryColor}\scriptsize$\blacktriangleright$}
+
+% Minimalist footer
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,rightskip=2ex]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+    \insertframenumber{} / \inserttotalframenumber
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% --- CUSTOM COMMANDS ---
+% Command for visual progress bars in tables
+\newcommand{\progressbar}[1]{%
+    \begin{tikzpicture}
+        \fill[LightGray] (0,0) rectangle (1.5,0.25);
+        \fill[TechGreen] (0,0) rectangle (#1*0.015,0.25);
+    \end{tikzpicture}%
+}
+
+% --- METADATA ---
+\title[6-Achs-Slicer]{Prototypische Entwicklung eines 6-Achs-Slicers}
+\subtitle{für nichtplanare, robotergestützte additive Fertigung}
+\author[Axtmann, Wachsmann, Stahl]{Adrian Axtmann \and Nik Wachsmann \and Ben Stahl}
+\institute[DHBW]{Studiengang Informatik \ DHBW Karlsruhe}
+\date{\today}
+% DHBW Logo
+\titlegraphic{\includegraphics[height=1.2cm]{dhbw_Logo.png}}
+
+\begin{document}
+
+% --- TITLE PAGE ---
+{
+\setbeamertemplate{footline}{} % No footer on title page
+\begin{frame}
+    \titlepage
+\end{frame}
+}
+
+% --- AGENDA ---
+\begin{frame}{Agenda}
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+% --- CONTENT (one file per section) ---
+% \input{sections/01_team}
+\input{sections/02_motivation}
+\input{sections/03_uebersicht}
+\input{sections/05_medusa}
+\input{sections/06_kronos}
+\input{sections/07_slicing_algorithmen}
+\input{sections/08_test_objekte}
+\input{sections/09_naechste_schritte}
+\input{sections/10_ziel}
+\input{sections/11_fragen}
+
+\end{document}

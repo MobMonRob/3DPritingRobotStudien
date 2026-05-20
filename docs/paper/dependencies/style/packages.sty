@@ -1,0 +1,151 @@
+% define packages and their options
+
+\usepackage{pdflscape} % package for landscape pages: https://ctan.org/pkg/pdflscape?lang=de
+\usepackage{afterpage} % package for executing commands after the current page: https://ctan.org/pkg/afterpage?lang=de
+
+\usepackage{xurl} % package for breaking URLs at appropriate points: https://ctan.org/pkg/xurl?lang=de
+
+\usepackage[utf8 % set encoding to Unicode UTF-8
+            ]{inputenc} % packet for specifiying the input encoding: https://ctan.org/pkg/inputenc?lang=de
+
+\usepackage[ngerman % set language to n(ew)german
+            ]{babel} % package for language support: https://ctan.org/pkg/babel?lang=de
+
+\usepackage[autostyle=true, % automatically style the quotes
+            german=guillemets % set the quotes to german guillemets
+            ]{csquotes} % package for quoting: https://ctan.org/pkg/csquotes?lang=de
+
+\usepackage[T1 % set font encoding to T1
+            ]{fontenc} % package for font encoding: https://ctan.org/pkg/fontenc?lang=de
+
+\usepackage{mathpazo} % Palatino font for body text and math (elegant dissertation font)
+\usepackage[scaled=0.85]{beramono} % Bera Mono as monospace font (pairs well with Palatino)
+
+\usepackage{amsmath} % package for math: https://ctan.org/pkg/amsmath?lang=de
+\usepackage{amssymb} % package for math symbols: https://ctan.org/pkg/amssymb?lang=de
+
+\usepackage[table % can be used to color tables
+            ]{xcolor} % package for color support: https://ctan.org/pkg/xcolor?lang=de
+
+\usepackage{tikz} % package for creating graphics: https://ctan.org/pkg/pgf?lang=de
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, decorations.pathreplacing, calc, shadings, patterns, shadows.blur, fit, backgrounds} % load TikZ libraries for additional features
+
+\usepackage{graphicx} % package for including graphics: https://ctan.org/pkg/graphicx?lang=de
+
+\usepackage[left=3cm,   % inner margin (binding side)
+            right=2.5cm, % outer margin
+            top=2.5cm,   % top margin
+            bottom=3cm,  % bottom margin (includes footer area)
+            headheight=15pt,
+            headsep=1.2em,
+            footskip=1.2cm % distance from text to footer
+            ]{geometry} % package for page layout: https://ctan.org/pkg/geometry
+
+\usepackage{fancyhdr} % package for customizing headers and footers: https://ctan.org/pkg/fancyhdr?lang=de
+
+\usepackage{setspace} % package for setting the line spacing: https://ctan.org/pkg/setspace?lang=de
+
+\usepackage{titlesec} % package for customizing section headings: https://ctan.org/pkg/titlesec
+
+\usepackage[titles]{tocloft} % package for customizing table of contents: https://ctan.org/pkg/tocloft?lang=de
+
+\usepackage{float} % package for floating objects: https://ctan.org/pkg/float?lang=de
+
+\usepackage[font=small,
+            labelfont=bf,
+            labelsep=endash,
+            format=hang,
+            justification=raggedright,
+            singlelinecheck=false
+            ]{caption} % package for caption styling: https://ctan.org/pkg/caption
+
+\captionsetup[table]{position=above}
+\captionsetup[figure]{position=below}
+
+\usepackage{listings} % package for code listings: https://ctan.org/pkg/listings?lang=de
+
+\usepackage{chngcntr} % package for changing the counter: https://ctan.org/pkg/chngcntr?lang=de
+
+\usepackage{wrapfig} % package for wrapping text around figures: https://ctan.org/pkg/wrapfig?lang=de
+
+\usepackage{booktabs} % package for professional tables: https://ctan.org/pkg/booktabs
+
+\usepackage{pdfpages} % package for including pdfs: https://ctan.org/pkg/pdfpages?lang=de
+
+\usepackage{pgf-umlcd} % package for UML diagrams: https://ctan.org/pkg/pgf-umlcd?lang=de
+
+\usepackage{lipsum} % package for generating dummy text: https://ctan.org/pkg/lipsum?lang=de
+
+\usepackage[noautomatic]{imakeidx} % package for creating indexes: https://ctan.org/pkg/imakeidx?lang=de
+% Index wird via latexmk + upmendex (UTF-8-faehig, ICU-Sortierung) erzeugt;
+% benoetigt UTF-8-Style dependencies/style/index.ist mit icu_locale.
+\makeindex[columns=2,        % two-column index layout
+           title=Stichwortverzeichnis
+           ]
+
+\usepackage[style=numeric, % set the style of the bibliography
+            ]{biblatex}% package for bibliography: https://ctan.org/pkg/biblatex?lang=de
+\bibliography{dependencies/sources/literature.bib} % set the bibliography file for the literature
+\bibliography{dependencies/sources/pictures.bib} % set the bibliography file for the pictures
+\bibliography{dependencies/sources/code.bib} % set the bibliography file for the code
+
+\AtBeginBibliography{\sloppy}
+
+
+\usepackage[printonlyused, % only print used acronyms
+            withpage % print the page number where the acronym is first used
+            ]{acronym} % package for acronyms: https://ctan.org/pkg/acronym?lang=de
+
+\usepackage[activate={true,nocompatibility},
+            final,
+            tracking=true,
+            kerning=true,
+            spacing=true,
+            factor=1100,
+            stretch=10,
+            shrink=10
+            ]{microtype} % package for micro-typographic extensions: https://ctan.org/pkg/microtype
+
+% hyperref must be loaded near last
+\usepackage[colorlinks=true, % colors the links instead of using boxes
+            linkcolor=black, % set the color of internal links
+            bookmarks=true, % create bookmarks
+            bookmarksopen=true, % open the bookmarks
+            bookmarksnumbered=true, % add section numbers to the bookmarks
+            unicode=true, % allows to use characters of non-latin based languages in bookmarks
+            pdftoolbar=true, % show toolbar
+            pdfnewwindow=true, % open links in a new window
+            pdfstartview={FitV}, % set the zoom level to fit the width of the page
+            hyperindex=true, % make index entries clickable
+            ]{hyperref} % package for hyperlinks: https://ctan.org/pkg/hyperref?lang=de
+
+% cleveref must be loaded after hyperref
+\usepackage{cleveref} % package for clever references: https://ctan.org/pkg/cleveref?lang=de
+
+% glossaries must be loaded after hyperref for links to work
+\usepackage[nonumberlist, % suppress the associated number lists in the glossaries
+            nopostdot % suppress the dot after the glossary entry
+            ]{glossaries} % package for glossaries: https://ctan.org/pkg/glossaries?lang=de
+
+\usepackage{array}      % package for extending the array and tabular environments: https://ctan.org/pkg/array?lang=de
+\usepackage{multirow}   % package for multi-row cells in tables: https://ctan.org/pkg/multirow?lang=de
+\usepackage{enumitem}   % package for customizing lists: https://ctan.org/pkg/enumitem?lang=de
+\usepackage{tabularx}   % package for tables with adjustable-width columns: https://ctan.org/pkg/tabularx?lang=de
+\usepackage{siunitx}    % package for typesetting units: https://ctan.org/pkg/siunitx?lang=de
+\usepackage{lipsum} % package for generating dummy text: https://ctan.org/pkg/lipsum?lang=de
+
+\usepackage{fancyhdr} % package for customizing headers and footers: https://ctan.org/pkg/fancyhdr?lang=de
+
+\usepackage{chngcntr} % package for changing the counter: https://ctan.org/pkg/chngcntr?lang=de
+
+\setlength{\marginparwidth}{2cm}
+\usepackage[textsize=tiny]{todonotes} % package for visible TODO notes: https://ctan.org/pkg/todonotes?lang=de
+
+\usepackage[titles]{tocloft} % package for customizing table of contents: https://ctan.org/pkg/tocloft?lang=de
+
+\usepackage{float} % package for floating objects: https://ctan.org/pkg/float?lang=de
+
+\usepackage{setspace} % package for setting the line spacing: https://ctan.org/pkg/setspace?lang=de
+
+
+\usepackage{gensymb}

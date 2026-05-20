@@ -1,0 +1,1023 @@
+\chapter{Implementierung}\label{chap:implementation}
+    \section{Implementierung der Komponente MEDUSA}\label{sec:implementation-of-component-medusa}
+        Die folgende Beschreibung der Implementierung von \ac{medusa} setzt die in \cref{subsec:component-medusa} entwickelte Konzeption in eine konkrete Realisierung in \texttt{C++} um.
+        Soweit möglich wird auf die entsprechenden Abschnitte der Konzeption verwiesen, um redundante konzeptionelle Erläuterungen an dieser Stelle zu vermeiden.
+        Der Fokus liegt stattdessen auf der konkreten Umsetzung, den getroffenen Implementierungsentscheidungen.
+        \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Projektstruktur und Build-System}\label{subsec:impl-medusa-project-structure} \index{MEDUSA!Projektstruktur}
+            Die Realisierung von \ac{medusa} erfolgt als \texttt{C++}-Projekt auf Basis von \gls{cmake} und wird gegen den Sprachstandard \texttt{C++23} kompiliert.
+            Das Gesamtbild wird dabei von vier strukturellen Festlegungen geprägt.
+            Damit spiegelt die Verzeichnisstruktur zunächst die in \cref{subsubsec:concept-medusa-modularization} konzipierte Schichtenarchitektur eins zu eins wider.
+            Darauf abgestimmt organisiert das Build-System die Module als separate CMake-Targets mit explizit deklarierten Sichtbarkeiten.
+            Zudem werden alle externen Bibliotheken deklarativ über \gls{fetchcontent} zur Konfigurationszeit gebunden.
+            Plattformspezifische Anpassungen beschränken sich schließlich auf die reine Build-Konfiguration und die Initialisierung des \ac{OpenGL}-Kontexts.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Verzeichnisstruktur}\label{subsubsec:impl-medusa-directory-layout}
+                Die Verzeichnisstruktur des Repositories folgt der konzeptionellen Aufteilung in Infrastruktur-, Domänen-, Schnittstellen-, Präsentations- und Kompositionsschicht.
+                Jedes Modul liegt in einem eigenen Unterverzeichnis unterhalb von \texttt{src/} und kapselt seinen öffentlichen Header sowie die zugehörige Implementierung.
+                Tests, Beispieldaten, externe Abhängigkeiten und Shader sind aus dem Quellbaum ausgelagert, damit sich der reine Bibliothekscode in \texttt{src/} isoliert prüfen lässt.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{table}[ht]
+                    \centering
+                    \caption[Top-Level-Verzeichnisse des Repositories]{Top-Level-Verzeichnisse des Repositories und ihre Zuordnung zur Schichtenarchitektur aus \cref{subsubsec:concept-medusa-modularization}}
+                    \label{tab:impl-medusa-toplevel-dirs}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l l p{6.5cm} @{}}
+                        \toprule
+                        \textbf{Verzeichnis} & \textbf{Rolle} & \textbf{Inhalt} \\
+                        \midrule
+                        \texttt{src/}      & Bibliotheks- und Anwendungscode & Module der fünf Architekturschichten \\
+                        \texttt{external/} & Abhängigkeiten                  & Per-Bibliothek-CMake-Fragmente und gevendortes GLAD \\
+                        \texttt{tests/}    & Testsuite                       & Unit- und Integrationstests sowie Testdaten \\
+                        \texttt{assets/}   & Laufzeitassets                  & GLSL-Shader für die Präsentationsschicht \\
+                        \texttt{data/}     & Beispieldaten                   & Beispiel-\glspl{mesh} und Benutzereinstellungen \\
+                        \texttt{ci/}       & CI-Infrastruktur                & Dockerfile \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Build-System-Konfiguration}\label{subsubsec:impl-medusa-cmake} \index{CMake}
+                Als Build-System wird \gls{cmake} ab Version~3.22.1 eingesetzt.
+                Die oberste Ebene legt die Sprachversion auf \texttt{C++23} fest, deaktiviert nicht-portable Compiler-Erweiterungen und bindet die in \cref{tab:impl-medusa-cmake-options} aufgeführten Optionen ein.
+
+                \begin{table}[ht]
+                    \centering
+                    \caption[CMake-Optionen des Wurzelprojekts]{CMake-Optionen des Wurzelprojekts und ihre Voreinstellungen}
+                    \label{tab:impl-medusa-cmake-options}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l l p{6.0cm} @{}}
+                        \toprule
+                        \textbf{Option} & \textbf{Standard} & \textbf{Wirkung} \\
+                        \midrule
+                        \texttt{MEDUSA\_BUILD\_APP}   & \texttt{ON}    & Baut die grafische Anwendung \\
+                        \texttt{MEDUSA\_BUILD\_TESTS} & \texttt{ON}    & Baut die Testsuite \\
+                        \texttt{CMAKE\_BUILD\_TYPE}   & \texttt{Debug} & Build-Typ \\
+                        \texttt{FETCH\_USE\_SHALLOW}  & \texttt{ON}    & Flache Git-Clones für FetchContent \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+                Jedes Modul der Schichtenarchitektur wird als eigenständiges statisches Bibliotheks-Target angelegt und über einen Alias mit \texttt{medusa::}-Präfix exportiert.
+                Die Linksichtbarkeit ist konsequent so gewählt, dass nur die für die öffentliche API benötigten Abhängigkeiten als \texttt{PUBLIC} und alle übrigen als \texttt{PRIVATE} propagiert werden.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{lstlisting}[style=cmakeStyle, caption={Linkkonfiguration von \texttt{medusa::slicing} (Ausschnitt).}, label={lst:impl-medusa-slicing-cmake}]
+add_library(medusa_slicing STATIC ${SLICING_SOURCES})
+add_library(medusa::slicing ALIAS medusa_slicing)
+
+target_link_libraries(medusa_slicing PUBLIC
+    medusa::core
+    medusa::geometry)
+
+# Crystal-spezifische Abhaengigkeiten bleiben PRIVATE
+target_link_libraries(medusa_slicing PRIVATE
+    ext::eigen
+    ext::libigl)
+                \end{lstlisting}
+
+                Externe Bibliotheken werden über \gls{fetchcontent} aus ihren öffentlichen Git"=Repositories bezogen.
+                Pro Bibliothek existiert eine eigene CMake-Datei, die das Versions-Tag, Repository-\ac{URL} sowie Konfigurationsoptionen kapselt.
+                Eine einzige Ausnahme bildet GLAD, das als gevendorter Quellbaum mitgeführt wird, da der offizielle Generator eine Webanfrage zur Build-Zeit stellen würde.
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Plattformspezifische Anpassungen}\label{subsubsec:impl-medusa-platform-specifics}
+                Die in \cref{subsec:architecture-principles-and-design-goals} geforderte Plattformunabhängigkeit wird durch plattformneutrale Bibliotheken (GLFW, GLM, Assimp, Eigen) abgedeckt.
+                Zwei Stellen bleiben dennoch plattformsensitiv.
+
+                \paragraph{Compiler-Anforderungen}\label{para:impl-medusa-platform-compilers}
+                    Die Mindestversionen sind GCC~13, Clang~16 sowie MSVC~19.35 (Visual Studio~2022~17.5).
+                    Diese Schwellen werden in der \texttt{CMakeLists.txt} geprüft und mit einer Fehlermeldung quittiert.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{OpenGL-Kontext auf macOS}\label{para:impl-medusa-platform-macos-gl}
+                    Apple stellt seit macOS~10.14 OpenGL ausschließlich im Forward-Compatible Core-Profile bereit und unterstützt maximal Version~4.1.
+                    Der OpenGL-Kontext wird daher durchgängig als \texttt{3.2 Core, Forward-Compatible} angefordert und alle Shader werden in GLSL~150 geschrieben.
+                    \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Infrastruktur-Schicht}\label{subsec:impl-medusa-infrastructure}
+            Die Infrastruktur-Schicht stellt querschnittliche Funktionalität bereit, auf die alle anderen Schichten zugreifen.
+            Das Modul \texttt{core} enthält die Klasse \texttt{Logger}, die als dünner Wrapper um \texttt{spdlog} fungiert.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Logging-Subsystem}\label{subsubsec:impl-medusa-logging}\index{Logging}\index{spdlog}
+                Drei Designentscheidungen prägen das Subsystem.
+                So ist der Logger grundsätzlich global zugänglich.
+                Zudem arbeitet er asynchron, sodass schreibende Threads nicht durch I/O blockiert werden.
+                Das Absetzen der Logmeldungen erfolgt schließlich über Makros.
+                \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Sink-Konfiguration}\label{para:impl-medusa-logger-sinks}
+                    Es werden parallel zwei Sinks bedient: ein farbig formatierter Konsolen-Sink auf \texttt{stderr} und ein rotierender Dateisink.
+                    Der Konsolen-Sink filtert standardmäßig auf \texttt{info}, der Datei-Sink auf \texttt{trace}.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Compile-Time-Filterung}\label{para:impl-medusa-logger-compile-time}
+                    Über die Präprozessor-Konstante \texttt{SPDLOG\_ACTIVE\_LEVEL} werden Logaufrufe unterhalb der angegebenen Stufe bereits zur Übersetzungszeit aus dem Maschinencode entfernt.
+                    In Release-Übersetzungen werden \texttt{trace}- und \texttt{debug}-Aufrufe eliminiert.
+                    \sig{Adrian Gabriel Axtmann}
+
+                    \begin{lstlisting}[style=cppStyle, caption={Verwendung der Logger-Makros.}, label={lst:impl-medusa-logger-macros}]
+Logger::init("logs");
+MEDUSA_INFO("Startup complete");
+MEDUSA_DEBUG("Loaded {} vertices, {} faces", n_vert, n_face);
+MEDUSA_WARN("Mesh contains {} non-manifold edges", n_bad);
+Logger::shutdown();
+                    \end{lstlisting}
+
+        \subsection{Domänen-Schicht: Geometrieverarbeitung}\label{subsec:impl-medusa-geometry}\index{MEDUSA!Modul!geometry}
+            Die Domänen-Schicht implementiert die in \cref{subsubsec:concept-medusa-data-representations} beschriebene indizierte Dreiecksrepräsentation.
+            Sie ist bewusst so geschnitten, dass sie keine Datei-IO-Abhängigkeit besitzt und keinerlei Bezug zur grafischen Darstellung kennt.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Datenstrukturen für Mesh}\label{subsubsec:impl-medusa-mesh-data-structures}\index{Mesh!Datenstruktur}
+                Die zentrale Datenstruktur \texttt{TriangleMesh} verwendet ein \ac{SoA}-Layout, bei dem \glspl{vertex}, Normalen, Flächenindizes sowie Adjazenz- und Inzidenzlisten in separaten \texttt{std::vector}-Instanzen liegen.
+                Diese Wahl verbessert die Cache-Auslastung bei Iterationen über Teilmengen der Attribute.
+
+                \begin{lstlisting}[style=cppStyle, caption={Indizierte Dreiecksrepräsentation \texttt{TriangleMesh}.}, label={lst:impl-medusa-trianglemesh}]
+struct TriangleMesh
+{
+    std::vector<glm::vec3>             vertices;
+    std::vector<glm::vec3>             normals;
+    std::vector<glm::uvec3>            faces;
+    std::vector<glm::vec3>             face_normals;
+    std::vector<glm::uvec3>            face_to_face;
+    std::vector<std::vector<uint32_t>> vertex_to_faces;
+    AABB                               bounds;
+
+    static constexpr uint32_t NO_ADJACENT_FACE
+        = std::numeric_limits<uint32_t>::max();
+
+    bool isValid() const noexcept;
+};
+                \end{lstlisting}
+
+                Die Flächen-zu-Flächen-Adjazenz ist als \texttt{glm::uvec3} pro \gls{triangle} kodiert, wobei Boundary-\glspl{edge} mit \texttt{NO\_ADJACENT\_FACE} markiert werden.
+                Die Inzidenz ist als \texttt{std::vector<std::vector<uint32\_t>>} repräsentiert, da die Anzahl inzidenter \glspl{triangle} pro \gls{vertex} nicht beschränkt ist.
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Mesh-Import über Assimp}\label{subsubsec:impl-medusa-mesh-import}
+                \index{Mesh!Import}
+                Der Mesh-Import erfolgt über die Klasse \texttt{MeshLoader}, die einen \texttt{Assimp::Importer} mit fester Postprocess-Konfiguration kapselt.
+
+                \begin{table}[ht]
+                    \centering
+                    \caption[Verwendete Assimp-Postprocess-Flags]{%
+                        Verwendete Postprocess-Flags des Assimp-Importers%
+                    }
+                    \label{tab:impl-medusa-assimp-flags}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l p{7.5cm} @{}}
+                        \toprule
+                        \textbf{Flag} & \textbf{Wirkung} \\
+                        \midrule
+                        \texttt{aiProcess\_Triangulate}        & Zerlegt nicht-dreieckige Polygone \\
+                        \texttt{aiProcess\_GenSmoothNormals}   & Erzeugt geglättete Vertex-Normalen \\
+                        \texttt{aiProcess\_JoinIdenticalVertices} & Verschmilzt identische Vertizes \\
+                        \texttt{aiProcess\_ImproveCacheLocality}  & Reordert Faces für Cache-Auslastung \\
+                        \texttt{aiProcess\_PreTransformVertices} & Wendet Szenen-Hierarchie an \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+                Mehrere Submeshes werden vor der Konvertierung zusammengeführt.
+                Material- und Texturkoordinaten werden hierbei verworfen.
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Vertex-Verschmelzung und Adjazenzaufbau}\label{subsubsec:impl-medusa-vertex-welding}
+                \index{Vertex Welding}
+                Das positionsbasierte Verschmelzen der Vertizes ist Voraussetzung dafür, dass nachgelagerte Stufen über die Adjazenzlisten navigieren können.
+                Die Verschmelzung erfolgt über eine \texttt{std::unordered\_map} mit quantisiertem \texttt{glm::vec3} als Schlüssel.
+                Die Quantisierung rundet die Komponenten auf ein Gitter mit Maschenweite $10^{-5}\,\si{mm}$.
+
+                \begin{lstlisting}[style=cppStyle, caption={Quantisierter Hash für Vertex-Welding.}, label={lst:impl-medusa-vertex-hash}]
+struct QuantizedVec3Hash
+{
+    static constexpr float weld_eps = 1.0e-5f;
+
+    std::size_t operator()(const glm::vec3& v) const noexcept
+    {
+        const auto qx = static_cast<int32_t>(std::round(v.x / weld_eps));
+        const auto qy = static_cast<int32_t>(std::round(v.y / weld_eps));
+        const auto qz = static_cast<int32_t>(std::round(v.z / weld_eps));
+
+        std::size_t h = std::hash<int32_t>{}(qx);
+        h ^= std::hash<int32_t>{}(qy) + 0x9e3779b9u + (h << 6) + (h >> 2);
+        h ^= std::hash<int32_t>{}(qz) + 0x9e3779b9u + (h << 6) + (h >> 2);
+        return h;
+    }
+};
+                \end{lstlisting}
+
+                Nach der Verschmelzung baut \texttt{buildVertexToFaces()} die Inzidenzlisten auf, anschließend bestimmt \texttt{buildFaceAdjacency()} die Flächen-zu-Flächen-Adjazenz.
+                Der Adjazenzaufbau ist erwartet linear in der Anzahl der \glspl{triangle}.
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Normalen und Bounding-Box}\label{subsubsec:impl-medusa-normals-aabb}
+                \index{Bounding Box}
+                Face-Normalen werden pro \gls{triangle} als normiertes Kreuzprodukt berechnet.
+                Vertex-Normalen werden vom Assimp-Importer mit \texttt{aiProcess\_GenSmoothNormals} erzeugt.
+                Die \ac{AABB} wird in einem Pass über das \texttt{vertices}-Array aufgebaut.
+                Sie wird von den Slicing-Algorithmen zur Schichtanzahl-Berechnung und von der Visualisierung zur Kameraplatzierung verwendet.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Schnittstellen-Schicht: Toolpath-Export}\label{subsec:impl-medusa-exporter} \index{MEDUSA!Modul!exporter}
+            Die Schnittstellen-Schicht setzt die in \cref{subsubsec:interface-conceptual-structure} spezifizierte Toolpath"=Repräsentation in ein konkretes \gls{json}-Schema um.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{JSON-Schema und Serialisierung}\label{subsubsec:impl-medusa-json-schema} \index{JSON-Schema}
+                Die POD-Strukturen \texttt{JobMetadata}, \texttt{Waypoint} und \texttt{Toolpath} bilden Header und Wegpunktstrom ab.
+                Die Position ist als drei \texttt{double}-Komponenten in \si{mm} repräsentiert, die Orientierung als \gls{quaternion} mit Reihenfolge $(q_w, q_x, q_y, q_z)$.
+                Intern speichert die \texttt{Segment}-Struktur die Ausrichtung lediglich als \texttt{glm::vec3} (entspricht $\vec{z}_\mathrm{tool}$).
+                Die Konvertierung in ein vollständiges \gls{quaternion} ist noch nicht implementiert.
+
+
+                \begin{lstlisting}[style=cppStyle, caption={POD-Struktur \texttt{Waypoint}.}, label={lst:impl-medusa-waypoint}]
+struct Waypoint
+{
+    double x, y, z;                 // Position in mm
+    double qw, qx, qy, qz;          // Einheits-Quaternion
+    double feed_rate;               // mm/s
+    double extrusion;               // mm^3/s, 0 fuer Travel-Moves
+    MotionType    motion_type;      // Travel | Print
+    std::uint32_t layer_id;
+    std::uint32_t segment_id;
+    std::uint32_t branch_id;
+};
+                \end{lstlisting}
+
+                Die Serialisierung erfolgt über \texttt{nlohmann\_json} mit \ac{ADL}-basierten \texttt{to\_json}\slash\allowbreak\texttt{from\_json}"=Funktionen.
+                Aufzählungstypen werden als Kleinbuchstaben-Zeichenkette serialisiert.
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Prüfsumme}\label{subsubsec:impl-medusa-checksum}\index{FNV-1a-Hash}
+                Die Prüfsumme über den Wegpunktstrom verwendet \gls{FNV-1a}-64, einen nicht-kryptografischen 64"=Bit"=Hash.
+                Der Hash wird über die serialisierte \gls{json}"=Repräsentation gebildet, nicht über die Rohdaten.
+                Dadurch kann \ac{kronos} die Prüfsumme unabhängig nachrechnen: es genügt, das empfangene \texttt{waypoints}-Array erneut zu serialisieren und zu hashen, ohne die interne \texttt{Waypoint}-Struktur zu kennen.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{lstlisting}[style=cppStyle, caption={FNV-1a-64-Implementierung.}, label={lst:impl-medusa-fnv1a}]
+constexpr std::uint64_t k_fnv1a_offset = 14695981039346656037ULL;
+constexpr std::uint64_t k_fnv1a_prime  = 1099511628211ULL;
+
+std::uint64_t fnv1a_64(std::string_view data) noexcept
+{
+    std::uint64_t hash = k_fnv1a_offset;
+    for (unsigned char c : data)
+    {
+        hash ^= static_cast<std::uint64_t>(c);
+        hash *= k_fnv1a_prime;
+    }
+    return hash;
+}
+                \end{lstlisting}
+
+            \subsubsection{Validierung und atomares Schreiben}\label{subsubsec:impl-medusa-atomic-write} \index{Validator}
+                Vor jedem Schreibvorgang prüft die Klasse \texttt{Validator} fünf Eigenschaften: Metadaten-Vollständigkeit, nichtleerer Wegpunktstrom, finite Werte, \gls{quaternion}-Norm ($\lVert q \rVert^2 \approx 1$ mit Toleranz $10^{-6}$) und monotone Layer-IDs.
+                Eine kinematische Erreichbarkeitsprüfung ist über das Interface \texttt{IReachabilityCheck} pluggable.
+
+                Das Schreiben erfolgt zweistufig: vollständige \gls{json}"=Repräsentation in temporäre Datei mit Suffix \texttt{.tmp}, dann atomares Umbenennen über \texttt{std::filesystem::rename()}.
+                Der Dateiname folgt dem Muster \texttt{toolpath\_<UTC-Timestamp>\_<algorithm>.json}.
+
+                Die Facade \texttt{KronosExporter} verwendet einen eigenständigen \texttt{Result<T, E>}-Typ auf Basis von \texttt{std::variant}, da das Modul als eigenständige Bibliothek auch in Projekten ohne \texttt{C++23} verwendbar bleiben soll.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Präsentations-Schicht: 3D-Visualisierung}\label{subsec:impl-medusa-graphics}\index{MEDUSA!Modul!graphics}
+            Die Visualisierung nutzt \ac{OpenGL}~3.2 Core Profile und ist nach dem Prinzip \glqq eine Renderschicht pro Klasse\grqq{} organisiert.
+            Dabei ist jede visuelle Darstellungsebene --- Mesh, Toolpath, Hilfsgeometrie, Feld-Overlay --- einer eigenen Renderer-Klasse zugeordnet, die ausschließlich die \ac{VAO}/\ac{VBO}-Ressourcen und das Shader-Paar ihrer Schicht verwaltet.
+            Schichten werden unabhängig aktiviert und können so zur Laufzeit ein- und ausgeblendet werden.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{OpenGL-Kontext}\label{subsubsec:impl-medusa-opengl-context}\index{OpenGL!Kontextinitialisierung}
+                Der \ac{OpenGL}-Kontext wird zweistufig erzeugt: GLFW legt das Fenster mit Kontext-Hints an, GLAD lädt die Funktionszeiger.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{lstlisting}[style=cppStyle, caption={GLFW-Kontext-Hints für einheitliches OpenGL-Profil.}, label={lst:impl-medusa-glfw-hints}]
+glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+glfwWindowHint(GLFW_OPENGL_PROFILE,        GLFW_OPENGL_CORE_PROFILE);
+glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);   // macOS
+                \end{lstlisting}
+
+            \subsubsection{Renderer-Klassen}\label{subsubsec:impl-medusa-renderer-classes}\index{Renderer-Klassen}
+                \begin{table}[ht]
+                    \centering
+                    \caption[Renderer-Klassen des Graphics-Moduls]{%
+                        Renderer-Klassen und ihre Zuordnung zu Renderschicht und Shader-Paar
+                    }
+                    \label{tab:impl-medusa-renderers}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l l l @{}}
+                        \toprule
+                        \textbf{Klasse} & \textbf{Renderschicht} & \textbf{Shader-Paar} \\
+                        \midrule
+                        \texttt{SceneRenderer}        & Mesh-Schicht           & \texttt{scene.vert/.frag} \\
+                        \texttt{AxesRenderer}         & Hilfsgeometrie         & \texttt{axes.vert/.frag} \\
+                        \texttt{GridRenderer}         & Hilfsgeometrie         & \texttt{grid.vert/.frag} \\
+                        \texttt{ToolpathRenderer}     & Toolpath-Schicht       & \texttt{toolpath.vert/.frag} \\
+                        \texttt{PhiOverlayRenderer}   & Feld-Overlay           & \texttt{phi\_overlay.vert/.frag} \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+                Auf eine formale Basisklasse wurde verzichtet.
+                Jede Renderer-Klasse verpflichtet sich auf drei Methoden: Konstruktor (Shader anlegen), \texttt{render(...)} und Destruktor (\ac{GPU}-Ressourcen freigeben).
+                Alle Shader verwenden GLSL~150 und feste Attributpositionen (\texttt{aPos} auf Location~0, \texttt{aNormal} auf Location~1).
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Viridis-Farbabbildung}\label{subsubsec:impl-medusa-viridis-shader}\index{Viridis}
+                Das $\Phi$-Overlay verwendet eine polynomielle Approximation der Viridis-Palette direkt im Fragment-Shader.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{lstlisting}[style=glslStyle, caption={Viridis-Farbabbildung als polynomielle Approximation.}, label={lst:impl-medusa-viridis-frag}]
+vec3 viridis(float t)
+{
+    const vec3 c0 = vec3( 0.2777, 0.0054, 0.3340);
+    const vec3 c1 = vec3( 0.1056, 1.4046, 1.3845);
+    const vec3 c2 = vec3(-0.3308, 0.2148, 0.0952);
+    const vec3 c3 = vec3(-4.6342,-5.7991,-19.3324);
+    const vec3 c4 = vec3( 6.2289, 14.1799, 56.6905);
+    const vec3 c5 = vec3( 4.7763, -13.7451, -65.3530);
+    const vec3 c6 = vec3(-5.4354, 4.6458, 26.3124);
+    return c0 + t*(c1 + t*(c2 + t*(c3 + t*(c4 + t*(c5 + t*c6)))));
+}
+                \end{lstlisting}
+
+
+            \subsubsection{Daten-Upload-Strategie}\label{subsubsec:impl-medusa-buffer-updates}\index{VBO!Upload}
+                Bei Änderungen wird der Puffer vollständig über \texttt{glBufferData()} neu befüllt.
+                Eine \ac{GPU}-Aktualisierung erfolgt in drei Situationen: beim Laden eines neuen Meshes, nach Abschluss eines Slicing-Laufs und beim Umschalten zwischen Renderschichten.
+                Sämtliche \ac{GPU}-Ressourcen werden über \ac{RAII} verwaltet.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Präsentations-Schicht: Bedienoberfläche}\label{subsec:impl-medusa-ui}\index{MEDUSA!Modul!ui}
+            Die Bedienoberfläche basiert auf Dear ImGui.
+            Das Docking-Feature aus dem \texttt{docking}-Branch ermöglicht bewegliche Werkzeugfenster.
+            Position, Größe und Dock"=Zuweisung werden über \texttt{imgui.ini} zwischen Sitzungen persistiert.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Werkzeugfenster}\label{subsubsec:impl-medusa-tool-windows}\index{ImGui!Werkzeugfenster}
+                Drei Werkzeugfenster realisieren die Interaktionsmuster.
+                \texttt{MeshFileBrowser} scannt ein konfiguriertes Verzeichnis nach 3D-Dateien und stellt sie als auswählbare Liste dar; ein Klick lädt das gewählte Modell.
+                Das Parameter-Panel zeigt Eingabefelder für den Slicer wie bspw. Schichtdicke.
+                Das Diagnose-Panel zeigt nach jedem Slicing-Lauf Schichtanzahl, Segmentanzahl, Branch-Anzahl, Coverage und Laufzeit.
+
+                Die Aktionsschaltflächen \emph{Slice}, \emph{Visualize} und \emph{Export} in der Menüleiste lösen die Pipeline-Stufen explizit aus.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Präsentations-Schicht: Eingabe und Kamera}\label{subsec:impl-medusa-controls}\index{MEDUSA!Modul!controls}
+            Das Modul \texttt{controls} übersetzt Maus- und Scrollrad-Eingaben in Zustandsänderungen.
+            \texttt{core::Camera} ist als Orbit-Kamera modelliert mit Azimut, Elevation und Distanz.
+            \sig{Adrian Gabriel Axtmann}
+
+            \begin{table}[ht]
+                \centering
+                \caption[Eingabe-Aktion-Zuordnung]{Zuordnung der Eingaben zu Aktionen}
+                \label{tab:impl-medusa-input-mapping}
+                \renewcommand{\arraystretch}{1.2}
+                \begin{tabular}{@{} l l l @{}}
+                    \toprule
+                    \textbf{Eingabe}             & \textbf{Aktion}        & \textbf{Ziel} \\
+                    \midrule
+                    Rechte Maustaste + Drag      & Azimut und Elevation   & \texttt{Camera} \\
+                    Scrollrad                    & Distanz                & \texttt{Camera} \\
+                    Linke Maustaste + Drag       & Yaw und Pitch          & \texttt{ModelTransform} \\
+                    \bottomrule
+                \end{tabular}
+            \end{table}
+
+            Die Trennung von \ac{UI}- und Viewport"=Eingaben erfolgt über \texttt{ImGuiIO::\allowbreak WantCaptureMouse}.
+            Beide Controller brechen ihre Verarbeitung ab, wenn die \ac{UI} die Eingabe beansprucht.
+            \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Komposition: Anwendungsschicht}\label{subsec:impl-medusa-app}\index{MEDUSA!Modul!app}
+            Die Anwendungsschicht orchestriert alle Module und ist die einzige Schicht mit Kenntnis aller anderen.
+            Das Modul besteht aus \texttt{main.cpp} (Prozess-Einsprungspunkt) und \texttt{app.cpp} (Orchestrator-Klasse).
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Lebenszyklus und Hauptschleife}\label{subsubsec:impl-medusa-main-loop}
+                Der Lebenszyklus umfasst drei Phasen.
+                Die Initialisierungsphase erzeugt \ac{OpenGL}-Kontext, ImGui, Renderer und Controller in fester Reihenfolge.
+                Die Hauptschleife folgt dem klassischen Aufbau: Eingaben einsammeln, Controller aktualisieren, 3D-Szene rendern, ImGui-Overlay zeichnen, Puffer tauschen.
+                Das Frame-Pacing folgt V-Sync über \texttt{glfwSwapInterval(1)}.
+                Die Beendigungsphase läuft in umgekehrter Reihenfolge.
+
+                \begin{lstlisting}[style=cppStyle, caption={Aufbau der Hauptschleife.}, label={lst:impl-medusa-loop}]
+while (!glfwWindowShouldClose(window_))
+{
+    glfwPollEvents();
+
+    const bool ui_capture = ImGui::GetIO().WantCaptureMouse;
+    camera_ctrl_.updateFromMouseDrag(window_, ui_capture);
+    model_ctrl_.updateFromMouseDrag(window_,  ui_capture);
+
+    glViewport(0, 0, fb_w_, fb_h_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    renderScene3d();
+    imgui_.beginFrame();
+    renderImGui();
+    imgui_.endFrameAndRender();
+
+    glfwSwapBuffers(window_);
+}
+                \end{lstlisting}
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Pipeline-Verkettung}\label{subsubsec:impl-medusa-pipeline-wiring}
+                \index{App!Pipeline-Verkettung}
+                Die Pipeline-Verkettung erfolgt in drei Methoden.
+                \texttt{loadMesh()} lädt das Mesh über \texttt{MeshLoader}, konvertiert in \texttt{TriangleMesh} und richtet die Kamera auf die \ac{AABB} aus.
+                \texttt{runSlicing()} delegiert an \texttt{SlicingPipeline::execute()} und übergibt das Ergebnis an die Renderer.
+                \texttt{exportToolpath()} reicht den Toolpath an \texttt{KronosExporter::\allowbreak export\_job()} weiter.
+                Die Visualisierungs-Abzweigung ist read-only durch \texttt{const}-Referenzen realisiert.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Test- und CI-Setup}\label{subsec:impl-medusa-testing}
+            \index{MEDUSA!Testkonzept}
+            Die Tests verwenden GoogleTest und sind in \texttt{tests/unit/} und \texttt{tests/integration/} aufgeteilt.
+            Die Testfälle werden über \texttt{gtest\_discover\_tests()} automatisch bei CTest registriert.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{CI-Pipeline}\label{subsubsec:impl-medusa-ci-pipeline}
+                \index{CI!GitLab}
+                Die \gls{ci-pipeline} läuft auf GitLab~CI in einem Docker-Image mit vorgebauten Abhängigkeiten.
+
+                \begin{table}[ht]
+                    \centering
+                    \caption[Stages der GitLab-CI-Pipeline]{%
+                        Stages der Pipeline und ihre Verantwortlichkeit%
+                    }
+                    \label{tab:impl-medusa-ci-stages}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l p{8.0cm} @{}}
+                        \toprule
+                        \textbf{Stage} & \textbf{Verantwortlichkeit} \\
+                        \midrule
+                        \texttt{prepare}        & Baut bei Bedarf das CI-Docker-Image \\
+                        \texttt{check}          & Statische Prüfungen (clang-format, clang-tidy) \\
+                        \texttt{build\_and\_test} & Übersetzung und GoogleTest-Suite \\
+                        \texttt{deploy}         & Doxygen-Dokumentation zu GitLab~Pages \\
+                        \texttt{tag}            & Automatische Release-Erzeugung \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+                Der Compiler-Cache \texttt{ccache} reduziert die Übersetzungszeit bei Folge-Jobs.
+                Die Slicer-Baseline besteht aus drei STL-Dateien: \texttt{Cube.stl} (prismatisch), \texttt{T.stl} (T-förmig mit Überhängen) und \texttt{Bipyramide.stl} (gekrümmte Flächen).
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Implementierung der Slicing-Strategien}\label{subsec:impl-medusa-slicing-strategies}
+            Alle drei implementierten Strategien sind im Modul \texttt{medusa::slicing} vereint.
+            Die Bibliothek bindet \texttt{medusa::core} und \texttt{medusa::geometry} als öffentliche Abhängigkeiten ein und hält Eigen und libigl als private Abhängigkeiten.
+            \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Gemeinsame Datenstrukturen und Schnittstellen}\label{subsubsec:impl-medusa-slicing-common}
+                \index{Slicing!gemeinsame Datenstrukturen}
+                Das Strategie-Interface \texttt{ISlicer} definiert drei Methoden.
+
+                \begin{lstlisting}[style=cppStyle, caption={Strategie-Interface \texttt{ISlicer}.}, label={lst:impl-medusa-islicer}]
+class ISlicer
+{
+public:
+    virtual ~ISlicer() = default;
+
+    virtual std::vector<Layer> slice(const geometry::TriangleMesh& mesh) = 0;
+    virtual std::string        name()  const = 0;
+    virtual float              coverage() const { return 0.0f; }
+};
+                \end{lstlisting}
+
+                Die Schichtrepräsentation \texttt{Layer} enthält Konturpunkte als flache Folge, Normalen, Face-IDs, Schichtdicke, Aufbauachse und einen Trennindex zwischen Wand- und Infill-Segmenten.
+
+                \begin{lstlisting}[style=cppStyle, caption={Schichtrepräsentation \texttt{Layer}.}, label={lst:impl-medusa-layer}]
+struct Layer
+{
+    std::uint32_t                index;
+    std::uint32_t                branch_id;
+    std::vector<glm::vec3>       contour_points;
+    std::vector<glm::vec3>       contour_normals;
+    std::vector<std::uint32_t>   contour_face_ids;
+    float                        thickness;
+    int                          up_axis;
+    std::size_t                  contour_count;
+};
+                \end{lstlisting}
+
+                Die Pipeline-Orchestrierung erfolgt über \texttt{SlicingPipeline::execute()}, das die Post-Slicer-Stufen (\gls{infill}-Generierung, Bewegungsplanung) verkettet.
+                Für den Kristall-Slicer gilt eine Ausnahme.
+                Liefert er bereits einen nicht-leeren Toolpath zurück, überspringt die Pipeline die generischen Post-Slicer-Stufen und verwendet den Kristall-Toolpath direkt, um die 6-\ac{DOF}-Pfade zu erhalten.
+
+                \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Implementierung des planaren Algorithmus}\label{subsubsec:impl-planar-algorithm}
+                \index{Slicing-Algorithmus!Planar!Implementierung}
+                Die Klasse \texttt{PlanarSlicer} folgt der in \cref{subsubsec:concept-planar-core-idea} konzipierten fünfstufigen Pipeline.
+                \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Schichtpositionen}\label{para:impl-planar-layer-positions}
+                    Die Schichtpositionen werden gemäß \cref{eq:concept-planar-layer-positions} mit Mittenversatz berechnet.
+                    Die letzte Schichtposition wird auf $a_{\max} - 10^{-6}$ geklemmt, um numerische Stabilität zu gewährleisten.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Ebene-Dreieck-Schnitt}\label{para:impl-planar-intersection}
+                    Pro Schicht werden alle \glspl{triangle} iteriert.
+                    Pro \gls{triangle} werden die vorzeichenbehafteten Abstände der \glspl{vertex} zur Schichtebene berechnet.
+                    Der \emph{P3-Fix} vermeidet Doppelzählung: eine \gls{edge} wird übersprungen, sobald ihr Endpunkt exakt auf der Ebene liegt.
+                    \sig{Adrian Gabriel Axtmann}
+
+\begin{lstlisting}[style=cppStyle, caption={Schnittberechnung mit P3-Fix (vereinfacht).}, label={lst:impl-planar-intersection}]
+for (std::size_t e = 0; e < 3 && k < 2; ++e)
+{
+    const std::size_t a = e;
+    const std::size_t b = (e + 1) % 3;
+
+    if ((d[a] > 0.0f) != (d[b] > 0.0f))
+    {
+        if (std::abs(d[b]) >= k_plane_eps)  // P3-Fix: b auf Ebene -> naechste Kante
+        {
+            const float t = d[a] / (d[a] - d[b]);
+            pts[k++] = v[a] + t * (v[b] - v[a]);
+        }
+    }
+    else if (std::abs(d[a]) < k_plane_eps)  // a exakt auf Ebene
+    {
+        pts[k++] = v[a];
+    }
+}
+\end{lstlisting}
+
+                \paragraph{Konturverkettung}\label{para:impl-planar-chaining}
+                    Die gierige \gls{nearest-neighbor}-Verkettung wählt pro Schritt das \gls{line-segment} mit dem kleinsten quadrierten Abstand zum Cursor.
+                    Die \gls{snap-tolerance} beträgt $10^{-4}\,\si{mm}$.
+                    Die Reihenfolgenoptimierung startet beim Ring mit der kleinsten Z-Koordinate des Schwerpunkts.
+                    \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Implementierung des Base-Algorithmus}\label{subsubsec:impl-base-algorithm}
+                \index{Slicing-Algorithmus!Base!Implementierung}
+                Die Klasse \texttt{BaseSlicer} folgt der in \cref{subsubsec:concept-base-core-idea} konzipierten queue-getriebenen Mehrlauf-Architektur.
+                Eine \texttt{std::queue<SliceRun>} hält anstehende Läufe.
+                Ein Iterationslimit von 20 schützt gegen Spawning-Kaskaden.
+                \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Lokales UV-Frame}\label{para:impl-base-uv-frame}
+                    Die Konstruktion erfolgt über ein \gls{gram-schmidt}.
+                    Falls $\vec{G}$ nahezu parallel zur Y-Achse liegt, wird die X-Achse als Referenz verwendet.
+
+                    \begin{lstlisting}[style=cppStyle, caption={Konstruktion des lokalen UV-Frames.}, label={lst:impl-base-uvframe}]
+void BaseSlicer::computeUV(const glm::vec3& growth, glm::vec3& u, glm::vec3& v)
+{
+    glm::vec3 ref = (std::abs(glm::dot(growth, glm::vec3(0.0f, 1.0f, 0.0f))) > 0.9f)
+                    ? glm::vec3(1.0f, 0.0f, 0.0f)
+                    : glm::vec3(0.0f, 1.0f, 0.0f);
+    u = glm::normalize(glm::cross(growth, ref));
+    v = glm::normalize(glm::cross(u, growth));
+}
+                    \end{lstlisting}
+
+                \paragraph{Überhangerkennung}\label{para:impl-base-overhang}
+                    Pro Schicht wird das \gls{bounding-rectangle} in der \gls{uv-plane} berechnet.
+                    Überschreitet die Differenz zur Vorgängerschicht die Schwelle
+                    $\text{thickness} \cdot \tan(\text{overhang\_angle})$, wird ein neuer Lauf gespawnt.
+                    Markierungsflags verhindern wiederholtes Spawning.
+                    \sig{Adrian Gabriel Axtmann}
+
+                    \begin{lstlisting}[style=cppStyle, caption={Überhangerkennung und Branch-Spawning in \texttt{+U}-Richtung (analog für $-\vec{U}$, $\pm\vec{V}$)}, label={lst:impl-base-overhang}]
+const float tolerance = thickness *
+    std::tan(glm::radians(std::clamp(mParams.overhang_angle,
+                                     BaseParams::OVERHANG_ANGLE_MIN,
+                                     BaseParams::OVERHANG_ANGLE_MAX)));
+
+if (!queuedUPlus &&
+    currentBounds.uMax > prevBounds.uMax + tolerance)
+{
+    allowed.uMax  = prevBounds.uMax;
+    pending.push({u, prevBounds.uMax, nextBranchId++});
+    queuedUPlus   = true;
+}
+                    \end{lstlisting}
+
+                \paragraph{Liang-Barsky-Clipping}\label{para:impl-base-clipping}\index{Liang-Barsky-Verfahren}
+                    Das Beschneiden der Segmente verwendet das \gls{liang-barsky}-Verfahren, das Segmente exakt an der Bereichsgrenze zerschneidet.
+                    Dies löste das Problem des schleichenden Auswanderns.
+                    \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Implementierung des Kristall-Algorithmus}\label{subsubsec:impl-crystal-algorithm}\index{Slicing-Algorithmus!Crystal!Implementierung}
+                Die Implementierung folgt der in \cref{subsubsec:concept-crystal-core-idea} beschriebenen achtstufigen Pipeline und stützt sich auf \texttt{Eigen} und \texttt{libigl}.
+                \sig{Adrian Gabriel Axtmann}
+
+                \begin{table}[ht]
+                    \centering
+                    \caption[Klassen der Crystal-Implementierung]{%
+                        Klassen der Crystal-Implementierung%
+                    }
+                    \label{tab:impl-crystal-classes}
+                    \renewcommand{\arraystretch}{1.2}
+                    \begin{tabular}{@{} l p{7.0cm} @{}}
+                        \toprule
+                        \textbf{Klasse} & \textbf{Verantwortlichkeit} \\
+                        \midrule
+                        \texttt{CrystalSlicer}     & Pipeline-Orchestrator, implementiert \texttt{ISlicer} \\
+                        \texttt{MeshRefiner}       & Mittelpunkt-Unterteilung \\
+                        \texttt{ScalarField}       & Berechnung von $\Phi$ und $\nabla\Phi$ \\
+                        \texttt{IsoExtractor}      & Adaptive Iso-Flächen-Extraktion \\
+                        \texttt{BranchTracker}     & Topologie-Tracking \\
+                        \texttt{CrystalInfill}     & Nicht-planare Infill-Generierung \\
+                        \texttt{AlternatingScheduler} & Round-Robin-Schichtreihenfolge \\
+                        \bottomrule
+                    \end{tabular}
+                \end{table}
+
+                \paragraph{Mesh-Verfeinerung}\label{para:impl-crystal-mesh-refinement}
+                    Die Verfeinerung erfolgt iterativ über \texttt{igl::upsample()} bis die maximale \gls{edge}-Länge eine Schwelle von $1{,}0\,\si{mm}$ unterschreitet.
+                    Eine Sicherheitsregel erzwingt mindestens eine Unterteilung bei weniger als 200 Vertizes.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Skalarfeld}\label{para:impl-crystal-solve}
+                    Der diskrete Laplace-Operator wird über \texttt{igl::cotmatrix()} aufgebaut.
+                    Die Randvertizes für die Dirichlet-Bedingungen stammen aus den unteren und oberen $2\,\%$ der Bauteilhöhe.
+                    Das lineare System wird über \texttt{igl::min\_quad\_with\_fixed} mit LDLT-Faktorisierung gelöst.
+                    \sig{Adrian Gabriel Axtmann}
+
+                    \begin{lstlisting}[style=cppStyle, caption={Aufbau und Lösung des Skalarfeld-Systems}, label={lst:impl-crystal-solve}]
+Eigen::SparseMatrix<double> L;
+igl::cotmatrix(V, F, L);
+Eigen::SparseMatrix<double> Q = -L;  // min_quad erwartet pos. semidef.
+
+Eigen::VectorXi known(bottom_idx.size() + top_idx.size());
+Eigen::VectorXd Y(known.size());
+Eigen::Index k = 0;
+for (int idx : bottom_idx) { known(k) = idx; Y(k) = 0.0; ++k; }
+for (int idx : top_idx)    { known(k) = idx; Y(k) = 1.0; ++k; }
+
+igl::min_quad_with_fixed_data<double> data;
+igl::min_quad_with_fixed_precompute(Q, known, {}, /*pd=*/true, data);
+
+Eigen::VectorXd phi;
+igl::min_quad_with_fixed_solve(data,
+                               Eigen::VectorXd::Zero(V.rows()),
+                               Y, {}, phi);
+                    \end{lstlisting}
+
+                \paragraph{Adaptive Iso-Extraktion}\label{para:impl-crystal-iso}
+                    Die Schrittweite wird adaptiv an den mittleren Gradienten angepasst,
+                    geklemmt zwischen $0{,}05$ und $8{,}0$ der uniformen Referenzschrittweite.
+                    Ein Iterationslimit von 2000 Iso-Schritten dient als Schutz.
+                    \sig{Adrian Gabriel Axtmann}
+
+                    \begin{lstlisting}[style=cppStyle, caption={Adaptive Schrittweite der Iso-Extraktion.}, label={lst:impl-crystal-adaptive}]
+// Einmalig vor der Schleife: Referenzschritt und Klemmbounds
+const float dphi_uniform = layer_thickness / h_range
+                         * (field.phi_max - field.phi_min);
+const float dphi_min = dphi_uniform * cfg.dphi_min_factor;  // Faktor 0,05
+const float dphi_max = dphi_uniform * cfg.dphi_max_factor;  // Faktor 8,0
+
+// Am Ende jeder Iso-Iteration: lokalen Gradienten messen und klemmen
+const float g_use     = (g_count > 0)
+                        ? float(g_sum / g_count) : g_seed;
+const float dphi_next = std::clamp(layer_thickness * g_use,
+                                   dphi_min, dphi_max);
+phi_cur += dphi_next;
+                    \end{lstlisting}
+
+                \paragraph{Branch-Tracking}\label{para:impl-crystal-branch-tracking}
+                    \index{Zweig!Tracking}
+                    Iso-Komponenten werden über Schwerpunktabstände zugeordnet.
+                    Die Drift-Schwelle beträgt $\delta_\mathrm{drift} = \max(0{,}5\,\si{mm},\,4t)$.
+                    Split- und Merge-Ereignisse werden erkannt und protokolliert.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Infill-Generierung}\label{para:impl-crystal-infill}
+                    Die Tangentialbasis wird über \ac{PCA} bestimmt.
+                    Bei isotropen Punktwolken ($\lambda_2/\lambda_1 > 0{,}7$) wird die globale X-Achse als Fallback verwendet.
+                    Der Scanline-Sweep erzeugt ein \gls{snake-pattern}.
+                    Die \gls{idw}-Anhebung mit $k = 6$ Nachbarn projiziert die Punkte auf die Iso-Fläche.
+                    \sig{Adrian Gabriel Axtmann}
+
+                \paragraph{Werkzeugausrichtung}\label{para:impl-crystal-pose}
+                    Die implementierte Ausrichtung beschränkt sich auf die Werkzeug-Z-Achse $\vec{z}_\mathrm{tool}$.
+                    Pro Segment wird das arithmetische Mittel der Oberflächennormalen an beiden Endpunkten
+                    normiert und als \texttt{orientation}-Feld der \texttt{Segment}-Struktur gespeichert.
+
+                    \begin{lstlisting}[style=cppStyle, caption={Berechnung der Werkzeugausrichtung}, label={lst:impl-crystal-tool-frame}]
+glm::vec3 n = nrm[i] + nrm[i + 1];
+const float l = glm::length(n);
+s.orientation = (l > 1e-8f) ? (n / l) : glm::vec3(0, 1, 0);
+                    \end{lstlisting}
+
+                    Die vollständige Orientierung als \gls{quaternion} (Felder \texttt{qw}, \texttt{qx}, \texttt{qy},
+                    \texttt{qz} der \texttt{Waypoint}-Struktur) ist eine offene Aufgabe; das aktuelle System
+                    überträgt keinen vollständigen Drehrahmen an \ac{kronos}.
+                    \sig{Adrian Gabriel Axtmann}
+
+            \subsubsection{Performance-Charakterisierung}\label{subsubsec:impl-slicing-performance}
+                \index{Slicing!Performance}
+                Beim planaren Algorithmus dominiert die Schnittstufe mit $\mathcal{O}(NT)$.
+                Beim Base"=Algorithmus multipliziert sich dies mit der Branch"=Anzahl zu $\mathcal{O}(BNT)$.
+                Beim Crystal-Algorithmus dominiert die Solver-Stufe mit etwa $\mathcal{O}(V^{1{,}5})$.
+                Für die Validierungsgeometrien liegen alle Laufzeiten im einstelligen Sekundenbereich.
+                \sig{Adrian Gabriel Axtmann}
+
+        \subsection{Zusammenfassung}\label{subsec:impl-medusa-summary}
+            Die Implementierung setzt alle Schichten der konzeptionellen Architektur um.
+            Die durchgängige Verarbeitungskette vom Mesh-Import über Geometrieaufbereitung, Slicing, \gls{infill}-Generierung und Bewegungsplanung bis zum atomaren \gls{json}-Export funktioniert in allen drei Strategien.
+            Die Visualisierung mit Mesh-, Hilfsgeometrie-, Toolpath- und Feld-Overlay-Schicht sowie die Schnittstelle zu \ac{kronos} sind lauffähig.
+            \sig{Adrian Gabriel Axtmann}
+
+            \paragraph{Bekannte Einschränkungen}\label{para:impl-medusa-summary-limitations}
+                Vier Klassen von Einschränkungen bestehen.
+                Im Kristall"=Algorithmus fehlen Mehrwand-Konturen, krümmungsadaptive Schichtdicke und Branch-Kollisionserkennung.
+                Der Sphären"=Algorithmus ist nicht implementiert.
+                Die Eingangsstufe führt keine Mesh-Reparatur durch.
+                Die plattformübergreifende Validierung ist nur unter Linux automatisiert.
+                \sig{Adrian Gabriel Axtmann}
+
+            \paragraph{Übergang zur Evaluation}\label{para:impl-medusa-summary-transition}
+                Die dokumentierte Implementierung ist die Grundlage für die in \cref{chap:evaluation} folgende Bewertung.
+                Dort wird die Funktionsfähigkeit der drei Slicing-Strategien geprüft, die Ausführbarkeit der \glspl{toolpath} durch \ac{kronos} bewertet und das Gesamtsystem gegen die Forschungsfragen reflektiert.
+                \sig{Adrian Gabriel Axtmann}
+
+    \section{Implementierung der Komponente KRONOS}\label{sec:implementation-of-component-kronos}
+        \subsection{Systemarchitektur}\label{subsec:kronos-system-architecture}
+            \subsubsection{Virtualisierung mittels Docker}
+            Die Implementierung von \ac{kronos} erfolgt in einer containerisierten Entwicklungsumgebung.
+            Das Docker-Image baut auf \texttt{osrf/ros:humble-desktop-full} auf und installiert darauf die für den Betrieb benötigten ROS-2-, MoveIt- und Universal-Robots-Pakete.
+            Zusätzlich werden Build-Werkzeuge wie \texttt{colcon}, \texttt{cmake} und \texttt{python3-rosdep} sowie die für inverse Kinematik benötigten Bibliotheken installiert.
+            TRAC-IK wird dabei nicht ausschließlich als Binärpaket eingebunden, sondern im Container aus dem Quelltext gebaut und an ROS~2 Humble angepasst.
+            Dazu war ein quellcode-seitiger Patch notwendig: Der im Rolling-Branch von TRAC-IK verwendete Header \texttt{urdf/model.hpp} existiert unter Humble nicht mehr und musste durch \texttt{urdf/model.h} ersetzt werden.
+            Diese Kapselung reduziert den Einrichtungsaufwand auf dem Host-System deutlich und stellt sicher,
+            dass Entwicklung, Build und Ausführung mit identischen Abhängigkeiten erfolgen.
+            \sig{Nik Wachsmann}
+
+            \subsubsection{Subkomponenten}
+            Innerhalb des ROS-2-Workspaces ist \ac{kronos} als Paket \texttt{ur3e\_control} umgesetzt.
+            Die Implementierung gliedert sich in zwei operative Teilbereiche sowie einen ergänzenden Versuchsknoten.
+
+            \paragraph{Simulationsumgebung}
+            Die Simulationsumgebung wird über die Launch-Datei \texttt{ur3e\_full.launch.py} gestartet.
+            Zunächst wird der \texttt{ur\_robot\_driver} im Modus \textit{fake hardware} gestartet,
+            sodass die Steuerungsschnittstellen des UR3e ohne reale Hardware verfügbar sind.
+            Anschließend werden zeitverzögert die MoveIt-Konfiguration und RViz gestartet,
+            damit der Treiber seine Controller vollständig initialisieren kann.
+            Die Visualisierung erfolgt über eine vorbereitete RViz-Konfiguration,
+            welche den Roboterzustand, die Planungsszene und später auch die vom Druckprozess erzeugten Marker darstellt.
+            
+            \paragraph{Trajektoriensteuerung}
+            Die eigentliche Ausführungslogik befindet sich im Knoten \texttt{ur3e\_printer}.
+            Dieser liest die von Medusa erzeugten Pfaddaten ein,
+            transformiert sie bei Bedarf aus dem Werkstück-Koordinatensystem in das Roboterkoordinatensystem
+            und erzeugt daraus MoveIt-kompatible Zielposen.
+            Als Kinematik-Plugin ist dabei \texttt{kdl\_kinematics\_plugin/KDLKinematicsPlugin} konfiguriert;
+            TRAC-IK steht zwar im Container zur Verfügung, wird jedoch nur im ergänzenden Versuchsknoten genutzt.
+
+            \paragraph{Experimentalknoten}
+            Der Knoten \texttt{ur3e\_trac\_ik\_controller} löst inverse Kinematik direkt über die TRAC-IK-Bibliothek
+            und führt die resultierenden Gelenkwinkel über MoveIt aus.
+            Er dient ausschließlich der isolierten Erprobung des TRAC-IK-Solvers
+            und ist nicht in den regulären Druckablauf eingebunden.
+            \sig{Nik Wachsmann}
+
+            \subsubsection{Komponenten Kommunikation}
+            Die Kommunikation zwischen den Komponenten erfolgt vollständig innerhalb des ROS~2 Ökosystems.
+            Der Druckknoten erhält die \url{robot\_description} und die Kinematikparameter beim Start aus der Launch Datei
+            und erzeugt daraus ein \texttt{Move\-Group\-Interface} für die Planungsgruppe \url{ur\_manipulator}.
+            Bewegungspläne werden nicht manuell an Controller serialisiert,
+            sondern über die MoveIt-Planungsschnittstelle an den aktiven \url{joint\_trajectory\_controller} übergeben.
+            Ergänzend publiziert der Knoten ein persistentes Marker-Array auf dem Topic \url{printed\_part},
+            um bereits ausgeführte Drucksegmente in RViz sichtbar zu machen.
+            \sig{Nik Wachsmann}
+
+        \subsection{Entwicklungs- und Laufzeitumgebung}
+            Die Entwicklungsumgebung ist so aufgebaut,
+            dass der Quelltext des Pakets \url{ur3e\_control} vom Host-System in den Container eingebunden wird,
+            während Build-, Installations- und Log-Verzeichnisse als Docker-Volumes persistent gespeichert werden.
+            Dadurch können Änderungen lokal mit einem Editor vorgenommen und im Container unmittelbar mit colcon neu gebaut werden.
+            Für die grafischen Werkzeuge wird der X11-Socket des Hosts in den Container durchgereicht.
+            Ein Hilfsskript bereitet die notwendige Freigabe für Docker oder Podman vor.
+
+            Eine getrennte Laufzeitumgebung wurde nicht implementiert.
+            Stattdessen dient dieselbe Containerkonfiguration sowohl für die Entwicklung als auch für die Ausführung in der Simulation.
+            Dieses Vorgehen ist für einen Prototypen zweckmäßig,
+            weil Integrationsprobleme zwischen Build- und Zielumgebung vermieden werden.
+            Über die Launch-Dateien lässt sich dabei zwischen verschiedenen Betriebsarten unterscheiden:
+            Die Standardkonfiguration startet den simulierten UR3e mit MoveIt und RViz,
+            während der Anschluss an reale Hardware über den offiziellen \texttt{ur\_robot\_driver} prinzipiell vorbereitet ist.
+            \sig{Nik Wachsmann}
+
+        \subsection{Start- und Konfigurationslogik}
+            Die Initialisierung von \ac{kronos} erfolgt bewusst nicht direkt im C++-Knoten,
+            sondern über Python-basierte ROS-2-Launch-Dateien.
+            Dadurch lassen sich Robotermodell,
+            semantische Beschreibung und Kinematik-Konfiguration bereits vor dem Start des Druckknotens zusammenführen.
+            Für den eigentlichen Druckprozess ist insbesondere \texttt{ur3e\_printer.launch.py} relevant,
+            da dort die für MoveIt notwendigen Parameter sowie der Pfad zur Eingabedatei an den Knoten \texttt{ur3e\_printer} übergeben werden.
+            Über eine paketinterne \texttt{kinematics.yaml} wird das Standard-Kinematik-Plugin durch
+            \texttt{kdl\_kinematics\_plugin/KDLKinematicsPlugin} ersetzt;
+            konfiguriert sind eine Suchauflösung von 0{,}005\,rad, ein Solver-Timeout von 50\,ms und bis zu drei Lösungsversuche.
+
+            Listing~\ref{lst:kronos-launch-printer-node} zeigt den zentralen Teil dieser Initialisierung.
+            Sichtbar ist,
+            dass der Knoten nicht nur die \gls{json}-Datei erhält,
+            sondern gleichzeitig auch die vom Launch-System erzeugten Modellparameter eingebunden bekommt.
+
+            \begin{lstlisting}[language=Python,caption={Initialisierung des Druckknotens in der Launch-Datei},label={lst:kronos-launch-printer-node}]
+toolpath_file = LaunchConfiguration("toolpath_file")
+
+printer_node = Node(
+    package="ur3e_control",
+    executable="ur3e_printer",
+    name="ur3e_printer",
+    output="screen",
+    parameters=[
+        robot_description,
+        robot_description_semantic,
+        robot_description_kinematics,
+        {"toolpath_file": toolpath_file},
+    ],
+)
+            \end{lstlisting}
+
+            Ergänzt wird dieser Startpfad durch \texttt{ur3e\_full.launch.py},
+            das zunächst den UR-Treiber im Simulationsmodus und anschließend mit einer Verzögerung von fünf Sekunden MoveIt und RViz startet.
+            Diese zeitliche Staffelung ist relevant,
+            weil die Controller des Treibers vor der Planung vollständig verfügbar sein müssen.
+            \sig{Nik Wachsmann}
+
+        \subsection{Einlesen und Aufbereitung der Trajektoriendaten}
+            Für den beschriebenen Fertigungsablauf ist ausschließlich das von Medusa erzeugte \gls{json}-Format relevant.
+            Der Knoten \texttt{ur3e\_printer} erwartet darin ein Top-Level-Feld \texttt{waypoints},
+            dessen Einträge kartesische Positionen in Millimetern sowie \glspl{quaternion} zur Werkzeugorientierung enthalten.
+            Beim Einlesen werden diese Werte zunächst validiert und anschließend in das von ROS und MoveIt erwartete Einheitensystem in Metern überführt.
+            Das optionale Top-Level-Feld \texttt{reference\_frame} steuert dabei, ob eine Koordinatentransformation stattfindet:
+            Der Wert \texttt{workpiece} aktiviert die Umrechnung vom Werkstück- ins Roboterbasissystem;
+            fehlt das Feld oder enthält es \texttt{base\_link}, werden die Werte unverändert übernommen.
+
+            Ein zusätzlicher Verarbeitungsschritt ist notwendig,
+            wenn Medusa die Bahn nicht im globalen Roboterkoordinatensystem,
+            sondern relativ zum Werkstück exportiert.
+            In diesem Fall transformiert \ac{kronos} die Positionen von der Y-up-Darstellung des Werkstücks in das in ROS übliche Z-up-System.
+            Parallel dazu wird aus der übergebenen Werkzeugausrichtung eine zur Roboterbasis konsistente Orientierung berechnet.
+            Listing~\ref{lst:kronos-json-transform} zeigt den Kern dieser Umrechnung.
+
+            \begin{lstlisting}[language=C++,caption={Einlesen und Transformation werkstückbezogener \gls{json}-Wegpunkte},label={lst:kronos-json-transform}]
+double x = waypoint.at("x").get<double>() / 1000.0;
+double y = waypoint.at("y").get<double>() / 1000.0;
+double z = waypoint.at("z").get<double>() / 1000.0;
+
+if (is_workpiece_frame) {
+  const tf2::Vector3 robot_position = medusa_workpiece_position_to_robot_basis(x, y, z);
+  x = robot_position.x();
+  y = robot_position.y();
+  z = robot_position.z();
+
+  const tf2::Vector3 medusa_tcp_direction = tf2::quatRotate(medusa_q, tf2::Vector3(0.0, 0.0, 1.0));
+  const tf2::Vector3 robot_tcp_direction = medusa_tcp_direction_to_robot_basis(medusa_tcp_direction);
+  robot_q = quaternion_from_z_axis(robot_tcp_direction);
+}
+            \end{lstlisting}
+
+            Die aufbereiteten Wegpunkte werden intern nicht als \glspl{quaternion} weiterverarbeitet,
+            sondern in Roll-, Pitch- und Yaw-Winkel überführt und in einer flachen Datenstruktur gespeichert.
+            Diese Normalisierung reduziert die Komplexität der nachfolgenden Pose-Erzeugung,
+            da jede geplante Zielpose aus einer einheitlichen Repräsentation zusammengesetzt werden kann.
+            \sig{Nik Wachsmann}
+
+        \subsection{Koordinatentransformation und Orientierungslogik}
+            \ac{kronos} führt das werkstückbezogene Koordinatensystem der Eingabedatei,
+            das Basissystem des Roboters und die Pose des Tool Center Points in eine gemeinsame Repräsentation über.
+            Dies ist notwendig,
+            weil Medusa die Druckbahn relativ zum Bauteil beschreibt,
+            während MoveIt Zielposen in der Roboterbasis erwartet.
+            Besonders relevant ist dabei die Umrechnung von der Medusa-Y-up-Darstellung in das in ROS übliche Z-up-System,
+            da hiervon sowohl die Positionen als auch die Bedeutung der Werkzeugorientierung abhängen.
+
+            Die in der \gls{json}-Datei enthaltenen \glspl{quaternion} werden deshalb nicht direkt übernommen,
+            sondern zunächst zur Bestimmung der lokalen TCP-Richtung ausgewertet.
+            Diese Richtung wird in das Roboterbasissystem transformiert und anschließend wieder in eine gültige Zielorientierung überführt.
+            Ergänzend werden Mehrdeutigkeiten in der Rotationsdarstellung reduziert,
+            indem Orientierungen intern vereinheitlicht und Gelenkwinkel vor der Ausführung entrollt werden.
+            Dadurch bleiben Werkzeughaltung und Trajektorienverlauf entlang benachbarter Wegpunkte konsistent,
+            was sowohl die Erreichbarkeit als auch die visuelle Plausibilitätsprüfung in RViz verbessert.
+            \sig{Nik Wachsmann}
+
+        \subsection{Bahnplanung und Ausführung}
+            Nach dem erfolgreichen Laden der \gls{json}-Datei initialisiert der Knoten die MoveIt-Schnittstelle,
+            wartet auf gültige Gelenkzustände und berechnet anschließend zunächst eine sichere Annäherung an den ersten Wegpunkt.
+            Dazu wird oberhalb des ersten Zielpunkts eine Annäherungspose erzeugt,
+            für die mehrere Planungsversuche durchgeführt werden.
+            Von diesen Kandidaten wird der kürzeste Gelenkpfad ausgewählt und ausgeführt.
+            Der letzte Abschnitt bis zum tatsächlichen Startpunkt wird bevorzugt als kartesische Gerade geplant,
+            um den Eintritt in den Druckpfad kontrolliert und reproduzierbar zu halten.
+
+            Der eigentliche Druckpfad wird blockweise mit maximal 50 Wegpunkten verarbeitet.
+            Für jeden Block ruft \ac{kronos} \texttt{computeCartesianPath} auf und bewertet anschließend,
+            welcher Anteil der angeforderten Punkte tatsächlich planbar war.
+            Der Sprungfilter (\texttt{jump\_threshold}) ist auf 0{,}0 gesetzt und damit deaktiviert,
+            da er im Simulationsbetrieb mit Fake-Hardware zu Fehlalarmen führt.
+            Wird die Mindestabdeckung unterschritten,
+            versucht das System lokal eine Wiederaufnahme im Gelenkraum,
+            statt den gesamten Auftrag sofort zu verwerfen.
+            Listing~\ref{lst:kronos-batch-planning} zeigt den Kern dieser Steuerungslogik.
+
+            \begin{lstlisting}[language=C++,caption={Batchweise kartesische Planung und Coverage-Auswertung},label={lst:kronos-batch-planning}]
+moveit_msgs::msg::RobotTrajectory trajectory;
+double coverage = move_group.computeCartesianPath(poses, CART_EEF_STEP, CART_JUMP_THRESH, trajectory);
+
+size_t planned_pts = static_cast<size_t>(std::round(coverage * static_cast<double>(poses.size())));
+
+if (coverage < MIN_COVERAGE) {
+  if (planned_pts == 0) {
+    // lokale Recovery-Planung im Gelenkraum
+  }
+}
+            \end{lstlisting}
+
+            Vor der Ausführung einer Trajektorie werden zwei zusätzliche Verarbeitungsschritte vorgenommen.
+            Erstens ergänzt \ac{kronos} mit der \textit{Time-Optimal Trajectory Generation} fehlende Zeitstempel,
+            Geschwindigkeiten und Beschleunigungen,
+            da \texttt{compute\-Cartesian\-Path} zunächst nur diskrete Gelenkpositionen liefert.
+            Zweitens werden eventuelle $2\pi$-Sprünge in den Gelenkwinkeln entfernt,
+            damit äquivalente Winkelrepräsentationen nicht zu unnötigen Umorientierungen des Roboters führen.
+            Erst danach wird die Trajektorie über MoveIt an den \texttt{joint\_trajectory\_controller} übergeben.
+            \sig{Nik Wachsmann}
+
+        \subsection{Recovery-Strategien und Fehlerbehandlung}
+            \ac{kronos} behandelt unvollständige kartesische Planung nicht sofort als Abbruch,
+            sondern bewertet nach jedem Aufruf von \texttt{computeCartesianPath},
+            welcher Anteil eines Wegpunktblocks tatsächlich planbar war.
+            Wird die Mindestabdeckung unterschritten,
+            können verwertbare Teiltrajektorien weiterhin ausgeführt werden;
+            bei vollständig unplanbaren Abschnitten versucht das System stattdessen eine lokale Wiederaufnahme im Gelenkraum.
+            Dazu werden bis zu zehn nachfolgende Wegpunkte als Wiederaufnahmekandidaten geprüft;
+            der erste erfolgreich planbare Punkt wird als Einstieg gewählt und übersprungene Wegpunkte werden protokolliert.
+            Dadurch lassen sich einzelne problematische Segmente überbrücken,
+            ohne den gesamten Fertigungsauftrag unmittelbar zu verwerfen.
+
+            Harte Fehlerzustände führen dennoch zu einem sofortigen Stopp.
+            Dazu zählen insbesondere ungültige Eingabedaten,
+            fehlgeschlagene Initialisierungsschritte,
+            nicht verfügbare Gelenkzustände oder eine nicht planbare Annäherung an den ersten Wegpunkt.
+            Ergänzend protokolliert \ac{kronos} solche Situationen zur Laufzeit und visualisiert den bis dahin erfolgreich ausgeführten Pfad in RViz.
+            Damit wird zwischen tolerierbaren Teilfehlern und Fehlern unterschieden,
+            bei denen keine belastbare oder fachlich sinnvolle Ausführung mehr gewährleistet ist.
+            \sig{Nik Wachsmann}
+
+        \subsection{Visualisierung und Laufzeitrückmeldung}
+            Neben der reinen Bewegungsausführung implementiert \ac{kronos} auch eine explizite Rückmeldung des Druckfortschritts.
+            Zu diesem Zweck sammelt der Knoten bereits erfolgreich abgefahrene Segmente und publiziert sie als \texttt{MarkerArray} auf dem Topic \texttt{printed\_part}.
+            In RViz entsteht dadurch schrittweise eine visuelle Repräsentation des bislang ausgeführten Druckpfads.
+
+            Diese Visualisierung erfüllt zwei Funktionen.
+            Zum einen erlaubt sie eine direkte Plausibilitätsprüfung während der Entwicklung,
+            etwa wenn kartesische Teilpfade unerwartet abbrechen oder übersprungen werden.
+            Zum anderen unterstützt sie die Fehlersuche,
+            weil sich geplante und bereits ausgeführte Bahnsegmente klar voneinander abgrenzen lassen.
+            Die Visualisierung ist damit kein bloßes Zusatzmerkmal,
+            sondern ein integraler Bestandteil der prototypischen Inbetriebnahme.
+            \sig{Nik Wachsmann}
+        
+        \subsection{Einbindung zentraler Frameworks}
+            \ac{kronos} verwendet mehrere Frameworks,
+            die jeweils einen klar abgegrenzten Teil der Steuerungs- und Simulationslogik übernehmen.
+            \paragraph{ROS~2}
+            ROS~2 bildet die technische Grundlage der gesamten Implementierung.
+            Das Paket \texttt{ur3e\_control} ist als reguläres \texttt{ament\_cmake}-Paket umgesetzt und bindet darüber unter anderem \texttt{rclcpp},
+            Nachrichten- und Geometriebibliotheken sowie die Schnittstellen von MoveIt ein.
+            ROS~2 übernimmt damit sowohl das Starten der Knoten über Launch-Dateien als auch die Verteilung von Parametern,
+            Zustandsinformationen und Visualisierungsdaten.
+
+            \paragraph{RViz}
+            RViz wird als primäres Werkzeug zur Laufzeitbeobachtung eingesetzt.
+            Innerhalb der Simulation visualisiert es das Roboter-Modell,
+            die durch MoveIt verwaltete Planungsszene und den Fortschritt des Druckpfads.
+            Die bereits abgefahrenen Segmente werden vom Druckknoten als \texttt{LINE\_STRIP}-Marker publiziert,
+            wodurch sich die tatsächliche Ausführung schrittweise nachvollziehen lässt.
+
+            \paragraph{MoveIt}
+            MoveIt übernimmt die eigentliche Bewegungsplanung.
+            Als Kinematik-Plugin wird \texttt{kdl\_kinematics\_plugin/KDLKinematicsPlugin} verwendet.
+            Die Library \texttt{TRAC-IK} wird zwar im Container bereitgestellt, ist aber ausschließlich im Versuchsknoten \url{ur3e_trac_ik_controller} aktiv.
+            Im Knoten \texttt{ur3e\_printer} wird zunächst eine Annäherungsbewegung an den ersten Wegpunkt geplant,
+            wobei zehn Planungsversuche erzeugt und anschließend der kürzeste Gelenkpfad ausgewählt wird.
+            Der Übergang zum ersten Druckpunkt erfolgt bevorzugt als kartesische Gerade;
+            schlägt dies fehl, wird auf eine gelenkraumorientierte Ausweichplanung zurückgegriffen.
+            Der restliche Druckpfad wird in Blöcke von jeweils bis zu 50 Wegpunkten aufgeteilt und über \texttt{computeCartesianPath} geplant.
+            Für jede Teiltrajektorie wird eine Mindestabdeckung von 95\,\% gefordert.
+            Unvollständige Abschnitte werden entweder teilweise ausgeführt oder,
+            falls keine kartesische Lösung vorliegt,
+            durch eine lokale Recovery-Planung im Gelenkraum überbrückt.
+            Anschließend wird auf die geplanten Gelenkpositionen eine zeitoptimale Parametrisierung angewendet,
+            damit der \texttt{joint\_trajectory\_controller} die Trajektorie mit gültigen Zeitstempeln,
+            Geschwindigkeiten und Beschleunigungen ausführen kann.
+
+            Für die Orientierung des Werkzeugs unterstützt der Druckknoten direkt übergebene \glspl{quaternion} im \ac{kronos}-\gls{json}-Format.
+            Zusätzlich kann ein werkstückbezogenes Koordinatensystem verwendet werden,
+            das zur Laufzeit in das ROS-übliche Z-up-System transformiert wird.
+            Zur Vermeidung von Gelenksprüngen werden geplante Trajektorien vor der Ausführung entrollt,
+            indem $2\pi$-Umschläge relativ zum aktuellen Gelenkzustand entfernt werden.
+            Damit adressiert die Implementierung direkt ein typisches Problem kontinuierlicher Roboterbahnen,
+            bei dem äquivalente Gelenkwinkelrepräsentationen sonst zu abrupten Umorientierungen führen würden.
+            \sig{Nik Wachsmann}

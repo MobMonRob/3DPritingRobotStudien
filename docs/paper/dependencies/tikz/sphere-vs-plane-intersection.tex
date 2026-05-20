@@ -1,0 +1,99 @@
+\begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small},
+]
+    % =========================================================
+    % Panel (a): Ebene-Dreieck-Schnitt
+    % =========================================================
+    \begin{scope}
+        \node[font=\bfseries, anchor=south] at (1.0, 2.6)
+            {(a) Ebene-Dreieck-Schnitt};
+
+        % Dreieck
+        \fill[blue!10] (0, 0) -- (2, 0) -- (1, 2) -- cycle;
+        \draw[thick, blue!60!black]
+            (0, 0) -- (2, 0) -- (1, 2) -- cycle;
+
+        % Vertices
+        \fill[red!80!black] (0, 0) circle (2pt);
+        \node[red!80!black, anchor=north east, font=\scriptsize]
+            at (-0.05, -0.05) {$\vec{v}_A$ ($d_A < 0$)};
+
+        \fill[red!80!black] (2, 0) circle (2pt);
+        \node[red!80!black, anchor=north west, font=\scriptsize]
+            at (2.05, -0.05) {$\vec{v}_B$ ($d_B < 0$)};
+
+        \fill[green!50!black] (1, 2) circle (2pt);
+        \node[green!50!black, anchor=south, font=\scriptsize]
+            at (1, 2.08) {$\vec{v}_C$ ($d_C > 0$)};
+
+        % Schnittebene
+        \draw[thick, dashed, gray!50!black] (-0.4, 1.0) -- (2.4, 1.0);
+        \node[gray!50!black, font=\scriptsize, anchor=west]
+            at (2.4, 1.0) {Ebene};
+
+        % Schnittpunkte (lineare Interpolation EXAKT)
+        \fill[orange!85!black] (0.5, 1.0) circle (2pt);
+        \fill[orange!85!black] (1.5, 1.0) circle (2pt);
+
+        % Liniensegment
+        \draw[ultra thick, orange!85!black] (0.5, 1.0) -- (1.5, 1.0);
+
+        \node[orange!85!black, font=\scriptsize, align=center]
+            at (1.0, -1.0) {Lineare Interpolation\\$\tau = \dfrac{d_A}{d_A - d_C}$ \emph{exakt}};
+    \end{scope}
+
+    % =========================================================
+    % Panel (b): Sphäre-Dreieck-Schnitt
+    % =========================================================
+    \begin{scope}[xshift=6cm]
+        \node[font=\bfseries, anchor=south] at (1.0, 2.6)
+            {(b) Sphäre-Dreieck-Schnitt};
+
+        % Dreieck
+        \fill[blue!10] (0, 0) -- (2, 0) -- (1, 2) -- cycle;
+        \draw[thick, blue!60!black]
+            (0, 0) -- (2, 0) -- (1, 2) -- cycle;
+
+        % Vertices
+        \fill[red!80!black] (0, 0) circle (2pt);
+        \node[red!80!black, anchor=north east, font=\scriptsize]
+            at (-0.05, -0.05) {$\vec{v}_A$ ($d_A < 0$)};
+
+        \fill[red!80!black] (2, 0) circle (2pt);
+        \node[red!80!black, anchor=north west, font=\scriptsize]
+            at (2.05, -0.05) {$\vec{v}_B$ ($d_B < 0$)};
+
+        \fill[green!50!black] (1, 2) circle (2pt);
+        \node[green!50!black, anchor=south, font=\scriptsize]
+            at (1, 2.08) {$\vec{v}_C$ ($d_C > 0$)};
+
+        % Sphärenbogen (gekrümmt) - Mittelpunkt unter dem Dreieck
+        % Mittelpunkt (1, -2.5), Radius 3.4 -> bogen-y_max = 0.9
+        \draw[thick, dashed, purple!70!black]
+            (1, -2.5) ++ (50:3.4) arc (50:130:3.4);
+        \node[purple!70!black, font=\scriptsize, anchor=west]
+            at (2.4, 1.05) {Sphärenbogen};
+
+        % Lineare Schätzpunkte (gestrichelt, leicht unterhalb)
+        \draw[orange!85!black, thin] (0.5, 0.85) circle (3pt);
+        \draw[orange!85!black, thin] (1.5, 0.85) circle (3pt);
+        \draw[thick, dotted, orange!85!black] (0.5, 0.85) -- (1.5, 0.85);
+        \node[orange!85!black, font=\scriptsize, anchor=east, align=right]
+            at (-0.1, 0.85) {lineare\\Schätzung\\$\tau_0$};
+
+        % Korrigierte Schnittpunkte (auf der Sphäre, ausgefüllt)
+        \fill[orange!85!black] (0.55, 1.05) circle (2.5pt);
+        \fill[orange!85!black] (1.45, 1.05) circle (2.5pt);
+        \draw[ultra thick, orange!85!black] (0.55, 1.05) -- (1.45, 1.05);
+
+        % Korrekturpfeile (von Schätzung zu Korrektur)
+        \draw[->, thin, gray!50!black]
+            (0.5, 0.95) .. controls (0.45, 1.0) .. (0.55, 1.04);
+        \draw[->, thin, gray!50!black]
+            (1.5, 0.95) .. controls (1.55, 1.0) .. (1.45, 1.04);
+
+        \node[orange!85!black, font=\scriptsize, align=center]
+            at (1.0, -1.0) {Lineare Schätzung $\tau_0$ + \\Newton-Korrektur auf $S_i$};
+    \end{scope}
+\end{tikzpicture}

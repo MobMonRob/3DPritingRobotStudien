@@ -1,0 +1,108 @@
+\section{Vorstellung Medusa}
+
+\begin{frame}{Medusa}
+    \centering
+    \textit{Multi‑dimensional Extrusion \& Dimensional Unified Slicing Algorithm}
+    \vspace{0.4cm}
+
+    \begin{columns}[T]
+        \column{0.33\textwidth}
+            \centering
+            \faFileCode\\
+            \textbf{Modell‑Darstellung}\\
+            \small Import \& Visualisierung (STL/OBJ)
+        \column{0.33\textwidth}
+            \centering
+            \faCogs\\
+            \textbf{Slicing}\\
+            \small Nichtplanare, parametrische Schichten
+        \column{0.33\textwidth}
+            \centering
+            \faRobot\\
+            \textbf{Pfad‑Generierung}\\
+            \small 6‑Achs Toolpaths \& Ausgabeformate
+    \end{columns}
+
+    \vspace{0.35cm}
+    \begin{block}{Kernaufgaben}
+        \small
+        \begin{itemize}
+            \item Robustes Mesh‑Handling und Visual Debugging
+            \item Modulare Slicing‑Pipeline (austauschbar)
+            \item Integration mit KRONOS für Kinematik und Collision‑Checks
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+    \begin{frame}{Medusa: Architektur \& Modulaufbau}
+        \textbf{Layered Architektur:}
+        \begin{itemize}
+            \item \textbf{App}: Einstiegspunkt, Window/Main-Loop, Orchestrierung
+            \item \textbf{UI (ImGui)}: Panels, File-Browser, Parameter/Settings
+            \item \textbf{Graphics (OpenGL)}: Mesh, Shader, Renderer, Scene
+            \item \textbf{Controls}: Input-Handling (Kamera/Model-Controller)
+            \item \textbf{Slicing (geplant)}: Slicing-Pipeline \& 6-Achs Toolpaths
+            \item \textbf{Core}: Logger, Camera, Math/Utilities (wiederverwendbar)
+        \end{itemize}
+
+        \vspace{0.35cm}
+        \textbf{Kopplung/Prinzipien:}
+        \begin{itemize}
+            \item klare Modulgrenzen, erweiterbare Pipeline (Slicing austauschbar)
+            \item Dependencies via CMake FetchContent (kein manuelles Setup)
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Medusa: Architektur (Diagramm)}
+        \centering
+        \begin{tikzpicture}[
+            font=\scriptsize,
+            box/.style={draw=SecondaryColor, thick, rounded corners, align=center, minimum width=3.6cm},
+            layer/.style={box, fill=SecondaryColor!8, minimum height=0.75cm},
+            core/.style={box, fill=SecondaryColor!14, minimum height=0.75cm},
+            ext/.style={box, fill=SecondaryColor!5, minimum height=0.75cm},
+            mod/.style={box, fill=SecondaryColor!10, minimum height=0.6cm, minimum width=1.65cm},
+            arrow/.style={->, thick, SecondaryColor!70}
+        ]
+            \node[layer] (app) {Application\\\texttt{src/app}};
+            \node[mod, below left=0.6cm and 1.5cm of app.south] (controls) {Controls\\\texttt{src/controls}};
+            \node[mod, below=0.6cm of app.south] (graphics) {Graphics\\\texttt{src/graphics}};
+            \node[mod, below right=0.6cm and 1.5cm of app.south] (ui) {UI\\\texttt{src/ui}};
+
+            \node[mod, below=0.25cm of graphics.south] (slicing) {Slicing (planned)\\\texttt{src/slicing}};
+            \node[core, below=0.6cm of slicing.south, minimum width=6.8cm] (core) {Core\\Logger \textbar\ Camera \textbar\ Math\\\texttt{src/core}};
+            \node[ext, below=0.6cm of core.south, minimum width=8.5cm] (ext) {External Libraries\\GLFW \textbar\ GLAD \textbar\ GLM \textbar\ ImGui \textbar\ Assimp \textbar\ spdlog};
+
+            \draw[arrow] (app) -- (controls);
+            \draw[arrow] (app) -- (graphics);
+            \draw[arrow] (app) -- (ui);
+            \draw[arrow] (graphics) -- (slicing);
+            \draw[arrow] (controls) -- (core);
+            \draw[arrow] (ui) -- (core);
+            \draw[arrow] (slicing) -- (core);
+            \draw[arrow] (core) -- (ext);
+        \end{tikzpicture}
+    \end{frame}
+    
+    \begin{frame}{Code Overview}
+        \small
+        \begin{columns}
+            \column{0.55\textwidth}
+                \begin{itemize}
+                    \item \textbf{Total files:} 67
+                    \item \textbf{Total lines of code:} 4\,286
+                \end{itemize}
+
+            \column{0.45\textwidth}
+                \begin{tabular}{@{}l r@{}}
+                \textbf{Language} & \textbf{LOC} \\\hline
+                C++ & 2\,492 \\
+                CMake & 786 \\
+                C/C++ Header & 411 \\
+                Markdown & 286 \\
+                YAML & 257 \\
+                Dockerfile & 54 \\\hline
+                \textbf{SUM} & \textbf{4\,286}
+                \end{tabular}
+        \end{columns}
+    \end{frame}

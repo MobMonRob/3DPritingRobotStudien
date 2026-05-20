@@ -1,0 +1,25 @@
+% Index style for upmendex (UTF-8 + ICU). Produces professional German index
+% formatting with separate letter groups for umlauts (Ä, Ö, Ü) and ß.
+
+preamble "\\begin{theindex}\n\\small\n"
+postamble "\n\n\\end{theindex}\n"
+
+lethead_flag 1
+lethead_prefix "\n\\indexspace\n{\\large\\sffamily\\bfseries\\hfil "
+lethead_suffix " \\hfil}\\nopagebreak\n\\medskip\n"
+
+delim_0 " \\dotfill\\ "
+delim_1 " \\dotfill\\ "
+delim_2 " \\dotfill\\ "
+delim_r "--"
+delim_n ", "
+
+indent_space "\t"
+indent_length 18
+
+% ICU collation: German base + tailoring so umlauts and ß are *primary* letters
+% on their own (Ä right after A, Ö after O, Ü after U, ß after S). This forces
+% upmendex to emit them as separate letter group headings.
+icu_locale "de"
+icu_rules "& A < a\u0308 <<< A\u0308 & O < o\u0308 <<< O\u0308 & U < u\u0308 <<< U\u0308 & S < ss <<< Ss <<< SS << \u00DF <<< \u1E9E"
+character_order "western digits symbols alphabet"

@@ -1,0 +1,38 @@
+\chapter*{Abstract}\label{chap:abstract}
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+\medskip
+\noindent
+
+This project aims to develop a prototypical slicer for non-planar, robot-assisted additive manufacturing.
+Conventional slicers create purely horizontal layers when slicing objects.
+This method brings inherent disadvantages, such as direction-dependent component properties as well as the need for support structures when trying to print overhangs.
+
+To overcome these limitations, this research project aims to utilize the six degrees of freedom of an industrial robot.
+Using these, the tool orientation and path planning can be adapted to better fit the object's geometry.
+
+To solve the software-related challenges, a modular architecture consisting of two decoupled main components was designed.
+The \acs{medusa} module handles the geometric path planning, while the \acs{kronos} module acts as middleware to form the interface to the industrial robot.
+
+Within the scope of this work, four specific slicing strategies were conceptualized and investigated to varying depths:
+
+\begin{enumerate}
+    \item \textbf{Planar Algorithm} Utilizes conventional horizontal slicing planes and serves as a functional reference and validation baseline in the project.
+    \item \textbf{Base Algorithm} A fully implemented multi-axis approach.
+    It geometrically detects overhangs and dynamically splits the component into a ``trunk'' and ``branches''.
+    These branches are printed with their own local growth directions, which enables the support-free manufacturing of overhangs.
+    \item \textbf{Sphere Algorithm} A purely conceptual design that decomposes the component into concentric spherical shells around a central starting point.
+    It was not implemented, as mechanical weak points are to be expected at the transitions between the spheres due to insufficient bonding areas.
+    \item \textbf{Crystal Algorithm} A more complex, field-driven approach.
+    It is based on solving the Laplace equation to generate a harmonic scalar field inside the component.
+    The print layers follow the natural geometry of the component as curved iso-surfaces, causing the tool orientation to vary continuously.
+\end{enumerate}
+
+The evaluation of the overall system was carried out in a simulation using three test geometries (cube, double pyramid, T-piece) in the RViz environment.
+The results prove the fundamental feasibility of the established data chain from the \acs{CAD} model to the simulated 6-axis robot movement.
+With the Base Algorithm, 90\degree~overhangs could be successfully planned without supports.
+The Crystal Algorithm also successfully demonstrates the generation of support-free, fully non-planar toolpaths.
+
+The work identifies the limits of the inverse kinematics solver as well as the future need to integrate real extrusion physics and cross-layer branch collision checking as critical challenges for future development.
+Overall, the work provides a valuable and flexibly extensible ``proof of concept'' for closing the software gap in robot-assisted additive manufacturing.
+\sig{Ben Stahl}

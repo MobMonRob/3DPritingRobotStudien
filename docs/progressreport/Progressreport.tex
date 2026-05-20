@@ -1,0 +1,288 @@
+% !TEX TS-program = lualatex
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[
+	paper=a4,
+	fontsize=11pt,
+	parskip=half,
+	headings=normal,
+	bibliography=totoc,
+	listof=totoc
+]{scrartcl}
+
+\usepackage[ngerman]{babel}
+\usepackage{csquotes}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\usepackage[a4paper,margin=25mm]{geometry}
+
+\usepackage[
+	unicode=true,
+	colorlinks=true,
+	linkcolor=blue!45!black,
+	urlcolor=blue!45!black,
+	citecolor=blue!45!black,
+	pdfauthor={Axtmann; Stahl; Wachsmann},
+	pdftitle={Fortschrittsbericht -- Studienarbeit (Oktober 2025--Februar 2026)},
+	pdfsubject={6-Achs-Slicer fuer nichtplanare, robotergestuetzte additive Fertigung}
+]{hyperref}
+\usepackage{bookmark}
+
+\usepackage[automark,headsepline]{scrlayer-scrpage}
+\clearpairofpagestyles
+\ihead{\headmark}
+\ohead{Fortschrittsbericht -- Studienarbeit}
+\ifoot{Studienarbeit 6D-Slicer -- Axtmann, Stahl, Wachsmann}
+\ofoot{\pagemark}
+
+\setlist[itemize]{noitemsep,topsep=4pt,leftmargin=*,label=--}
+\setlist[enumerate]{noitemsep,topsep=4pt,leftmargin=*}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+\title{Fortschrittsbericht -- Studienarbeit\\[0.25em]
+\large Oktober 2025--Februar 2026\\[0.5em]
+\normalsize Prototypische Entwicklung und Evaluation eines 6-Achs-Slicers für nichtplanare,\\
+robotergestützte additive Fertigung}
+\author{Adrian Gabriel Axtmann \and Ben Stahl \and Nik Wachsmann}
+\date{9.\ März 2026}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	{\Large Fortschrittsbericht -- Studienarbeit\par}
+	\vspace{1.0cm}
+	{\large Oktober 2025--Februar 2026\par}
+	\vspace{1.25cm}
+	{\LARGE Prototypische Entwicklung und Evaluation eines 6-Achs-Slicers\par}
+	\vspace{0.25cm}
+	{\Large für nichtplanare, robotergestützte additive Fertigung\par}
+	\vspace{1.25cm}
+	{\large Adrian Gabriel Axtmann \textbullet\ Ben Stahl \textbullet\ Nik Wachsmann\par}
+	\vfill
+	{\large \today\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Einleitung und Zielsetzung}
+	Ziel dieser Studienarbeit ist die prototypische Entwicklung und Evaluation eines 6-Achs-Slicers für nichtplanare, robotergestützte additive Fertigung.
+	Im Gegensatz zu herkömmlichen Slicern, die auf kartesischen 3D-Drucksystemen mit planaren Schichten basieren, soll ein Slicer entwickelt werden, der Bewegungen und Materialauftrag im dreidimensionalen Raum auf einer 6-Achs-Roboterplattform planen kann.
+	Dadurch ergeben sich neue Möglichkeiten, insbesondere in Bezug auf Bauteilfestigkeit, Oberflächenqualität und Materialeinsatz.
+	In den ersten Bearbeitungsmonaten lag der Fokus auf der Einrichtung der technischen Infrastruktur, der Einarbeitung in das Robot Operating System (ROS) sowie auf der Konzeption möglicher algorithmischer Ansätze für den Slicing-Prozess.
+	Darüber hinaus wurde mit der theoretischen und praktischen Einarbeitung in Grundlagen der Robotik begonnen, die für den 3D-Druck erforderliche Hardware spezifiziert und eine erste Visualisierungsanwendung aufgebaut.
+	Dieser Fortschrittsbericht fasst die Arbeiten, Herausforderungen und erzielten Ergebnisse für den Zeitraum von Oktober 2025 bis Februar 2026 monatsweise zusammen und gibt einen Ausblick auf die nächsten Arbeitsschritte.
+
+\section{Fortschritt Oktober 2025}
+
+\subsection{Einarbeitung in ROS und Einrichtung der Entwicklungsumgebung}
+	Ein wesentlicher Bestandteil des Projekts ist die Ansteuerung des UR3e-Industrieroboters über ROS.
+	Da ROS als Middleware die Kommunikation zwischen Softwarekomponenten und der Roboterhardware ermöglicht, bildet es die zentrale Schnittstelle für den geplanten Slicer.
+
+\subsubsection{Installation und Konfiguration unter macOS}
+	Zunächst wurde versucht, ROS auf macOS nativ oder in containerisierten Umgebungen lauffähig zu machen.
+	Der erste Ansatz bestand darin, ROS in einem Docker-Container zu installieren.
+	Diese Lösung war grundsätzlich funktionsfähig, jedoch konnte keine X11-Weiterleitung realisiert werden.
+	Dadurch war es nicht möglich, grafische Benutzeroberflächen wie RViz oder MoveIt zu verwenden, die jedoch für die Visualisierung und Bewegungsplanung essenziell sind.
+	Ein alternativer Ansatz war die Einrichtung einer virtuellen Umgebung mit \emph{mikromamba}, um ROS in einem isolierten Python-basierten Umfeld zu betreiben.
+	Aufgrund von Versionsinkompatibilitäten zwischen den ROS-Distributionspaketen und den verfügbaren mikromamba-Paketen war eine erfolgreiche Installation allerdings nicht möglich.
+	Schließlich wurde eine virtuelle Maschine mit Ubuntu 22.04 LTS auf dem macOS-System eingerichtet.
+	In dieser Umgebung gelang es, ROS~2 mit MoveIt sowie dem UR-Treiber vollständig zu installieren und funktionsfähig zu konfigurieren.
+	Die grafischen Tools konnten erfolgreich ausgeführt werden, und die Verbindung zur Simulationsebene wurde hergestellt.
+
+\subsubsection{Einrichtung unter Linux}
+	Parallel dazu wurde eine native Linux-Umgebung konfiguriert.
+	In einem Docker-Container auf Basis von Ubuntu 22.04 LTS wurde ROS~2 mitsamt MoveIt und UR-Treibern installiert.
+	Im Gegensatz zur macOS-Umgebung war hier eine X11-Weiterleitung problemlos möglich, wodurch die grafischen Tools vollständig nutzbar waren.
+	Dadurch bot sich diese Umgebung als stabilere Entwicklungsplattform an.
+
+\subsubsection{Herausforderungen}
+	Derzeit besteht jedoch die Herausforderung, dass der UR3e-Roboter nicht über ROS angesteuert werden kann.
+	Die Kommunikation mit dem Roboter funktioniert hingegen direkt über C++- und Python-Skripte, was auf eine fehlerhafte oder unvollständige ROS-Treiberkonfiguration hinweist.
+	In Zusammenarbeit mit externer Unterstützung wird derzeit an einer Lösung gearbeitet, um die ROS-Anbindung zu optimieren und eine zuverlässige Steuerung über MoveIt zu ermöglichen.
+	Langfristig soll eine durchgängige Softwarepipeline entstehen, in der der Slicer die geplanten Bahnen generiert, ROS diese an die Robotersteuerung übergibt und MoveIt die Bewegungskontrolle übernimmt.
+
+\subsection{Einarbeitung in Robotik und Bewegungsplanung}
+	Parallel zur Einrichtung der technischen Infrastruktur wurde eine theoretische und praktische Einarbeitung in die Robotik durchgeführt.
+	Ziel war es, ein tieferes Verständnis für die inverse und direkte Kinematik, die Bewegungsplanung sowie die Trajektoriengenerierung zu entwickeln.
+	Diese Kenntnisse sind grundlegend für das Verständnis der nichtplanaren Druckbahnen, die der geplante Slicer generieren soll.
+	Dabei wurde insbesondere untersucht, wie die zusätzlichen Freiheitsgrade eines 6-Achs-Roboters im Vergleich zu kartesischen Systemen genutzt werden können, um komplexe Bewegungen und Orientierungen des Druckkopfes zu realisieren.
+	Relevante Themen umfassten die Definition von Koordinatensystemen, die Transformation zwischen Werkzeug- und Weltkoordinaten sowie die Planung kollisionsfreier Pfade.
+	Zudem wurde analysiert, welche bestehenden Bibliotheken und Frameworks innerhalb von ROS und MoveIt zur Lösung inverser Kinematikprobleme verwendet werden können und inwiefern diese an die Anforderungen eines nichtplanaren Druckverfahrens angepasst werden müssen.
+
+\subsection{Auswahl der Hardwarekomponenten für den 3D-Druck}
+	Ein weiterer Schwerpunkt lag in der Spezifikation und Auswahl der notwendigen Hardware für den additiven Fertigungsprozess.
+	Dabei wurden zentrale Komponenten identifiziert und hinsichtlich ihrer Eignung für den robotergestützten Aufbau bewertet.
+	Zu den ausgewählten Komponenten zählen insbesondere:
+
+\begin{itemize}
+    \item \textbf{Druckbett:} Es wurde nach geeigneten Heiz- und Haftsystemen gesucht, die eine stabile Basis für den nichtplanaren Druck gewährleisten.
+    \item \textbf{Nozzle und Extrusionssystem:} Verschiedene Düsen\nobreakspace{}-Konzepte wurden verglichen, um eine gleichmäßige Materialförderung auch bei variabler Orientierung des Druckkopfes sicherzustellen.
+    \item \textbf{Materialsystem:} Es wurden erste Überlegungen zur Verwendung von thermoplastischen Filamenten angestellt, die bei unterschiedlichen Orientierungen zuverlässig extrudierbar sind.
+\end{itemize}
+
+Die Auswahl erfolgte unter Berücksichtigung der mechanischen Anforderungen des UR3e-Roboters sowie der thermischen und geometrischen Bedingungen des Druckprozesses.
+
+\subsection{Konzeptentwicklung für den nichtplanaren Slicing-Algorithmus}
+	Ein zentraler Bestandteil des Projekts ist die Entwicklung eines Algorithmus, der das Slicing nichtplanar und roboterorientiert ausführt.
+	Ziel ist es, die geometrische Komplexität und die Freiheitsgrade des 6-Achs-Systems auszunutzen, um Schichten entlang der realen Geometrie zu legen, anstatt sie auf planare Ebenen zu projizieren.
+	Dazu wurden drei algorithmische Grundkonzepte entwickelt, die als Ausgangspunkt für die spätere Implementierung dienen sollen:
+	\begin{enumerate}
+		\item \textbf{Base-Algorithmus:} Dieser Ansatz nutzt eine feste Referenzebene, von der aus die Schichten aufgebaut werden. Er ist vergleichbar mit klassischen Slicern, jedoch erweitert um die Möglichkeit, lokale Normalenrichtungen zu berücksichtigen.
+		\item \textbf{Sphere-Algorithmus:} Bei diesem Konzept erfolgt die Schichtbildung ausgehend von einem definierten Ursprungspunkt, wobei die Geometrie kugelförmig analysiert und in konzentrischen Schalen \enquote{geschnitten} wird. Dieser Ansatz eignet sich besonders für rotationssymmetrische oder organische Formen.
+		\item \textbf{Kristall-Algorithmus:} Hierbei handelt es sich um einen adaptiven Wachstumsansatz, der die Ausbreitungsrichtung der Schichten bereits frühzeitig abschätzt und diese Information in die weitere Schichtgenerierung einfließen lässt. Dadurch kann ein organisches, kristallartiges Wachstumsverhalten simuliert werden, das zu besonders gleichmäßigen Oberflächen führen kann.
+	\end{enumerate}
+
+	Alle drei Ansätze sollen in der weiteren Projektphase anhand definierter Testgeometrien evaluiert werden.
+	Ziel ist es, die Vor- und Nachteile der einzelnen Verfahren in Bezug auf geometrische Präzision, Rechenzeit und Druckqualität zu vergleichen.
+
+\subsection{Aufbau der Softwarestruktur und Auswahl unterstützender Bibliotheken}
+	Um eine saubere und erweiterbare Softwarearchitektur zu gewährleisten, wurde im ersten Monat zudem die grundlegende Struktur des C++-Projekts erstellt.
+	Die Konfiguration erfolgt über CMake, wodurch eine modulare und plattformübergreifende Entwicklung ermöglicht wird.
+	Ein Logging-System wurde implementiert, um während der Entwicklung und später im Echtbetrieb Fehler und Prozessinformationen gezielt zu erfassen.
+	Darüber hinaus wurden verschiedene externe Bibliotheken identifiziert, die im weiteren Verlauf zur Anwendung kommen sollen.
+	Dazu gehören insbesondere Geometriebibliotheken für die effiziente Verarbeitung von Mesh-Daten, Bibliotheken zur Visualisierung sowie mathematische Frameworks zur Lösung von Transformations- und Optimierungsproblemen.
+
+\subsection{Zusammenfassung und Ausblick (Oktober)}
+	Zusammenfassend konnte im ersten Monat eine solide Grundlage für die weitere Arbeit geschaffen werden.
+	Die Entwicklungsumgebung ist eingerichtet, die theoretischen Grundlagen zu Robotik und Bewegungsplanung sind erarbeitet, und erste konzeptionelle Ansätze für den Slicer liegen vor.
+	Die größten Herausforderungen bestehen aktuell in der ROS-Anbindung des UR3e-Roboters und in der Integration der Hardwarekomponenten.
+	In der kommenden Phase sollen folgende Ziele erreicht werden:
+
+	\begin{itemize}
+		\item Vollständige Ansteuerung des UR3e über ROS und MoveIt,
+		\item Implementierung erster Prototypen der Slicing-Algorithmen,
+		\item Aufbau eines Visualisierungstools zur Analyse der generierten Pfade,
+		\item Validierung der Konzepte anhand einfacher Druckaufgaben.
+	\end{itemize}
+	Damit wird der Grundstein für die eigentliche Evaluationsphase gelegt, in der die Leistungsfähigkeit des entwickelten Systems experimentell überprüft werden soll.
+
+\section{Fortschritt November 2025}
+\subsection{Inbetriebnahme und Vorbereitung des 3D-Drucksystems}
+Zu Beginn des Monats wurde der für das Projekt ausgewählte FDM-3D-Drucker geliefert, vollständig montiert und im Werkszustand in Betrieb genommen.
+Die primäre Zielsetzung bestand darin, die Funktionsfähigkeit sämtlicher mechanischer und elektronischer Komponenten zu überprüfen und sicherzustellen, dass der Drucker eine stabile Ausgangsbasis für die spätere vollständige Demontage und robotergestützte Rekonfiguration bildet.
+Da der Druckkopf und das Extrusionssystem später als Endeffektor am UR3e-Roboter eingesetzt werden sollen, ist eine präzise Validierung der Grundfunktionalität besonders wichtig, um potenzielle Fehlerquellen eindeutig dem Umbauprozess oder der späteren Integration zuordnen zu können.
+Im Rahmen der initialen Inbetriebnahme erfolgte eine systematische Prüfung aller zentralen Subsysteme: Zunächst wurde das Heizbett kalibriert und die Temperaturregelung von Hotend und Heizbett hinsichtlich Stabilität und Ansprechverhalten überprüft.
+Anschließend wurden die Achsbewegungen validiert, inklusive Homing-Prozessen, Linearführungsbewegungen und Beschleunigungsprofilen.
+Auch die Materialextrusion wurde getestet, indem verschiedene Fördergeschwindigkeiten und Retract-Parameter untersucht wurden, um eine zuverlässige Filamentführung zu gewährleisten.
+Diese Untersuchungen bestätigten, dass der Drucker im Werkszustand über eine präzise Extrusionsleistung und eine stabile thermische Regelung verfügt.
+Daraufhin wurden mehrere Testdrucke -- darunter das verbreitete Benchmark-Objekt \enquote{3D Benchy} -- durchgeführt, um die Druckqualität, Oberflächenhomogenität, Geometriepräzision und Wiederholbarkeit zu evaluieren.
+Die erfolgreichen Testdrucke belegen, dass der Druckkopf, die Nozzle-Geometrie, der Extruder-Mechanismus sowie die Temperatursteuerung zuverlässig zusammenarbeiten und damit eine solide Grundlage für die weiterführenden Umbauarbeiten darstellen.
+Im Gegensatz zu einem regulären Einsatz verbleibt der Drucker jedoch nur temporär in dieser Konfiguration.
+In den kommenden Projektphasen wird er vollständig zerlegt, um die benötigten Baugruppen -- insbesondere Hotend, Extruder-Drive, Filamentpfad, Sensorikkomponenten und ggf. Teile der Elektronik -- zu extrahieren und für die Montage am UR3e-Roboterarm vorzubereiten.
+Hierzu werden modulare Befestigungsadapter konstruiert, welche eine vibrationsstabile, ausbalancierte und thermisch entkoppelte Integration ermöglichen.
+Ebenso erfolgt die Abtrennung der Elektronik vom ursprünglichen Gehäuse, da Temperaturregelung, Extrusionssteuerung und Sicherheitsmechanismen später separat betrieben werden müssen.
+\subsection{Entwicklung einer softwareseitigen 3D-Visualisierungsanwendung}
+Parallel zu den Arbeiten am Drucksystem wurde im November ein weiteres wesentliches Softwaremodul konzipiert und umgesetzt: eine eigenständige C++-Anwendung zur geometrischen Visualisierung von 3D-Modellen und später auch der vom Slicer erzeugten Pfade.
+Diese Anwendung bildet die Basis für eine interaktive Analyseumgebung, mit der die Güte, Struktur und Plausibilität der nichtplanaren Slicing-Ergebnisse überprüft werden kann.
+Für die Entwicklung wurden eine Reihe etablierter Bibliotheken und Frameworks integriert, darunter OpenGL, GLFW, GLM, spdlog, Dear ImGui, glad, Assimp, GoogleTest sowie nlohmann/json.
+Diese Kombination ermöglicht einerseits eine performante Darstellung komplexer 3D-Geometrien und andererseits eine flexible Erweiterbarkeit der Softwarearchitektur.
+Im Rahmen der ersten Implementationsphase wurde der Fokus auf das Einlesen und Darstellen von STL-Dateien gelegt.
+Die Anwendung unterstützt dabei sowohl ASCII- als auch binär kodierte STL-Formate, sodass ein breites Spektrum an Testgeometrien verarbeitet werden kann.
+Nach dem Import wird das Modell in einer interaktiven 3D-Ansicht visualisiert, in der der Benutzer mithilfe der Maus die Orientierung, den Zoom-Faktor und die Positionierung der Kamera steuern kann.
+Zusätzlich kann zwischen einer klassischen Oberflächenansicht und einer Wireframe-Darstellung gewechselt werden.
+Zur Verbesserung der Bedienbarkeit wurde eine grafische Benutzeroberfläche auf Basis von Dear ImGui integriert.
+über diese Oberfläche lassen sich zentrale Parameter verändern, unter anderem:
+
+\begin{itemize}
+    \item Laden neuer STL-Dateien,
+    \item Umschalten zwischen Wireframe- und Solid-Darstellung,
+    \item Aktivieren einer automatischen Rotation zur Vollansicht komplexer Geometrien.
+\end{itemize}
+
+Diese Funktionen schaffen eine professionelle Grundlage, um in späteren Projektphasen die durch den Slicer generierten Bahndaten visuell und quantitativ zu bewerten.
+Insbesondere die Möglichkeit, Wireframes und Pfadverläufe gleichzeitig darzustellen, wird für die Validierung des nichtplanaren Algorithmus von entscheidender Bedeutung sein.
+Darüber hinaus gewährleistet die modulare Architektur der Anwendung, dass zukünftige Erweiterungen -- etwa das Visualisieren von Roboterarm-IK-Lösungen oder Kollisionserkennungen -- ohne grundlegende Umstrukturierungen möglich sind.
+Auch softwaretechnisch wurde großer Wert auf Qualitätssicherung gelegt: Durch die Integration von GoogleTest wurde eine Teststruktur vorbereitet, mit der zentrale Funktionen, beispielsweise das Einlesen von STL-Daten oder mathematische Transformationen, automatisiert geprüft werden können.
+Dies ist insbesondere im Hinblick auf die spätere Integration komplexer Slicing-Algorithmen wichtig, deren Korrektheit und Stabilität kontinuierlich verifiziert werden müssen.
+
+\section{Fortschritt Dezember 2025}
+	Aufgrund der Klausuren und der darauffolgenden Feiertage konnten im Dezember keine Fortschritte an der Studienarbeit erzielt werden.
+
+\section{Fortschritt Januar 2026}
+	Im Januar konnten keine fachlichen Fortschritte an der Studienarbeit erzielt werden, da sich das Team in der Praxisphase befand.
+	Entsprechend standen weder Entwicklungsarbeiten an der Software noch experimentelle oder konzeptionelle Arbeiten am robotergestützten 3D-Drucksystem im Vordergrund.
+	Der Monat diente somit nicht der inhaltlichen Weiterentwicklung des Projekts, sondern war durch externe organisatorische Rahmenbedingungen gebunden.
+
+\section{Fortschritt Februar 2026}
+
+\subsection{Restrukturierung der Softwarearchitektur von Medusa}
+	Im Februar lag der Schwerpunkt auf einer grundlegenden Überarbeitung der Softwarearchitektur des Projekts \enquote{Medusa}.
+	Ziel dieser Maßnahme war es, die Entwicklungsprozesse zu vereinfachen, Abhängigkeiten zwischen Teilkomponenten zu reduzieren und eine belastbare Grundlage für die spätere Integration der eigentlichen Slicing-Algorithmen zu schaffen.
+	Die zuvor gewachsene Implementierung wurde dazu in klar abgegrenzte Module überführt, sodass fachliche Verantwortlichkeiten sauber getrennt und Erweiterungen mit geringerem Änderungsaufwand umgesetzt werden können.
+	Die neue Struktur orientiert sich an funktionalen Domänen und trennt insbesondere Anwendungssteuerung, Kernfunktionalität, grafische Verarbeitung, Eingabesteuerung, Benutzeroberfläche und Slicing-Logik voneinander.
+	Dadurch wird eine höhere Kohäsion innerhalb einzelner Komponenten sowie eine geringere Kopplung zwischen den Komponenten erreicht.
+	Diese Modularisierung verbessert sowohl die Wartbarkeit als auch die Testbarkeit des Systems und reduziert das Risiko, dass Änderungen in einem Teilbereich unbeabsichtigte Seiteneffekte in anderen Modulen verursachen.
+	Die resultierende Modulstruktur lässt sich wie folgt zusammenfassen:
+
+	\begin{table}[h]
+		\centering
+		\begin{tabular}{ll}
+			\toprule
+			\textbf{Modul} & \textbf{Zweck} \\
+			\midrule
+			\texttt{src/app/} & Anwendungssteuerung, Fensterverwaltung und Hauptschleife \\
+			\texttt{src/core/} & Logging mit \texttt{spdlog}, Kamerasystem und gemeinsam genutzte Hilfsfunktionen \\
+			\texttt{src/graphics/} & OpenGL-basierte Darstellung, Mesh-Import, Shader und Szenenverwaltung \\
+			\texttt{src/controls/} & Verarbeitung von Benutzereingaben zur Kamera- und Modellmanipulation \\
+			\texttt{src/ui/} & Integration von Dear ImGui, Dateibrowser und visuelle Bedienkonzepte \\
+			\texttt{src/slicing/} & Geplante Implementierung von Mesh-Slicing und robotergeeigneter Bahnplanung \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+
+	Insbesondere die Einführung eines dedizierten \texttt{src/slicing/}-Moduls ist aus architektonischer Sicht wesentlich, da dadurch die zukünftige Entwicklung der Kernalgorithmen nicht mehr direkt mit Darstellungs- oder Interaktionslogik vermischt wird.
+	Damit entsteht eine klar definierte Schnittstelle zwischen algorithmischer Verarbeitung und Visualisierung, was für die spätere Validierung von Bahndaten und Transformationsketten von zentraler Bedeutung ist.
+	Gleichzeitig wurde die Einstiegsschicht der Anwendung in \texttt{src/app/} konsolidiert, sodass Initialisierung, Laufzeitsteuerung und Ressourcenverwaltung systematischer organisiert werden können.
+
+\subsection{Erweiterung der technischen Dokumentation}
+	Ein weiterer Arbeitsschwerpunkt bestand in der Ergänzung doxygen-kompatibler Quelltextkommentare.
+	Diese Dokumentationsform wurde gezielt gewählt, um die wachsende Codebasis konsistent und automatisiert dokumentieren zu können.
+	Die annotierten Schnittstellen ermöglichen es, Klassen, Methoden, Parameter und Rückgabewerte strukturiert zu erfassen und daraus projekteinheitliche Entwicklerdokumentation abzuleiten.
+	Für ein Forschungs- und Entwicklungsprojekt mit interdisziplinärem Charakter ist diese Form der Dokumentation besonders relevant, da sie die Nachvollziehbarkeit der Implementierung erhöht und den Wissenstransfer innerhalb des Teams erleichtert.
+	Darüber hinaus stellt sie sicher, dass spätere Erweiterungen -- etwa im Bereich nichtplanarer Schichtgenerierung, Trajektorienplanung oder Kopplung an Roboterschnittstellen -- auf einer klar beschriebenen Softwarebasis aufsetzen können.
+	Die Einführung standardisierter Dokumentationskommentare ist damit nicht nur eine redaktionelle Maßnahme, sondern ein Beitrag zur langfristigen Beherrschbarkeit der Softwarekomplexität.
+
+\subsection{Aufbau automatisierter Qualitätssicherung durch Unit-Tests}
+	Zur Absicherung zentraler Kernfunktionen wurde im Februar außerdem die testgetriebene Qualitätssicherung erweitert.
+	Hierzu wurden auf Basis von GoogleTest erste Unit-Tests für fundamentale Softwarebausteine ergänzt, insbesondere für den STL-Import sowie für geometrische Transformationen.
+	Beide Bereiche sind für das Gesamtprojekt kritisch, da Fehler in diesen Verarbeitungsschritten unmittelbar zu fehlerhaften Geometrierepräsentationen, inkorrekten Koordinatensystembezügen oder instabilen Visualisierungsergebnissen führen können.
+	Die Tests dienen dazu, das Verhalten definierter Kernkomponenten reproduzierbar zu überprüfen und Regressionen frühzeitig zu erkennen.
+	Für den STL-Import ist dies insbesondere im Hinblick auf unterschiedliche Eingabegeometrien und Dateiformate relevant, während Transformationstests sicherstellen, dass Translationen, Rotationen und gegebenenfalls kombinierte Transformationsketten korrekt angewendet werden.
+	Gerade im Kontext eines robotergestützten 6-Achs-Slicers ist die mathematisch konsistente Behandlung von Transformationen essenziell, da die spätere Ableitung von Werkzeugorientierungen und Roboterbahnen direkt auf diesen Operationen aufbaut.
+	Zusammenfassend stellt der Februar einen wichtigen Konsolidierungsmonat für die Softwarebasis dar.
+	Während in diesem Zeitraum noch keine vollständige Implementierung der Slicing-Verfahren erfolgte, wurden wesentliche strukturelle Voraussetzungen geschaffen, um die weitere Entwicklung effizienter, nachvollziehbarer und robuster durchführen zu können.
+	Die Kombination aus modularer Architektur, automatisierter Dokumentation und ersten systematischen Tests bildet damit eine tragfähige Grundlage für die nachfolgenden Implementierungsschritte.
+
+\section{Fortschritt März 2026}
+	Im März lag der Schwerpunkt auf der praktischen Umsetzung erster Slicing-Verfahren.
+	Ziel war es, die zuvor erarbeiteten konzeptionellen Ansätze schrittweise in lauffähige Algorithmik zu überführen und damit die Grundlage für weiterführende Vergleiche der unterschiedlichen Strategien zu schaffen.
+	Als erster Implementierungsschritt wurde ein planarer Slicing-Algorithmus umgesetzt.
+	Dieser diente bewusst als Einstiegsstufe, um zentrale Verarbeitungsschritte -- insbesondere Geometrieaufbereitung, Schichtbildung und Pfadableitung -- unter kontrollierten Bedingungen zu validieren.
+	Die Implementierung des planaren Verfahrens ermöglichte es, die grundlegende Pipeline technisch abzusichern und ein belastbares Referenzverhalten für spätere nichtplanare Erweiterungen zu etablieren.
+	Darauf aufbauend wurde auch der Base-Algorithmus implementiert.
+	Damit steht nun neben dem planaren Referenzverfahren ein erster projektspezifischer Ansatz zur Verfügung, der in den kommenden Arbeitsschritten hinsichtlich geometrischer Eignung, Rechenaufwand und resultierender Bahnqualität systematisch ausgewertet werden kann.
+	Beim Kristall-Algorithmus befinden wir uns aktuell in der Umsetzung.
+	Die laufenden Arbeiten konzentrieren sich auf die schrittweise Überführung des adaptiven Wachstumsprinzips in eine robuste Implementierung sowie auf die Vorbereitung geeigneter Testszenarien, um das Verhalten des Verfahrens im Vergleich zu den bereits implementierten Ansätzen valide beurteilen zu können.
+	\newline
+	Zusätzlich zu den algorithmischen Implementierungen wurde auch die Ansteuerung der 3D-Drucker Hardware testweise umgesetzt.
+	Hierfür wurde der Extruder des FDM-Druckers ausgebaut und unabhängig von der ursprünglichen Elektronik betrieben.
+	Um dies zu erreichen, wurde ein einfacher Steuerschaltkreis mithilfe eines Arduino-Boards aufgebaut.
+	Die Ansteuerung erfolgt über einen PWM gesteuerten MOSFET, welcher das Heizelement des Extruders aktiviert.
+	Mithilfe dieses Heizelement und dem eingebauten NTC-Temperatursensor wird die Extrusionstemperatur über eine PID-Regelung stabil gehalten.
+	Der Schrittmotor des Direct-Drive-Extruders wird über einen a4988 Schrittmotortreiber angesteuert, der ebenfalls von einem Arduino-Signal gesteuert wird.
+	In den nächsten Schritten soll die Temperaturregelung parallel zur Motorsteuerung laufen, um eine synchronisierte Extrusion zu ermöglichen.
+	Ebenso soll die Auswirkung des Materialvorschubes auf die Temperaturstabilität untersucht werden, um die Parameter der PID-Regelung entsprechend anzupassen.
+	\newline
+	Desweiteren wurde eine reproduzierbare Entwicklungsumgebung mit Devcontainer, Docker-Compose und einem X11-Vorbereitungsskript eingerichtet, um GUI-basierte ROS-Tools im Container auszuführen.
+	Parallel wurde das UR3e-Control-Paket in die Projektstruktur eingebunden und relevante Launch- sowie Steuerungsquellen zusammengeführt.
+	Nicht benötigte Module wurden entfernt und Dokumentation/IDE-Hilfen ergänzt.
+\end{document}

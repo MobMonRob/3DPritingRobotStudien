@@ -1,0 +1,151 @@
+\begin{tikzpicture}[
+    >=Latex,
+    x={(0.85cm, -0.5cm)},
+    y={(0cm, 1cm)},
+    z={(-0.85cm, -0.5cm)},
+    every node/.style={font=\small},
+]
+    % ===========================================
+    % Buildplate
+    % ===========================================
+    \fill[gray!12]
+        (-3.0, 0, -1.5) -- (4.0, 0, -1.5) --
+        (4.0,  0,  1.5) -- (-3.0, 0,  1.5) -- cycle;
+    \draw[gray!60]
+        (-3.0, 0, -1.5) -- (4.0, 0, -1.5) --
+        (4.0,  0,  1.5) -- (-3.0, 0,  1.5) -- cycle;
+    \node[font=\scriptsize, gray!60!black, anchor=north west]
+        at (-3.0, 0, 1.5) {Buildplate};
+
+    % ===========================================
+    % 1) LINKER ZWEIG b=2  (gruen) - hinten
+    % ===========================================
+    \fill[green!12] % Front
+        (-2.0, 2.5, 0.3) -- (-0.3, 2.5, 0.3) --
+        (-0.3, 3.2, 0.3) -- (-2.0, 3.2, 0.3) -- cycle;
+    % Die linke Seitenfläche (\fill[green!18]) wurde entfernt, da abgewandt/verdeckt!
+    \fill[green!22] % Oben
+        (-2.0, 3.2, 0.3) -- (-0.3, 3.2, 0.3) --
+        (-0.3, 3.2, -0.3) -- (-2.0, 3.2, -0.3) -- cycle;
+
+    \draw[green!50!black] % Front-Rahmen
+        (-2.0, 2.5, 0.3) -- (-0.3, 2.5, 0.3) --
+        (-0.3, 3.2, 0.3) -- (-2.0, 3.2, 0.3) -- cycle;
+    % Rahmen für Oben (nur noch vordere-linke und hintere Kante sichtbar)
+    \draw[green!50!black]
+        (-2.0, 3.2, 0.3) -- (-2.0, 3.2, -0.3) -- (-0.3, 3.2, -0.3);
+
+    \foreach \xi in {-1.8, -1.5, -1.2, -0.9, -0.6} {
+        \draw[green!50!black, very thin] (\xi, 2.5, 0.3) -- (\xi, 3.2, 0.3);
+    }
+
+    % ===========================================
+    % 2) STAMM b=0  (blau) - Mitte
+    % ===========================================
+    \fill[blue!12] % Front
+        (-0.3, 0, 0.3) -- (0.3, 0, 0.3) --
+        (0.3, 3.2, 0.3) -- (-0.3, 3.2, 0.3) -- cycle;
+    \fill[blue!18] % Rechte Seite (endet bei y=2.5 fuer orangen Ast)
+        (0.3, 0, 0.3) -- (0.3, 0, -0.3) --
+        (0.3, 2.5, -0.3) -- (0.3, 2.5, 0.3) -- cycle;
+    \fill[blue!22] % Oben
+        (-0.3, 3.2, 0.3) -- (0.3, 3.2, 0.3) --
+        (0.3, 3.2, -0.3) -- (-0.3, 3.2, -0.3) -- cycle;
+
+    \draw[blue!60!black] % Front-Rahmen
+        (-0.3, 0, 0.3) -- (0.3, 0, 0.3) --
+        (0.3, 3.2, 0.3) -- (-0.3, 3.2, 0.3) -- cycle;
+    \draw[blue!60!black] % Rechter Rahmen (endet bei y=2.5)
+        (0.3, 0, 0.3) -- (0.3, 0, -0.3) --
+        (0.3, 2.5, -0.3) -- (0.3, 2.5, 0.3);
+    \draw[blue!60!black] % Oberer Rahmen (hinten und links)
+        (-0.3, 3.2, 0.3) -- (-0.3, 3.2, -0.3) -- (0.3, 3.2, -0.3);
+
+    \foreach \y in {0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, 3.0} {
+        \draw[blue!50, very thin] (-0.3, \y, 0.3) -- (0.3, \y, 0.3);
+    }
+
+    % ===========================================
+    % 3) RECHTER ZWEIG b=1  (orange) - vorne
+    % ===========================================
+    \fill[orange!12]
+        (0.3, 2.5, 0.3) -- (2.0, 2.5, 0.3) --
+        (2.0, 3.2, 0.3) -- (0.3, 3.2, 0.3) -- cycle;
+    \fill[orange!18]
+        (2.0, 2.5, 0.3) -- (2.0, 2.5, -0.3) --
+        (2.0, 3.2, -0.3) -- (2.0, 3.2, 0.3) -- cycle;
+    \fill[orange!22]
+        (0.3, 3.2, 0.3) -- (2.0, 3.2, 0.3) --
+        (2.0, 3.2, -0.3) -- (0.3, 3.2, -0.3) -- cycle;
+    \draw[orange!70!black]
+        (0.3, 2.5, 0.3) -- (2.0, 2.5, 0.3) --
+        (2.0, 3.2, 0.3) -- (0.3, 3.2, 0.3) -- cycle;
+    \draw[orange!70!black]
+        (2.0, 2.5, 0.3) -- (2.0, 2.5, -0.3) --
+        (2.0, 3.2, -0.3) -- (2.0, 3.2, 0.3);
+    \draw[orange!70!black]
+        (0.3, 3.2, -0.3) -- (2.0, 3.2, -0.3);
+    \foreach \xi in {0.6, 0.9, 1.2, 1.5, 1.8} {
+        \draw[orange!70!black, very thin] (\xi, 2.5, 0.3) -- (\xi, 3.2, 0.3);
+    }
+
+    % ===========================================
+    % Globales Frame
+    % ===========================================
+    \draw[->, thick] (0, 0, 0) -- (1.0, 0, 0)
+        node[font=\scriptsize, anchor=north west, inner sep=1pt] {$\vec{e}_x$};
+    \draw[->, thick] (0, 0, 0) -- (0, 1.0, 0)
+        node[font=\scriptsize, anchor=west] {$\vec{e}_y$};
+    \draw[->, thick] (0, 0, 0) -- (0, 0, 1.0)
+        node[font=\scriptsize, anchor=north east, inner sep=1pt] {$\vec{e}_z$};
+    \node[font=\scriptsize, anchor=north, inner sep=3pt] at (0, 0, 0) {};
+
+    % ===========================================
+    % Stamm-Wachstumsrichtung G_0
+    % ===========================================
+    \draw[->, very thick, blue!70!black]
+        (-1.5, 0.4, 0.3) -- (-1.5, 2.0, 0.3)
+        node[font=\scriptsize, midway, anchor=east]
+        {$\vec{G}_0 = \vec{e}_y$};
+
+    % ===========================================
+    % Lokales Frame Zweig b=1  (orange)
+    % ===========================================
+    \draw[->, very thick, orange!85!black]
+        (2.5, 2.85, 0) -- (3.5, 2.85, 0)
+        node[font=\scriptsize, anchor=north west, inner sep=1pt]
+        {$\vec{G}_1$};
+    \draw[->, very thick, orange!85!black]
+        (2.5, 2.85, 0) -- (2.5, 3.85, 0)
+        node[font=\scriptsize, anchor=south] {$\vec{U}_1$};
+    \draw[->, very thick, orange!85!black]
+        (2.5, 2.85, 0) -- (2.5, 2.85, 1.0)
+        node[font=\scriptsize, anchor=north east, inner sep=1pt]
+        {$\vec{V}_1$};
+
+    % ===========================================
+    % Lokales Frame Zweig b=2  (gruen)
+    % ===========================================
+    \draw[->, very thick, green!50!black]
+        (-2.5, 2.85, 0) -- (-3.5, 2.85, 0)
+        node[font=\scriptsize, anchor=north east, inner sep=1pt]
+        {$\vec{G}_2$};
+    \draw[->, very thick, green!50!black]
+        (-2.5, 2.85, 0) -- (-2.5, 3.85, 0)
+        node[font=\scriptsize, anchor=south] {$\vec{U}_2$};
+    \draw[->, very thick, green!50!black]
+        (-2.5, 2.85, 0) -- (-2.5, 2.85, -1.0)
+        node[font=\scriptsize, anchor=north west, inner sep=1pt]
+        {$\vec{V}_2$};
+
+    % ===========================================
+    % Beschriftungen
+    % ===========================================
+    \node[font=\scriptsize, blue!70!black, anchor=west]
+        at (0.5, 0.2, 0.0) {Stamm $b=0$};
+    \node[font=\scriptsize, orange!85!black, anchor=south]
+        at (0.9, 3.5, -0.5) {Zweig $b=1$};
+    \node[font=\scriptsize, green!50!black, anchor=south]
+        at (-1.4, 3.5, 2.0) {Zweig $b=2$};
+
+\end{tikzpicture}

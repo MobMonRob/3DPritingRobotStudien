@@ -1,0 +1,56 @@
+# ==============================================================================
+# VERSION CONTROL
+# ==============================================================================
+# Exclude the entire git history to significantly reduce build context size.
+.git
+.gitignore
+.gitlab-ci.yml
+
+# ==============================================================================
+# LOCAL BUILD ARTIFACTS
+# ==============================================================================
+# CRITICAL: Exclude all local build folders.
+# This prevents macOS binaries from being copied into the Linux container,
+# which would cause "Exec format errors" or CMake cache conflicts.
+build/
+bin/
+lib/
+out/
+
+# CLion specific build directories
+cmake-build-debug/
+cmake-build-release/
+cmake-build-relwithdebinfo/
+cmake-build-minsizerel/
+
+# CMake cache and generated files
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+install_manifest.txt
+compile_commands.json
+
+# ==============================================================================
+# IDE & EDITOR SETTINGS
+# ==============================================================================
+# JetBrains / CLion project files
+.idea/
+
+# VS Code settings (if used)
+.vscode/
+
+# Xcode project files (macOS specific)
+*.xcodeproj
+*.xcworkspace
+
+# ==============================================================================
+# SYSTEM & TEMPORARY FILES
+# ==============================================================================
+# macOS metadata files (clutter in Linux)
+.DS_Store
+Thumbs.db
+
+# Temporary logs and swap files
+*.swp
+*~
+*.log

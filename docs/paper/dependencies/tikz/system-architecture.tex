@@ -1,0 +1,120 @@
+\begin{tikzpicture}[
+    >=Latex,
+    every node/.style={font=\small},
+    component/.style={
+        rectangle, rounded corners=6pt, draw, very thick,
+        minimum width=4.6cm,
+        minimum height=5.6cm,
+        align=center, inner sep=8pt,
+    },
+    medusa/.style={component, fill=blue!6,  draw=blue!55!black},
+    kronos/.style={component, fill=orange!8, draw=orange!60!black},
+    submodule/.style={
+        rectangle, rounded corners=2pt, draw, thin,
+        fill=white, minimum width=3.8cm,
+        minimum height=0.55cm,
+        align=center, font=\scriptsize, inner sep=2pt,
+    },
+    domaintext/.style={
+        font=\scriptsize\itshape, gray!60!black, align=center,
+    },
+    flow/.style={->, very thick, blue!50!black},
+    iflow/.style={->, very thick, orange!60!black},
+    iolabel/.style={font=\scriptsize\bfseries, gray!70!black,
+                    align=center},
+    extbox/.style={
+        rectangle, rounded corners=2pt, draw, thin,
+        fill=gray!10, minimum width=2.0cm, minimum height=1.0cm,
+        align=center, font=\scriptsize,
+    },
+    inlinelbl/.style={
+        font=\scriptsize, gray!70!black, align=center,
+        fill=white, inner xsep=3pt, inner ysep=1pt,
+    },
+]
+    % =========================================================
+    % MEDUSA-Komponente (links)
+    % =========================================================
+    \node[medusa] (medusa) {};
+    \node[font=\bfseries, anchor=north]
+        at ([yshift=-4pt]medusa.north) {MEDUSA};
+    \node[domaintext, anchor=north]
+        at ([yshift=-22pt]medusa.north) {Domäne: Geometrie};
+
+    \node[submodule, anchor=north]
+        at ([yshift=-44pt]medusa.north) (m1) {Mesh-Import};
+    \node[submodule, below=2pt of m1] (m2) {Geometrieaufbereitung};
+    \node[submodule, below=2pt of m2] (m3) {Slicing-Algorithmen};
+    \node[submodule, below=2pt of m3] (m4) {Toolpath-Planung};
+    \node[submodule, below=2pt of m4] (m5) {3D-Viewer (OpenGL)};
+    \node[submodule, below=2pt of m5] (m6) {JSON-Export};
+
+    % =========================================================
+    % KRONOS-Komponente (rechts)
+    % =========================================================
+    \node[kronos, right=3.0cm of medusa] (kronos) {};
+    \node[font=\bfseries, anchor=north]
+        at ([yshift=-4pt]kronos.north) {KRONOS};
+    \node[domaintext, anchor=north]
+        at ([yshift=-22pt]kronos.north) {Domäne: Roboterkinematik};
+
+    \node[submodule, anchor=north]
+        at ([yshift=-44pt]kronos.north) (k1) {JSON-Parser};
+    \node[submodule, below=2pt of k1] (k2) {Planning Scene / Kollision};
+    \node[submodule, below=2pt of k2] (k3) {Inverse Kinematik (TRAC-IK)};
+    \node[submodule, below=2pt of k3] (k4) {Singularitätsbehandlung};
+    \node[submodule, below=2pt of k4] (k5) {Postprozessor};
+    \node[submodule, below=2pt of k5] (k6) {ROS\,2 / MoveIt-Anbindung};
+
+% =========================================================
+    % Schnittstelle: toolpath.json (datei-artig, etwas größer)
+    % =========================================================
+    \coordinate (mid) at ($(medusa.east)!0.5!(kronos.west)$);
+
+    \begin{scope}[shift={(mid)}]
+        \def\fw{0.75}   % halbe Breite  -> Gesamtbreite 1.5 cm
+        \def\fh{0.55}   % halbe Höhe    -> Gesamthöhe   1.1 cm
+        \def\fc{0.22}   % Eckenfase (rechts oben)
+        % Korpus
+        \fill[red!8]
+            (-\fw,-\fh) -- (\fw,-\fh) -- (\fw,\fh-\fc)
+            -- (\fw-\fc,\fh) -- (-\fw,\fh) -- cycle;
+        \draw[red!55!black, thick]
+            (-\fw,-\fh) -- (\fw,-\fh) -- (\fw,\fh-\fc)
+            -- (\fw-\fc,\fh) -- (-\fw,\fh) -- cycle;
+        % Knick-Linien (Faltkante)
+        \draw[red!55!black, thick]
+            (\fw-\fc,\fh) -- (\fw-\fc,\fh-\fc) -- (\fw,\fh-\fc);
+        % Beschriftung
+        \node[font=\scriptsize\ttfamily, align=center, text=red!35!black]
+            at (0,-0.02) {toolpath\\.json};
+        % Ankerpunkte für die Pfeile
+        \coordinate (artwest)  at (-\fw,0);
+        \coordinate (arteast)  at ( \fw,0);
+        \coordinate (artnorth) at (0, \fh);
+    \end{scope}
+
+    \draw[flow]  (medusa.east) -- (artwest);
+    \draw[iflow] (arteast)     -- (kronos.west);
+
+    \node[inlinelbl, anchor=south]
+        at ([yshift=6pt]artnorth)
+        {dateibasiert,\\asynchron};
+
+    % =========================================================
+    % Eingabe (3D-Mesh)
+    % =========================================================
+    \node[extbox, left=1.2cm of medusa] (input) {3D-Datei\\(STL / OBJ)};
+    \draw[flow] (input.east) -- (medusa.west);
+
+    % =========================================================
+    % Ausgabe (UR3e-Roboter) – etwas mehr Abstand für das Label
+    % =========================================================
+    \node[extbox, right=1.7cm of kronos] (robot) {UR3e\\(simuliert)};
+    \draw[iflow] (kronos.east) -- (robot.west);
+
+    \node[inlinelbl, anchor=south]
+        at ([yshift=6pt]$(kronos.east)!0.5!(robot.west)$)
+        {Joint-\\Trajektorien};
+
+\end{tikzpicture}
