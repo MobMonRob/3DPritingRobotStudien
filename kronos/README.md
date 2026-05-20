@@ -1,7 +1,7 @@
 # UR3e 3D Printer — Docker Development Environment
 
 ROS 2 Humble + MoveIt 2 environment for controlling a Universal Robots UR3e arm
-as a 3D printer. Reads toolpath files (CSV or G-code) produced by a slicer,
+as a 3D printer. Reads Kronos JSON toolpath files produced by a slicer,
 plans collision-aware Cartesian paths, and executes them on a simulated (or real)
 UR3e with a print-bed collision object in the MoveIt planning scene.
 
@@ -64,7 +64,7 @@ In a **second** terminal (`docker compose exec ur3e-dev bash`):
 
 ```bash
 ros2 launch ur3e_control ur3e_printer.launch.py \
-    toolpath_file:=/ros2_ws/src/ur3e_control/toolpaths/demo_square.csv
+  toolpath_file:=/ros2_ws/src/ur3e_control/toolpaths/toolpath_2026-05-13T15-24-26Z_planar.json
 ```
 
 The printer node will:
@@ -94,23 +94,23 @@ TRAC-IK directly, then executes via MoveIt joint planning.
 
 ## Toolpath Format
 
-The printer accepts two formats:
+The printer accepts the **Kronos JSON** format — a top-level `waypoints` array with positions in mm
+and orientation as a quaternion:
 
-**CSV** (default) — one `x, y, z` point per line in metres (base_link frame):
-
-```csv
-# comments start with #
-0.290, -0.010, 0.112
-0.310, -0.010, 0.112
-0.310,  0.010, 0.112
-```
-
-**G-code** (`.gcode` / `.gco` extension) — standard `G0`/`G1` moves in mm:
-
-```gcode
-G1 X290 Y-10 Z112
-G1 X310 Y-10 Z112
-G1 X310 Y10 Z112
+```json
+{
+  "waypoints": [
+    {
+      "x": 50.0,
+      "y": 1.0055,
+      "z": 0.0,
+      "qw": 0.70710677,
+      "qx": -0.70710677,
+      "qy": 0.0,
+      "qz": 0.0
+    }
+  ]
+}
 ```
 
 Place toolpath files in `src/ur3e_control/toolpaths/` and reference them by
@@ -162,7 +162,7 @@ Then launch MoveIt and the printer controller as above.
     │   ├── ur3e_gazebo.launch.py
     │   └── ur3e_moveit.launch.py
     ├── toolpaths/
-    │   └── demo_square.csv            # sample 3-layer square
+    │   └── toolpath_2026-05-13T15-24-26Z_planar.json
     └── src/
       ├── ur3e_printer.cpp           # 3D printer controller
       ├── ur3e_trac_ik_controller.cpp# TRAC-IK IK demo

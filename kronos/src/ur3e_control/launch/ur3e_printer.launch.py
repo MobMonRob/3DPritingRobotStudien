@@ -3,7 +3,7 @@ Launch the UR3e 3D-printer node.
 
 Usage (simulation must be running):
   ros2 launch ur3e_control ur3e_printer.launch.py \
-      toolpath_file:=/ros2_ws/src/ur3e_control/toolpaths/demo_square.csv
+    toolpath_file:=/ros2_ws/src/ur3e_control/toolpaths/toolpath_2026-05-13T15-24-26Z_planar.json
 """
 
 import os
@@ -70,7 +70,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "toolpath_file",
                 default_value="",
-                description="Path to CSV or G-code toolpath file",
+                description="Path to Kronos JSON toolpath file",
             ),
             printer_node,
         ]

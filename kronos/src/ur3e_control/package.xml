@@ -20,11 +20,13 @@
   <depend>controller_manager_msgs</depend>
   <depend>moveit_msgs</depend>
   <depend>shape_msgs</depend>
+  <depend>visualization_msgs</depend>
 
   <exec_depend>ur_robot_driver</exec_depend>
   <exec_depend>ur_description</exec_depend>
   <exec_depend>ur_moveit_config</exec_depend>
   <exec_depend>gazebo_ros2_control</exec_depend>
+  <exec_depend>rviz2</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
