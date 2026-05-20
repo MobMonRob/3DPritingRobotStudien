@@ -33,7 +33,7 @@ void Camera::setFovDegrees(float degrees)
     if (std::abs(kClamped - mFovDegrees) > kEpsilon)
     {
         mFovDegrees = kClamped;
-        MEDUSA_INFO("Camera FOV set to {} degrees", mFovDegrees);
+        MEDUSA_DEBUG("Camera FOV set to {} degrees", mFovDegrees);
     }
 }
 

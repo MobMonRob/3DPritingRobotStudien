@@ -13,6 +13,10 @@ add_executable(MedusaUnitTests ${UNIT_TEST_SOURCES})
 target_link_libraries(MedusaUnitTests PRIVATE
         medusa::core
         medusa::graphics
+        medusa::geometry
+        medusa::slicing
+        medusa::controls
+        medusa::export
         ext::gtest_main
 )
 

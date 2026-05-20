@@ -45,12 +45,13 @@ public:
      * @param mesh Mesh to draw.
      * @param modelMatrix Model transform (provided by the application).
      * @param renderWireframe When true, draws using GL_LINE polygon mode.
+     * @param alpha Mesh opacity (0.0 = fully transparent, 1.0 = fully opaque).
      *
      * @note The normal matrix is derived as mat3(modelMatrix) which is correct for
      *       uniform scaling. If you introduce non-uniform scaling, use inverse-transpose.
      */
     void render(GLFWwindow* window, const Camera& camera, const graphics::Mesh& mesh, const glm::mat4& modelMatrix,
-                bool renderWireframe) const;
+                bool renderWireframe, float alpha = 1.0f) const;
 
 private:
     /** @brief Shader program used for scene rendering. */
@@ -64,4 +65,7 @@ private:
 
     /** @brief Cached uniform location for the wireframe mode flag. */
     GLint mWireframeUniformLocation{-1};
+
+    /** @brief Cached uniform location for the alpha (opacity) value. */
+    GLint mAlphaUniformLocation{-1};
 };

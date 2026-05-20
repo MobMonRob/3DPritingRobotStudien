@@ -20,6 +20,7 @@ void ModelTransform::setManualRotation(const float yawRad, const float pitchRad)
 {
     mManualYawRad = yawRad;
     mManualPitchRad = pitchRad;
+    MEDUSA_TRACE("ModelTransform: yaw={:.3f} rad, pitch={:.3f} rad", yawRad, pitchRad);
 }
 
 glm::mat4 ModelTransform::computeModelMatrix(const float elapsedSeconds, const graphics::Mesh& mesh) const
@@ -43,11 +44,13 @@ glm::mat4 ModelTransform::computeModelMatrix(const float elapsedSeconds, const g
         MEDUSA_WARN("Mesh radius is <= 0 ({}). Falling back to radius=1 for normalization", mesh.radius);
     }
 
-    // Scale and center the mesh so it rotates around the world origin (0,0,0)
-    // Order: first translate to center, then scale, then rotate
-    // Matrix multiplication is right-to-left, so we build: Rotation * Scale * Translation
+    // Scale and center the mesh so it sits on the ground plane (Y=0).
+    // X/Z: centered on world origin so Y-axis rotation looks correct.
+    // Y:   bottom of the AABB placed at Y=0 (not the center), so the object
+    //      rests on the grid and never goes below it.
+    // Matrix multiplication is right-to-left: Rotation * Scale * Translation
     model = glm::scale(model, glm::vec3(1.5f / kSafeRadius));
-    model = glm::translate(model, -mesh.center);
+    model = glm::translate(model, glm::vec3(-mesh.center.x, -mesh.boundsMin.y, -mesh.center.z));
     return model;
 }
 

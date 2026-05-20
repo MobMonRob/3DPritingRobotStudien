@@ -18,6 +18,7 @@ namespace graphics
 
     void Mesh::clear()
     {
+        const bool hadGpuData = (vao != 0 || vbo != 0);
         if (vbo != 0)
         {
             glDeleteBuffers(1, &vbo);
@@ -32,6 +33,10 @@ namespace graphics
         count = 0;
         center = glm::vec3(0.0f);
         radius = 1.0f;
+        if (hadGpuData)
+        {
+            MEDUSA_DEBUG("Mesh::clear: GPU buffers released");
+        }
     }
 
     bool Mesh::loadFromCandidates(const std::vector<std::string>& paths)
@@ -58,13 +63,14 @@ namespace graphics
             meshRadius = 1.0f;
         }
 
-        build(kResult.vertices, kResult.bounds.center(), meshRadius);
+        build(kResult.vertices, kResult.bounds.center(), kResult.bounds.min, meshRadius);
 
         MEDUSA_INFO("Mesh load successful (vertices={}, radius={})", count, radius);
         return true;
     }
 
-    void Mesh::build(const std::vector<float>& vertices, const glm::vec3& meshCenter, const float meshRadius)
+    void Mesh::build(const std::vector<float>& vertices, const glm::vec3& meshCenter,
+                     const glm::vec3& meshBoundsMin, const float meshRadius)
     {
         clear();
 
@@ -76,6 +82,7 @@ namespace graphics
         }
 
         center = meshCenter;
+        boundsMin = meshBoundsMin;
         radius = meshRadius;
 
         MEDUSA_DEBUG("Uploading mesh to GPU: vertices={}, bytes={}", count, vertices.size() * sizeof(float));
@@ -98,6 +105,7 @@ namespace graphics
                               reinterpret_cast<const void*>(3 * sizeof(float)));
 
         glBindVertexArray(0);
+        MEDUSA_DEBUG("Mesh::build: GPU upload complete (VAO={}, vertices={})", vao, count);
     }
 
     void Mesh::draw() const

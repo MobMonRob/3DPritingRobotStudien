@@ -20,6 +20,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/glad.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/imgui.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/assimp.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/nlohmann_json.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/eigen.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/deps/libigl.cmake)
 
 # -------------------------------------
 # Optional: unit testing

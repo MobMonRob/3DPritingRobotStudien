@@ -12,6 +12,8 @@ set(GRAPHICS_SOURCES
         "model_transform.cpp"
         "scene_renderer.cpp"
         "shader_program.cpp"
+        "toolpath_renderer.cpp"
+        "phi_overlay_renderer.cpp"
 
         # --- Header Files ---
         "axes_renderer.h"
@@ -21,6 +23,8 @@ set(GRAPHICS_SOURCES
         "model_transform.h"
         "scene_renderer.h"
         "shader_program.h"
+        "toolpath_renderer.h"
+        "phi_overlay_renderer.h"
 )
 
 # -----------------------------------------------------------------------------
@@ -47,6 +51,13 @@ target_link_libraries(medusa_graphics PUBLIC
         ext::assimp
 )
 
+# Include slicing headers for ToolpathRenderer (no link needed, only data structs used)
+target_include_directories(medusa_graphics PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../slicing)
+
+# Phi overlay renderer needs the geometry::TriangleMesh definition (data only,
+# no link required — geometry is header-only structs from medusa_graphics's POV).
+target_link_libraries(medusa_graphics PUBLIC medusa::geometry)
+
 medusa_log("Linked deps: medusa::core, ext::glad, ext::glm, ext::glfw, ext::assimp" VERBOSE)
 
 # -----------------------------------------------------------------------------
@@ -55,4 +66,5 @@ medusa_log("Linked deps: medusa::core, ext::glad, ext::glm, ext::glfw, ext::assi
 target_compile_definitions(medusa_graphics PUBLIC
         GLFW_INCLUDE_NONE
         GL_SILENCE_DEPRECATION
+        MEDUSA_PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
 )

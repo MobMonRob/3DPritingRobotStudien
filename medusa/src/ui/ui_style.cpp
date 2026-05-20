@@ -5,11 +5,13 @@
 
 #include "ui_style.h"
 #include "imgui.h"
+#include "logger.h"
 
 namespace ui
 {
     void applyMedusaStyle()
     {
+        MEDUSA_DEBUG("Applying Medusa ImGui style");
         ImGuiStyle& style = ImGui::GetStyle();
 
         // Rounding

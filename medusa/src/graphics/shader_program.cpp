@@ -1,4 +1,6 @@
 #include <string>
+#include <fstream>
+#include <sstream>
 
 #include "logger.h"
 #include "shader_program.h"
@@ -143,6 +145,7 @@ bool ShaderProgram::create(const char* vsSrc, const char* fsSrc)
     // The renderer expects fixed attribute locations.
     glBindAttribLocation(programId, 0, "aPos");
     glBindAttribLocation(programId, 1, "aNormal");
+    glBindAttribLocation(programId, 1, "aColor");
 
     glLinkProgram(programId);
 
@@ -167,6 +170,31 @@ bool ShaderProgram::create(const char* vsSrc, const char* fsSrc)
 
     MEDUSA_INFO("Shader program created (id={})", programId);
     return true;
+}
+
+bool ShaderProgram::createFromFiles(const char* vsPath, const char* fsPath)
+{
+    auto readFile = [](const char* path, std::string& out) -> bool
+    {
+        std::ifstream f(path);
+        if (!f)
+        {
+            MEDUSA_ERROR("Cannot open shader file: {}", path);
+            return false;
+        }
+        std::ostringstream ss;
+        ss << f.rdbuf();
+        out = ss.str();
+        return true;
+    };
+
+    std::string vsSrc;
+    std::string fsSrc;
+    if (!readFile(vsPath, vsSrc) || !readFile(fsPath, fsSrc))
+        return false;
+
+    MEDUSA_DEBUG("Loaded shader sources: '{}', '{}'", vsPath, fsPath);
+    return create(vsSrc.c_str(), fsSrc.c_str());
 }
 
 void ShaderProgram::use() const

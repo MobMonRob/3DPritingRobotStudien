@@ -9,23 +9,6 @@
 #include "camera.h"
 #include "logger.h"
 
-static auto kGridVsSrc = R"GLSL(
-    #version 150
-    in vec3 aPos;
-    uniform mat4 uMVP;
-    void main() {
-        gl_Position = uMVP * vec4(aPos, 1.0);
-    }
-)GLSL";
-
-static auto kGridFsSrc = R"GLSL(
-    #version 150
-    out vec4 FragColor;
-    void main() {
-        FragColor = vec4(0.4, 0.4, 0.4, 0.6);
-    }
-)GLSL";
-
 GridRenderer::~GridRenderer()
 {
     if (mVao != 0)
@@ -42,7 +25,9 @@ bool GridRenderer::initialize()
 {
     MEDUSA_INFO("Initializing GridRenderer");
 
-    if (!mShaderProgram.create(kGridVsSrc, kGridFsSrc))
+    if (!mShaderProgram.createFromFiles(
+            MEDUSA_PROJECT_ROOT "/assets/shaders/grid.vert",
+            MEDUSA_PROJECT_ROOT "/assets/shaders/grid.frag"))
     {
         MEDUSA_CRITICAL("GridRenderer shader program creation failed");
         return false;

@@ -66,14 +66,28 @@ namespace graphics
             }
             return kCross / kLen;
         }
+
+        // Converts a point from Z-up (3D printing / CAD convention) to Y-up (OpenGL / MEDUSA convention).
+        // Transform: (x, y, z) -> (x, z, -y)
+        glm::vec3 convertZUpToYUp(const aiVector3D& v)
+        {
+            return {v.x, v.z, -v.y};
+        }
     } // namespace
 
-    MeshLoadResult MeshLoader::load(const std::string& path)
+    MeshLoadResult MeshLoader::load(const std::string& path, const bool zUpToYUp)
     {
         MeshLoadResult result;
         initBounds(result.bounds);
 
-        MEDUSA_DEBUG("[MeshLoader] Starting load: '{}'", path);
+        // Local conversion helper — avoids name conflict with the parameter
+        auto cvt = [zUpToYUp](const aiVector3D& v) -> glm::vec3
+        {
+            if (zUpToYUp) return {v.x, v.z, -v.y};
+            return {v.x, v.y, v.z};
+        };
+
+        MEDUSA_DEBUG("[MeshLoader] Starting load: '{}' (zUpToYUp={})", path, zUpToYUp);
 
         if (!isSupportedFormat(path))
         {
@@ -148,9 +162,9 @@ namespace graphics
                 const aiVector3D& v1 = mesh->mVertices[kI1];
                 const aiVector3D& v2 = mesh->mVertices[kI2];
 
-                const glm::vec3 kP0{v0.x, v0.y, v0.z};
-                const glm::vec3 kP1{v1.x, v1.y, v1.z};
-                const glm::vec3 kP2{v2.x, v2.y, v2.z};
+                const glm::vec3 kP0 = cvt(v0);
+                const glm::vec3 kP1 = cvt(v1);
+                const glm::vec3 kP2 = cvt(v2);
 
                 glm::vec3 normals[3];
 
@@ -159,9 +173,9 @@ namespace graphics
                     const aiVector3D& n0 = mesh->mNormals[kI0];
                     const aiVector3D& n1 = mesh->mNormals[kI1];
                     const aiVector3D& n2 = mesh->mNormals[kI2];
-                    normals[0] = glm::vec3{n0.x, n0.y, n0.z};
-                    normals[1] = glm::vec3{n1.x, n1.y, n1.z};
-                    normals[2] = glm::vec3{n2.x, n2.y, n2.z};
+                    normals[0] = cvt(n0);
+                    normals[1] = cvt(n1);
+                    normals[2] = cvt(n2);
                 }
                 else
                 {
@@ -228,13 +242,13 @@ namespace graphics
         return result;
     }
 
-    MeshLoadResult MeshLoader::loadFromCandidates(const std::vector<std::string>& paths)
+    MeshLoadResult MeshLoader::loadFromCandidates(const std::vector<std::string>& paths, const bool zUpToYUp)
     {
         MEDUSA_DEBUG("[MeshLoader] Trying {} candidate path(s)", paths.size());
 
         for (const auto& path : paths)
         {
-            auto result = load(path);
+            auto result = load(path, zUpToYUp);
             if (result.isValid())
             {
                 return result;

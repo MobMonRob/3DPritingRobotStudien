@@ -67,6 +67,8 @@ void CameraController::updateFromScroll(const double yOffset)
 {
     const float kCurrentDistance = mCamera.getDistance();
     const float kNewDistance = kCurrentDistance - static_cast<float>(yOffset) * mZoomSensitivity;
+    MEDUSA_TRACE("CameraController: scroll offset={:.2f}, distance {:.3f} -> {:.3f}",
+                 yOffset, kCurrentDistance, kNewDistance);
     mCamera.setDistance(kNewDistance);
 }
 

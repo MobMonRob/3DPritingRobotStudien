@@ -4,10 +4,12 @@ medusa_log("Configuring src/ targets")
 medusa_log("Subdirs: core, graphics, ui (+ optional app)" , VERBOSE)
 
 add_subdirectory(core)
+add_subdirectory(geometry)
+add_subdirectory(slicing)
 add_subdirectory(graphics)
 add_subdirectory(controls)
-add_subdirectory(slicing)
 add_subdirectory(ui)
+add_subdirectory(exporter)
 
 if (MEDUSA_BUILD_APP)
     medusa_log("App enabled -> add_subdirectory(app)")

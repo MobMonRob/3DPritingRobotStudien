@@ -35,6 +35,9 @@ namespace graphics
         /** @brief Center of the bounding box (used for centering). */
         glm::vec3 center = glm::vec3(0.0f);
 
+        /** @brief Minimum corner of the bounding box (used for floor-placement). */
+        glm::vec3 boundsMin = glm::vec3(0.0f);
+
         /** @brief Approx. radius (half of max extent) used for normalization. */
         float radius = 1.0f;
 
@@ -61,9 +64,11 @@ namespace graphics
      *
      * @param vertices Interleaved vertex data (pos.xyz + normal.xyz per vertex).
      * @param meshCenter Center of the bounding box.
+     * @param meshBoundsMin Minimum corner of the bounding box (for floor-placement).
      * @param meshRadius Radius for normalization.
      */
-        void build(const std::vector<float>& vertices, const glm::vec3& meshCenter, float meshRadius);
+        void build(const std::vector<float>& vertices, const glm::vec3& meshCenter,
+                   const glm::vec3& meshBoundsMin, float meshRadius);
 
         /**
      * @brief Draws the mesh with glDrawArrays(GL_TRIANGLES).

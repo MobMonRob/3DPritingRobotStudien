@@ -46,6 +46,14 @@ public:
     bool create(const char* vsSrc, const char* fsSrc);
 
     /**
+     * @brief Creates (or recreates) the program by loading GLSL source from files.
+     * @param vsPath Path to the vertex shader file.
+     * @param fsPath Path to the fragment shader file.
+     * @return True on success.
+     */
+    bool createFromFiles(const char* vsPath, const char* fsPath);
+
+    /**
      * @brief Activates the program (glUseProgram).
      */
     void use() const;

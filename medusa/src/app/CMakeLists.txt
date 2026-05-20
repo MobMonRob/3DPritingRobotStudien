@@ -32,8 +32,11 @@ target_compile_definitions(MedusaApp PRIVATE
 target_link_libraries(MedusaApp PRIVATE
         medusa::ui
         medusa::graphics
+        medusa::slicing
+        medusa::geometry
         medusa::controls
         medusa::core
+        medusa::export
 )
 medusa_log("Linked internal modules: medusa::ui, medusa::graphics, medusa::core" VERBOSE)
 
@@ -47,14 +50,14 @@ if (APPLE)
 
     set_target_properties(MedusaApp PROPERTIES
             MACOSX_BUNDLE TRUE
-            MACOSX_BUNDLE_BUNDLE_NAME "Medusa Engine"
-            MACOSX_BUNDLE_GUI_IDENTIFIER "com.axtmann.medusa"
+            MACOSX_BUNDLE_BUNDLE_NAME "Medusa"
+            MACOSX_BUNDLE_GUI_IDENTIFIER "com.medusa"
             MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
             MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
-            MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2026 Medusa Team"
+            MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2026 Adrian Gabriel Axtmann, Ben Stahl and Nik Wachsmann"
             OUTPUT_NAME "Medusa"
     )
-    medusa_log("  Bundle ID: com.axtmann.medusa" VERBOSE)
+    medusa_log("  Bundle ID: com.medusa" VERBOSE)
     medusa_log("  Version:   ${PROJECT_VERSION}" VERBOSE)
 
     find_library(COCOA_LIB Cocoa)

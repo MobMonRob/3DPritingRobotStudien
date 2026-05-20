@@ -57,16 +57,18 @@ namespace graphics
         /**
      * @brief Loads a mesh file from a path.
      * @param path File path.
+     * @param zUpToYUp When true, converts Z-up (CAD/3D-print) coordinates to Y-up (OpenGL). Default: true.
      * @return Load result (check isValid()).
      */
-        static MeshLoadResult load(const std::string& path);
+        static MeshLoadResult load(const std::string& path, bool zUpToYUp = true);
 
         /**
      * @brief Tries to load from multiple candidate paths.
      * @param paths Candidate file paths.
+     * @param zUpToYUp When true, converts Z-up coordinates to Y-up. Default: true.
      * @return Load result from first successful path (check isValid()).
      */
-        static MeshLoadResult loadFromCandidates(const std::vector<std::string>& paths);
+        static MeshLoadResult loadFromCandidates(const std::vector<std::string>& paths, bool zUpToYUp = true);
     };
 } // namespace graphics
 

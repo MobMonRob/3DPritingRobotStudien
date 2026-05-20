@@ -38,4 +38,8 @@ target_link_libraries(medusa_ui PUBLIC
         ext::imgui
 )
 
+target_compile_definitions(medusa_ui PRIVATE
+        MEDUSA_PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
 medusa_log("Linked deps: medusa::graphics, ext::imgui" VERBOSE)

@@ -11,6 +11,12 @@
 #include "logger.h"
 #include "ui_style.h"
 
+#ifndef MEDUSA_PROJECT_ROOT
+#define MEDUSA_PROJECT_ROOT "."
+#endif
+
+static const char* kIniPath = MEDUSA_PROJECT_ROOT "/data/settings/imgui.ini";
+
 bool ImGuiLayer::init(GLFWwindow* window)
 {
     if (!window)
@@ -23,14 +29,16 @@ bool ImGuiLayer::init(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = kIniPath;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-    MEDUSA_DEBUG("ImGui config: keyboardNav={}, docking={}, viewports={}",
+    MEDUSA_DEBUG("ImGui config: keyboardNav={}, docking={}, viewports={}, iniFile={}",
                  (io.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) != 0,
                  (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) != 0,
-                 (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0);
+                 (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0,
+                 kIniPath);
 
     ImGui::StyleColorsDark();
     ImGuiStyle& style = ImGui::GetStyle();

@@ -9,45 +9,13 @@
 #include "mesh.h"
 #include "scene_renderer.h"
 
-
-// Shader: Lambert-style shading with optional wireframe color.
-static auto kSceneVsSrc = R"GLSL(
-    #version 150
-    in vec3 aPos;
-    in vec3 aNormal;
-    uniform mat4 uMVP;
-    uniform mat3 uNormalMat;
-    out vec3 vNormal;
-    void main() {
-        vNormal = normalize(uNormalMat * aNormal);
-        gl_Position = uMVP * vec4(aPos, 1.0);
-    }
-)GLSL";
-
-static auto kSceneFsSrc = R"GLSL(
-    #version 150
-    in vec3 vNormal;
-    uniform bool uWireframe;
-    out vec4 FragColor;
-    void main() {
-        vec3 base = vec3(0.20, 0.55, 0.90);
-        if (uWireframe) {
-            FragColor = vec4(base, 1.0);
-        } else {
-            vec3 N = normalize(vNormal);
-            vec3 L = normalize(vec3(0.5, 1.0, 0.3));
-            float diff = max(dot(N, L), 0.0);
-            vec3 color = base * (0.25 + 0.75 * diff);
-            FragColor = vec4(color, 1.0);
-        }
-    }
-)GLSL";
-
 bool SceneRenderer::initialize()
 {
     MEDUSA_INFO("Initializing SceneRenderer shaders");
 
-    if (!mShaderProgram.create(kSceneVsSrc, kSceneFsSrc))
+    if (!mShaderProgram.createFromFiles(
+            MEDUSA_PROJECT_ROOT "/assets/shaders/scene.vert",
+            MEDUSA_PROJECT_ROOT "/assets/shaders/scene.frag"))
     {
         MEDUSA_CRITICAL("SceneRenderer shader program creation failed");
         return false;
@@ -56,9 +24,11 @@ bool SceneRenderer::initialize()
     mMvpUniformLocation = mShaderProgram.loc("uMVP");
     mNormalMatrixUniformLocation = mShaderProgram.loc("uNormalMat");
     mWireframeUniformLocation = mShaderProgram.loc("uWireframe");
+    mAlphaUniformLocation = mShaderProgram.loc("uAlpha");
 
-    MEDUSA_DEBUG("SceneRenderer uniforms: uMVP={}, uNormalMat={}, uWireframe={}", mMvpUniformLocation,
-                 mNormalMatrixUniformLocation, mWireframeUniformLocation);
+    MEDUSA_DEBUG("SceneRenderer uniforms: uMVP={}, uNormalMat={}, uWireframe={}, uAlpha={}",
+                 mMvpUniformLocation, mNormalMatrixUniformLocation,
+                 mWireframeUniformLocation, mAlphaUniformLocation);
 
     if (mMvpUniformLocation < 0 || mNormalMatrixUniformLocation < 0 || mWireframeUniformLocation < 0)
     {
@@ -72,7 +42,8 @@ void SceneRenderer::render(GLFWwindow* window,
                            const Camera& camera,
                            const graphics::Mesh& mesh,
                            const glm::mat4& modelMatrix,
-                           const bool renderWireframe) const
+                           const bool renderWireframe,
+                           const float alpha) const
 {
     if (!window)
     {
@@ -119,6 +90,7 @@ void SceneRenderer::render(GLFWwindow* window,
     mShaderProgram.use();
     glUniformMatrix4fv(mMvpUniformLocation, 1, GL_FALSE, glm::value_ptr(kMvp));
     glUniformMatrix3fv(mNormalMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(kNormalMatrix));
+    glUniform1f(mAlphaUniformLocation, alpha);
 
     glBindVertexArray(mesh.vao);
     if (renderWireframe)

@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://medusa.example.com/schemas/toolpath/1.0.0/toolpath.schema.json",
+  "title": "KronosToolpath",
+  "description": "JSON Schema for the MEDUSA→KRONOS toolpath export format. Version 1.0.0 (SemVer). All positions in mm, velocities in mm/s.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "slicer_version",
+    "algorithm",
+    "units",
+    "reference_frame",
+    "created_at",
+    "waypoints_hash",
+    "waypoints"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "SemVer version of this schema. KRONOS must verify that the major part matches.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0"]
+    },
+    "slicer_version": {
+      "type": "string",
+      "description": "SemVer version of the MEDUSA slicer that produced this job.",
+      "examples": ["0.0.1"]
+    },
+    "algorithm": {
+      "type": "string",
+      "description": "Slicing algorithm used to generate this toolpath.",
+      "enum": ["planar", "base", "crystal"]
+    },
+    "units": {
+      "type": "object",
+      "description": "Units of measurement for position and time values.",
+      "required": ["position", "time"],
+      "properties": {
+        "position": {
+          "type": "string",
+          "const": "mm"
+        },
+        "time": {
+          "type": "string",
+          "const": "s"
+        }
+      },
+      "additionalProperties": false
+    },
+    "reference_frame": {
+      "type": "string",
+      "description": "Name of the reference coordinate frame (TF2 frame in ROS 2).",
+      "examples": ["workpiece", "world"]
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Timestamp at which the job was created (ISO 8601, UTC).",
+      "format": "date-time",
+      "examples": ["2026-05-08T14:30:00Z"]
+    },
+    "waypoints_hash": {
+      "type": "string",
+      "description": "FNV-1a-64 checksum (16 lowercase hex digits) computed over the serialised 'waypoints' array. Used for integrity verification.",
+      "pattern": "^[0-9a-f]{16}$",
+      "examples": ["a1b2c3d4e5f60718"]
+    },
+    "waypoints": {
+      "type": "array",
+      "description": "Ordered list of 6-DOF path points in execution order.",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Waypoint"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Waypoint": {
+      "type": "object",
+      "description": "A single 6-DOF path point.",
+      "required": ["x", "y", "z", "qw", "qx", "qy", "qz", "feed_rate", "extrusion", "motion_type", "layer_id", "segment_id"],
+      "properties": {
+        "x": {
+          "type": "number",
+          "description": "X coordinate in the reference frame [mm]."
+        },
+        "y": {
+          "type": "number",
+          "description": "Y coordinate in the reference frame [mm]."
+        },
+        "z": {
+          "type": "number",
+          "description": "Z coordinate in the reference frame [mm]."
+        },
+        "qw": {
+          "type": "number",
+          "description": "Quaternion real part w. The quaternion must be normalised (|q| = 1)."
+        },
+        "qx": {
+          "type": "number",
+          "description": "Quaternion imaginary part x."
+        },
+        "qy": {
+          "type": "number",
+          "description": "Quaternion imaginary part y."
+        },
+        "qz": {
+          "type": "number",
+          "description": "Quaternion imaginary part z."
+        },
+        "feed_rate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Tool feed rate [mm/s]."
+        },
+        "extrusion": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Extrusion flow rate [mm³/s]. Must be 0 for travel moves."
+        },
+        "motion_type": {
+          "type": "string",
+          "description": "Type of motion: 'travel' (no material deposition) or 'print' (active extrusion).",
+          "enum": ["travel", "print"]
+        },
+        "layer_id": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Layer index (0-based). May be equal across consecutive waypoints, but must be monotonically non-decreasing."
+        },
+        "segment_id": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Segment index within a layer (0-based)."
+        },
+        "branch_id": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Branch identifier from the Crystal branch tracker. 0 = trunk / planar base; 1..N = tracked branches. Optional; defaults to 0 for legacy / non-Crystal exports."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

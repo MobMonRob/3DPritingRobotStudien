@@ -8,27 +8,6 @@
 #include "camera.h"
 #include "logger.h"
 
-static auto kAxesVsSrc = R"GLSL(
-    #version 150
-    in vec3 aPos;
-    in vec3 aColor;
-    uniform mat4 uMVP;
-    out vec3 vColor;
-    void main() {
-        vColor = aColor;
-        gl_Position = uMVP * vec4(aPos, 1.0);
-    }
-)GLSL";
-
-static auto kAxesFsSrc = R"GLSL(
-    #version 150
-    in vec3 vColor;
-    out vec4 FragColor;
-    void main() {
-        FragColor = vec4(vColor, 1.0);
-    }
-)GLSL";
-
 AxesRenderer::~AxesRenderer()
 {
     if (mVao != 0)
@@ -45,7 +24,9 @@ bool AxesRenderer::initialize()
 {
     MEDUSA_INFO("Initializing AxesRenderer");
 
-    if (!mShaderProgram.create(kAxesVsSrc, kAxesFsSrc))
+    if (!mShaderProgram.createFromFiles(
+            MEDUSA_PROJECT_ROOT "/assets/shaders/axes.vert",
+            MEDUSA_PROJECT_ROOT "/assets/shaders/axes.frag"))
     {
         MEDUSA_CRITICAL("AxesRenderer shader program creation failed");
         return false;
